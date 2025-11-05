@@ -1,0 +1,73 @@
+{
+  "name": "IPV Online - Igreja Presbiteriana Vida",
+  "short_name": "IPV Online",
+  "description": "Site oficial da Igreja Presbiteriana Vida em Campinas-SP. Uma comunidade de fé, esperança e amor.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1A4731",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/images/logo.svg",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/logo.svg",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["religion", "church", "community"],
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "Devocionais",
+      "short_name": "Devocionais",
+      "description": "Versículo, Salmo e Provérbio do Dia",
+      "url": "/index.html#devocionais",
+      "icons": [
+        {
+          "src": "assets/images/logo.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Cultos",
+      "short_name": "Cultos",
+      "description": "Assista aos cultos online",
+      "url": "/index.html#videos",
+      "icons": [
+        {
+          "src": "assets/images/logo.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Contribuir",
+      "short_name": "Contribuir",
+      "description": "Faça sua contribuição",
+      "url": "/index.html#contribuicoes",
+      "icons": [
+        {
+          "src": "assets/images/logo.svg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/images/foto-igreja.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ]
+}

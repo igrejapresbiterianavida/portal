@@ -1,0 +1,104 @@
+{
+  "redesSociais": [
+    {
+      "nome": "YouTube",
+      "usuario": "@ipbvida",
+      "url": "https://www.youtube.com/@ipbvida",
+      "icone": "bi-youtube",
+      "cor": "#FF0000",
+      "ativo": true,
+      "descricao": "Acompanhe nossos cultos e mensagens"
+    },
+    {
+      "nome": "Instagram",
+      "usuario": "@ipbvida",
+      "url": "https://instagram.com/ipbvida",
+      "icone": "bi-instagram",
+      "cor": "#E4405F",
+      "ativo": true,
+      "descricao": "Fotos e momentos da igreja"
+    },
+    {
+      "nome": "Facebook",
+      "usuario": "ipbvida",
+      "url": "https://facebook.com/ipbvida",
+      "icone": "bi-facebook",
+      "cor": "#1877F2",
+      "ativo": true,
+      "descricao": "Conecte-se conosco"
+    },
+    {
+      "nome": "WhatsApp",
+      "usuario": "Grupo da Igreja",
+      "url": "https://chat.whatsapp.com/XXXXXXXX",
+      "icone": "bi-whatsapp",
+      "cor": "#25D366",
+      "ativo": false,
+      "descricao": "Grupo de membros da igreja"
+    },
+    {
+      "nome": "Telegram",
+      "usuario": "@ipbvida",
+      "url": "https://t.me/ipbvida",
+      "icone": "bi-telegram",
+      "cor": "#0088CC",
+      "ativo": false,
+      "descricao": "Canal de notícias e avisos"
+    },
+    {
+      "nome": "Twitter/X",
+      "usuario": "@ipbvida",
+      "url": "https://twitter.com/ipbvida",
+      "icone": "bi-twitter-x",
+      "cor": "#000000",
+      "ativo": false,
+      "descricao": "Reflexões e versículos diários"
+    },
+    {
+      "nome": "TikTok",
+      "usuario": "@ipbvida",
+      "url": "https://tiktok.com/@ipbvida",
+      "icone": "bi-tiktok",
+      "cor": "#000000",
+      "ativo": false,
+      "descricao": "Conteúdo curto e dinâmico"
+    }
+  ],
+  "pastor": {
+    "nome": "Rev. Enéias Mendes",
+    "redesSociais": [
+      {
+        "nome": "Instagram",
+        "usuario": "@pr.eneiasmendes",
+        "url": "https://instagram.com/pr.eneiasmendes",
+        "icone": "bi-instagram",
+        "ativo": true
+      }
+    ]
+  },
+  "denominacao": {
+    "nome": "Igreja Presbiteriana do Brasil",
+    "sigla": "IPB",
+    "siteOficial": "https://ipb.org.br",
+    "redesSociais": [
+      {
+        "nome": "Site Oficial",
+        "url": "https://ipb.org.br",
+        "icone": "bi-globe",
+        "descricao": "Site oficial da IPB"
+      },
+      {
+        "nome": "Instagram IPB",
+        "usuario": "@ipboficial",
+        "url": "https://instagram.com/ipboficial",
+        "icone": "bi-instagram"
+      }
+    ]
+  },
+  "configuracoes": {
+    "exibirNoFooter": true,
+    "exibirNaNavbar": false,
+    "abrirNovaAba": true,
+    "mostrarApenasAtivos": true
+  }
+}

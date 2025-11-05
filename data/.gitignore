@@ -1,0 +1,8 @@
+# Backups locais (não versionar)
+backups/
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.old
+*~

@@ -1,0 +1,57 @@
+{
+  "pix": {
+    "chave": "00.000.000/0001-00",
+    "tipo": "CNPJ",
+    "favorecido": "Igreja Presbiteriana Vida",
+    "banco": "Banco do Brasil"
+  },
+  "contaBancaria": {
+    "banco": {
+      "nome": "Banco do Brasil",
+      "codigo": "001"
+    },
+    "agencia": "0000-10",
+    "conta": "00000-0",
+    "tipoConta": "Conta Corrente",
+    "favorecido": "Igreja Presbiteriana Vida",
+    "cnpj": "00.000.000/0001-00"
+  },
+  "informacoes": {
+    "mensagem": "Sua contribuição é fundamental para a continuidade da obra de Deus através da IPV.",
+    "mensagemDizimo": "O dízimo é uma expressão de gratidão e obediência a Deus (Malaquias 3:10).",
+    "mensagemOferta": "As ofertas voluntárias sustentam projetos missionários e sociais da igreja.",
+    "formasContribuicao": [
+      "PIX",
+      "Transferência Bancária",
+      "Depósito em Conta",
+      "Envelope na Igreja"
+    ]
+  },
+  "destinacoes": [
+    {
+      "tipo": "Dízimos e Ofertas",
+      "descricao": "Manutenção da igreja e ministérios",
+      "prioridade": 1
+    },
+    {
+      "tipo": "Missões",
+      "descricao": "Apoio a missionários e plantação de igrejas",
+      "prioridade": 2
+    },
+    {
+      "tipo": "Ação Social",
+      "descricao": "Projetos sociais e assistência a necessitados",
+      "prioridade": 3
+    },
+    {
+      "tipo": "Reforma e Construção",
+      "descricao": "Melhorias no templo e infraestrutura",
+      "prioridade": 4
+    }
+  ],
+  "qrcode": {
+    "imagemUrl": "assets/images/pix.png",
+    "descricao": "QR Code para pagamento via PIX",
+    "instrucoes": "Abra o app do seu banco, selecione Pix > Ler QR Code e escaneie a imagem"
+  }
+}

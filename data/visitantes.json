@@ -1,0 +1,54 @@
+{
+  "visitantes": [
+    {
+      "id": 1730720000,
+      "nome": "Maria Silva Santos",
+      "dataVisita": "2025-11-10",
+      "telefone": "(19) 98765-4321",
+      "mensagem": "Estou muito empolgada para conhecer a igreja! Ouvi falar muito bem da comunidade.",
+      "dataCadastro": "2025-11-01T10:30:00Z",
+      "status": "Confirmado"
+    },
+    {
+      "id": 1730730000,
+      "nome": "João Pedro Costa",
+      "dataVisita": "2025-11-10",
+      "telefone": "(19) 99876-5432",
+      "mensagem": "Recentemente me mudei para Campinas e estou procurando uma igreja reformada.",
+      "dataCadastro": "2025-11-02T14:20:00Z",
+      "status": "Confirmado"
+    },
+    {
+      "id": 1730740000,
+      "nome": "Ana Paula Oliveira",
+      "dataVisita": "2025-11-13",
+      "telefone": "",
+      "mensagem": "",
+      "dataCadastro": "2025-11-03T09:15:00Z",
+      "status": "Confirmado"
+    },
+    {
+      "id": 1730750000,
+      "nome": "Carlos Eduardo Mendes",
+      "dataVisita": "2025-11-17",
+      "telefone": "(19) 97654-3210",
+      "mensagem": "Gostaria de participar do culto de jovens também. Tenho 22 anos.",
+      "dataCadastro": "2025-11-04T16:45:00Z",
+      "status": "Confirmado"
+    },
+    {
+      "id": 1730760000,
+      "nome": "Fernanda Lima Rodrigues",
+      "dataVisita": "2025-11-24",
+      "telefone": "(19) 96543-2109",
+      "mensagem": "Posso levar meus filhos? Eles têm 5 e 8 anos.",
+      "dataCadastro": "2025-11-04T11:00:00Z",
+      "status": "Confirmado"
+    }
+  ],
+  "configuracoes": {
+    "mensagemBemVindo": "Que alegria saber que você quer nos visitar! Aguardamos você de braços abertos.",
+    "informacoesAdicionais": "Nossos cultos acontecem aos domingos às 19h30 e também temos programação durante a semana.",
+    "contatoEmergencia": "(19) 99999-9999"
+  }
+}

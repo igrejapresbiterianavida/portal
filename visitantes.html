@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Visitantes cadastrados na IPV - Igreja Presbiteriana Vida">
+  <title>Visitantes | IPV - Igreja Presbiteriana Vida</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛪</text></svg>">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/globais.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/animacoes.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/desktop.css">
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <style>
+    .visitantes-header {
+      background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde-medio) 100%);
+      color: var(--branco);
+      padding: 100px 20px 60px;
+      text-align: center;
+    }
+    
+    .visitantes-header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin-bottom: 1rem;
+    }
+    
+    .visitantes-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 40px 0;
+    }
+    
+    .stat-card {
+      background: var(--branco);
+      padding: 30px;
+      border-radius: var(--borda-arredondada);
+      box-shadow: var(--sombra-media);
+      text-align: center;
+      transition: var(--transicao-padrao);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--sombra-forte);
+    }
+    
+    .stat-numero {
+      font-size: 3rem;
+      font-weight: var(--peso-bold);
+      color: var(--verde-escuro);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    
+    .stat-label {
+      color: var(--cinza-escuro);
+      font-size: 1rem;
+    }
+    
+    .visitantes-lista {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .visitante-card {
+      background: var(--branco);
+      border-radius: var(--borda-arredondada);
+      padding: 25px;
+      box-shadow: var(--sombra-leve);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: var(--transicao-padrao);
+      border-left: 4px solid var(--verde-medio);
+    }
+    
+    .visitante-card:hover {
+      box-shadow: var(--sombra-media);
+      transform: translateX(5px);
+    }
+    
+    .visitante-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--verde-claro), var(--verde-medio));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--branco);
+      font-weight: var(--peso-bold);
+      flex-shrink: 0;
+    }
+    
+    .visitante-info {
+      flex: 1;
+    }
+    
+    .visitante-nome {
+      font-size: 1.25rem;
+      font-weight: var(--peso-bold);
+      color: var(--verde-escuro);
+      margin-bottom: 5px;
+    }
+    
+    .visitante-detalhes {
+      display: flex;
+      gap: 20px;
+      color: var(--cinza-medio);
+      font-size: 0.9rem;
+      flex-wrap: wrap;
+    }
+    
+    .visitante-detalhes span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .visitante-badge {
+      background: var(--verde-claro);
+      color: var(--verde-escuro);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: var(--peso-semibold);
+    }
+    
+    .filtros {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .filtros input,
+    .filtros select {
+      padding: 12px 20px;
+      border: 2px solid var(--cinza-claro);
+      border-radius: var(--borda-arredondada);
+      font-size: 1rem;
+      transition: var(--transicao-rapida);
+    }
+    
+    .filtros input:focus,
+    .filtros select:focus {
+      outline: none;
+      border-color: var(--verde-medio);
+    }
+    
+    .filtros input {
+      flex: 1;
+      min-width: 250px;
+    }
+    
+    .btn-voltar {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--branco);
+      color: var(--verde-escuro);
+      padding: 12px 25px;
+      border-radius: var(--borda-arredondada);
+      text-decoration: none;
+      font-weight: var(--peso-semibold);
+      transition: var(--transicao-padrao);
+      box-shadow: var(--sombra-leve);
+    }
+    
+    .btn-voltar:hover {
+      background: var(--verde-claro);
+      transform: translateY(-2px);
+      box-shadow: var(--sombra-media);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--cinza-medio);
+    }
+    
+    .empty-state .material-icons {
+      font-size: 5rem;
+      opacity: 0.3;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Header -->
+  <div class="visitantes-header">
+    <div class="container">
+      <h1>Visitantes</h1>
+      <p style="font-size: 1.2rem; opacity: 0.9;">Pessoas que desejam nos visitar</p>
+      
+      <div style="margin-top: 30px;">
+        <a href="index.html" class="btn-voltar">
+          <span class="material-icons">arrow_back</span>
+          Voltar ao Site
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Conteúdo -->
+  <section class="secao" style="background: var(--cinza-muito-claro);" x-data="visitantesPage()">
+    <div class="container">
+      
+      <!-- Estatísticas -->
+      <div class="visitantes-stats">
+        <div class="stat-card">
+          <div class="stat-numero" x-text="visitantes.length"></div>
+          <div class="stat-label">Total de Visitantes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-numero" x-text="visitantesEsteMes"></div>
+          <div class="stat-label">Este Mês</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-numero" x-text="proximosVisitantes"></div>
+          <div class="stat-label">Próximas Visitas</div>
+        </div>
+      </div>
+      
+      <!-- Filtros -->
+      <div class="filtros">
+        <input 
+          type="text" 
+          x-model="filtroNome" 
+          placeholder="🔍 Buscar por nome..."
+          @input="filtrarVisitantes()">
+        
+        <select x-model="filtroMes" @change="filtrarVisitantes()">
+          <option value="">Todos os meses</option>
+          <option value="01">Janeiro</option>
+          <option value="02">Fevereiro</option>
+          <option value="03">Março</option>
+          <option value="04">Abril</option>
+          <option value="05">Maio</option>
+          <option value="06">Junho</option>
+          <option value="07">Julho</option>
+          <option value="08">Agosto</option>
+          <option value="09">Setembro</option>
+          <option value="10">Outubro</option>
+          <option value="11">Novembro</option>
+          <option value="12">Dezembro</option>
+        </select>
+      </div>
+      
+      <!-- Lista de Visitantes -->
+      <div class="visitantes-lista">
+        <template x-for="visitante in visitantesFiltrados" :key="visitante.id">
+          <div class="visitante-card">
+            <div class="visitante-avatar" x-text="visitante.nome.charAt(0).toUpperCase()"></div>
+            <div class="visitante-info">
+              <div class="visitante-nome" x-text="visitante.nome"></div>
+              <div class="visitante-detalhes">
+                <span>
+                  <span class="material-icons" style="font-size: 18px;">calendar_today</span>
+                  <span x-text="formatarData(visitante.dataVisita)"></span>
+                </span>
+                <span>
+                  <span class="material-icons" style="font-size: 18px;">schedule</span>
+                  <span x-text="calcularTempoAte(visitante.dataVisita)"></span>
+                </span>
+              </div>
+            </div>
+            <div class="visitante-badge" x-text="visitante.status || 'Confirmado'"></div>
+          </div>
+        </template>
+        
+        <!-- Estado vazio -->
+        <div x-show="visitantesFiltrados.length === 0" class="empty-state">
+          <span class="material-icons">people_outline</span>
+          <h3>Nenhum visitante encontrado</h3>
+          <p>Ainda não há visitantes cadastrados ou nenhum resultado para o filtro aplicado.</p>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  
+  <!-- JavaScript -->
+  <script src="js/data-manager.js"></script>
+  
+  <script>
+    function visitantesPage() {
+      return {
+        visitantes: [],
+        visitantesFiltrados: [],
+        filtroNome: '',
+        filtroMes: '',
+        visitantesEsteMes: 0,
+        proximosVisitantes: 0,
+        
+        async init() {
+          await this.carregarVisitantes();
+          this.calcularEstatisticas();
+          this.filtrarVisitantes();
+        },
+        
+        async carregarVisitantes() {
+          try {
+            const visitantesLocal = JSON.parse(localStorage.getItem('ipv_visitantes') || '[]');
+            
+            const timestamp = new Date().getTime();
+            const response = await fetch(`data/visitantes.json?v=${timestamp}`);
+            const dados = await response.json();
+            const visitantesJSON = dados.visitantes || [];
+            
+            this.visitantes = [...visitantesJSON, ...visitantesLocal];
+            
+            console.log('✅ Carregados:');
+            console.log(`   JSON: ${visitantesJSON.length}`);
+            console.log(`   localStorage: ${visitantesLocal.length}`);
+            console.log(`   Total: ${this.visitantes.length}`);
+          } catch (erro) {
+            console.error('❌ Erro:', erro);
+            this.visitantes = JSON.parse(localStorage.getItem('ipv_visitantes') || '[]');
+          }
+        },
+        
+        filtrarVisitantes() {
+          this.visitantesFiltrados = this.visitantes.filter(v => {
+            const nomeMatch = v.nome.toLowerCase().includes(this.filtroNome.toLowerCase());
+            const mesMatch = this.filtroMes === '' || v.dataVisita.startsWith(`2025-${this.filtroMes}`);
+            return nomeMatch && mesMatch;
+          });
+        },
+        
+        calcularEstatisticas() {
+          const hoje = new Date();
+          const mesAtual = hoje.getMonth() + 1;
+          
+          this.visitantesEsteMes = this.visitantes.filter(v => {
+            const dataVisita = new Date(v.dataVisita);
+            return dataVisita.getMonth() + 1 === mesAtual;
+          }).length;
+          
+          this.proximosVisitantes = this.visitantes.filter(v => {
+            const dataVisita = new Date(v.dataVisita);
+            return dataVisita >= hoje;
+          }).length;
+        },
+        
+        formatarData(dataString) {
+          const data = new Date(dataString + 'T00:00:00');
+          return data.toLocaleDateString('pt-BR', { 
+            day: '2-digit', 
+            month: 'long',
+            year: 'numeric',
+            weekday: 'long'
+          });
+        },
+        
+        calcularTempoAte(dataString) {
+          const hoje = new Date();
+          hoje.setHours(0, 0, 0, 0);
+          const dataVisita = new Date(dataString + 'T00:00:00');
+          const diff = dataVisita - hoje;
+          const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
+          
+          if (dias < 0) return 'Visitou';
+          if (dias === 0) return 'Hoje!';
+          if (dias === 1) return 'Amanhã';
+          if (dias <= 7) return `Em ${dias} dias`;
+          return `Em ${Math.ceil(dias / 7)} semanas`;
+        }
+      };
+    }
+  </script>
+  
+</body>
+</html>

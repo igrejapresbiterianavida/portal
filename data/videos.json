@@ -1,0 +1,76 @@
+{
+  "canal": {
+    "nome": "IPB Vida",
+    "usuario": "@ipbvida",
+    "urlCanal": "https://www.youtube.com/@ipbvida",
+    "urlInscricao": "https://www.youtube.com/channel/UCYWVZvpAfXRtnmCTfsQfhmw   ?sub_confirmation=1"
+  },
+  "videos": [
+    {
+      "id": "H3vpXaanS4Y",
+      "titulo": "Tentação | Rev. Eneias Mendes",
+      "descricao": "Pregação sobre como vencer as tentações",
+      "thumbnail": "https://img.youtube.com/vi/H3vpXaanS4Y/mqdefault.jpg",
+      "url": "https://www.youtube.com/watch?v=H3vpXaanS4Y",
+      "dataPublicacao": "2024-11-02T10:00:00Z",
+      "visualizacoes": "24",
+      "duracao": "1:47:15"
+    },
+    {
+      "id": "Lp5FsNQx_k8",
+      "titulo": "Amigos de Deus | Rev. Eneias Mendes",
+      "descricao": "Mensagem sobre amizade com Deus",
+      "thumbnail": "https://img.youtube.com/vi/Lp5FsNQx_k8/mqdefault.jpg",
+      "url": "https://www.youtube.com/watch?v=Lp5FsNQx_k8",
+      "dataPublicacao": "2024-10-26T10:00:00Z",
+      "visualizacoes": "20",
+      "duracao": "1:43:02"
+    },
+    {
+      "id": "32gwoMw7d0s",
+      "titulo": "Poder da Paciência | Rev. Eneias Mendes",
+      "descricao": "Pregação sobre o fruto da paciência",
+      "thumbnail": "https://img.youtube.com/vi/32gwoMw7d0s/mqdefault.jpg",
+      "url": "https://www.youtube.com/watch?v=32gwoMw7d0s",
+      "dataPublicacao": "2024-11-01T10:00:00Z",
+      "visualizacoes": "18",
+      "duracao": "1:12:48"
+    },
+    {
+      "id": "rGf27gcSEak",
+      "titulo": "A maldição da comparação | Rev. Eneias Mendes",
+      "descricao": "Como lidar com comparações na vida cristã",
+      "thumbnail": "https://img.youtube.com/vi/rGf27gcSEak/mqdefault.jpg",
+      "url": "https://www.youtube.com/watch?v=rGf27gcSEak",
+      "dataPublicacao": "2024-10-21T10:00:00Z",
+      "visualizacoes": "48",
+      "duracao": "1:34:45"
+    },
+    {
+      "id": "M2AQYGfGAis",
+      "titulo": "Amor em Ação | Rev. Eneias Mendes",
+      "descricao": "Pregação sobre demonstrar amor na prática",
+      "thumbnail": "https://img.youtube.com/vi/M2AQYGfGAis/mqdefault.jpg",
+      "url": "https://www.youtube.com/watch?v=M2AQYGfGAis",
+      "dataPublicacao": "2024-10-04T10:00:00Z",
+      "visualizacoes": "46",
+      "duracao": "1:44:13"
+    },
+    {
+      "id": "3iTABypGsrw",
+      "titulo": "Breve catecismo de Westminster para CRIANÇAS - Pergunta 1",
+      "descricao": "Ensino do catecismo para crianças",
+      "thumbnail": "https://img.youtube.com/vi/3iTABypGsrw/mqdefault.jpg",
+      "url": "https://www.youtube.com/watch?v=3iTABypGsrw",
+      "dataPublicacao": "2020-07-24T10:00:00Z",
+      "visualizacoes": "100",
+      "duracao": "10:09"
+    }
+  ],
+  "configuracoes": {
+    "maxVideos": 6,
+    "ordenacao": "date",
+    "autoplay": true,
+    "tempoAutoplay": 5000
+  }
+}

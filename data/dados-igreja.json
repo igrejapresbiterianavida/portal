@@ -1,0 +1,76 @@
+{
+  "igreja": {
+    "nome": "Igreja Presbiteriana Vida",
+    "nomeAbreviado": "IPV",
+    "denominacao": "Igreja Presbiteriana do Brasil",
+    "fundacao": "2010"
+  },
+  "endereco": {
+    "logradouro": "R. Rozalindo de Souza",
+    "numero": "08",
+    "complemento": "",
+    "bairro": "Residencial Cosmos",
+    "cidade": "Campinas",
+    "estado": "SP",
+    "cep": "13059-582",
+    "enderecoCompleto": "R. Rozalindo de Souza, 08 - Residencial Cosmos, Campinas - SP, CEP: 13059-582"
+  },
+  "contato": {
+    "telefone": "(19) 99516-1006",
+    "telefoneFormatado": "+55 19 99516-1006",
+    "whatsapp": "5519995161006",
+    "email": "contato@ipbvida.com.br",
+    "emailSecretaria": "secretaria@ipbvida.com.br"
+  },
+  "localizacao": {
+    "latitude": -22.947046,
+    "longitude": -47.159194,
+    "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d229.63039820932624!2d-47.159194!3d-22.947046!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8b7beca27d1e1%3A0x782b1183a25ff854!2sComunidade%20Viver%20-%20Residencial%20Cosmos!5e0!3m2!1spt-BR!2sbr!4v1762275962246!5m2!1spt-BR!2sbr",
+    "googleMapsUrl": "https://maps.app.goo.gl/roQKMucnRyLw1yQy9",
+    "wazeUrl": "https://waze.com/ul?q=R.+Rozalindo+de+Souza,+08,+Campinas&navigate=yes",
+    "uberUrl": "https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=R.%20Rozalindo%20de%20Souza,%2008,%20Residencial%20Cosmos,%20Campinas%20-%20SP,%2013059-582"
+  },
+  "horarios": {
+    "cultos": [
+      {
+        "dia": "Sexta-feira",
+        "horario": "20h00",
+        "tipo": "Culto de Oração"
+      },
+      {
+        "dia": "Domingo",
+        "horario": "10h00",
+        "tipo": "Culto de Celebração"
+      }
+    ],
+    "secretaria": {
+      "dias": "Segunda a Sexta",
+      "horario": "9h00 às 17h00"
+    },
+    "atendimentoPastoral": {
+      "disponibilidade": "Mediante agendamento",
+      "telefone": "(19) 99516-1006"
+    }
+  },
+  "lideranca": {
+    "pastor": {
+      "nome": "Rev. Enéias Mendes",
+      "titulo": "Pastor Titular",
+      "instagram": "@pr.eneiasmendes",
+      "instagramUrl": "https://instagram.com/pr.eneiasmendes",
+      "email": "pastor@ipbvida.com.br"
+    },
+    "presbiteros": [
+      {
+        "nome": "A definir",
+        "funcao": "Presbítero"
+      }
+    ],
+    "diaconos": [
+      {
+        "nome": "Leandro",
+        "funcao": "Diácono"
+      }
+    ]
+  }
+}

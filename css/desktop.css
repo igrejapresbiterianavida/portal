@@ -1,0 +1,412 @@
+/* ============================================
+   DESKTOP.CSS - Media Queries para Desktop
+   ============================================ */
+
+/* ==================== TABLETS (768px+) ==================== */
+@media (min-width: 768px) {
+  /* Navbar */
+  .navbar-logo-texto {
+    font-size: 1.5rem;
+  }
+
+  /* Hero */
+  .hero-titulo {
+    font-size: 3.5rem;
+  }
+
+  .hero-subtitulo {
+    font-size: 1.25rem;
+  }
+
+  .hero-botoes {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  /* Carrossel Devocionais */
+  .carrossel-slides {
+    height: 450px;
+  }
+
+  .carrossel-versiculo {
+    font-size: 1.75rem;
+  }
+
+  /* Vídeos */
+  .videos-acoes {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--espacamento-lg);
+  }
+
+  .videos-acoes .botao {
+    flex: 0 1 auto;
+    min-width: 280px;
+  }
+
+  /* Notícias */
+  .noticias-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Programação */
+  .programacao-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--espacamento-xl);
+  }
+
+  .carrossel-programacao-slides {
+    min-height: 650px;
+    aspect-ratio: unset;
+  }
+
+  .card-programacao-imagem-full {
+    height: 650px;
+  }
+
+  .programacao-icone-grande {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .carrossel-seta-prog {
+    width: 45px;
+    height: 45px;
+  }
+
+  .banner-vertical {
+    min-height: 250px;
+  }
+
+  .lista-scroll {
+    max-height: 650px;
+  }
+
+  /* Eventos */
+  .eventos-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Contribuições */
+  .contribuicoes-content {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .qrcode-container {
+    flex: 0 0 300px;
+  }
+
+  .dados-bancarios {
+    flex: 1;
+    max-width: 500px;
+  }
+
+  /* Localização */
+  .localizacao-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--espacamento-xl);
+  }
+
+  .mapa-container {
+    height: 450px;
+  }
+
+  .botoes-navegacao {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Footer */
+  .footer-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ==================== DESKTOP (1024px+) ==================== */
+@media (min-width: 1024px) {
+  /* Typography */
+  h1 {
+    font-size: 3.5rem;
+  }
+
+  h2 {
+    font-size: 3rem;
+  }
+
+  h3 {
+    font-size: 2.25rem;
+  }
+
+  /* Navbar Desktop */
+  .navbar-container {
+    padding: var(--espacamento-md) var(--espacamento-lg);
+  }
+
+  .navbar-menu {
+    gap: var(--espacamento-xl);
+  }
+
+  .navbar-item a {
+    font-size: 1.05rem;
+    padding: var(--espacamento-xs) var(--espacamento-md);
+  }
+
+  /* Hero Desktop */
+  .hero {
+    min-height: 90vh;
+  }
+
+  .hero-titulo {
+    font-size: 4.5rem;
+  }
+
+  .hero-subtitulo {
+    font-size: 1.375rem;
+  }
+
+  /* Seções */
+  .secao {
+    padding: 5rem 0;
+  }
+
+  .secao-titulo {
+    font-size: 3rem;
+  }
+
+  .secao-subtitulo {
+    font-size: 1.25rem;
+  }
+
+  /* Notícias Desktop */
+  .noticias-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .noticia-imagem-container {
+    height: 220px;
+  }
+
+  /* Carrossel Devocionais Desktop */
+  .carrossel-slides {
+    min-height: 500px;
+  }
+
+  .carrossel-slide {
+    min-height: 500px;
+  }
+
+  .carrossel-tipo {
+    font-size: 2rem;
+  }
+
+  .carrossel-versiculo {
+    font-size: 2rem;
+    max-width: 800px;
+  }
+
+  .carrossel-controles {
+    padding: var(--espacamento-lg);
+  }
+
+  /* Eventos Grid Desktop */
+  .eventos-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Contribuições Desktop */
+  .qrcode-imagem {
+    width: 220px;
+    height: 220px;
+  }
+
+  /* Localização Desktop */
+  .mapa-container {
+    height: 500px;
+  }
+
+  /* Footer Desktop */
+  .footer-content {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+
+  .footer {
+    padding: 4rem 0 var(--espacamento-lg);
+  }
+
+  /* Botões Acessibilidade Desktop */
+  .acessibilidade-container {
+    bottom: 30px;
+    right: 30px;
+  }
+
+  .botao-acessibilidade-principal {
+    width: 65px;
+    height: 65px;
+  }
+  
+  .botao-acessibilidade-principal .material-icons {
+    font-size: 2rem;
+  }
+  
+  .acessibilidade-menu {
+    min-width: 220px;
+  }
+}
+
+/* ==================== LARGE DESKTOP (1440px+) ==================== */
+@media (min-width: 1440px) {
+  /* Hero */
+  .hero-titulo {
+    font-size: 5rem;
+  }
+
+  /* Seções */
+  .secao {
+    padding: 6rem 0;
+  }
+
+  /* Carrossel */
+  .carrossel-tipo {
+    font-size: 2.25rem;
+  }
+
+  .carrossel-versiculo {
+    font-size: 2.25rem;
+    max-width: 900px;
+  }
+
+  /* Eventos */
+  .eventos-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ==================== NAVBAR ADAPTATIVA (quando fonte aumenta) ==================== */
+@media (max-width: 1200px) {
+  .navbar-menu {
+    gap: clamp(0.25rem, 1vw, 1rem);
+  }
+  
+  .navbar-item a {
+    font-size: clamp(0.8rem, 0.9vw, 0.95rem);
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .navbar-logo-texto {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 768px) {
+  .navbar-container {
+    padding: var(--espacamento-sm);
+  }
+  
+  .navbar-menu {
+    gap: 0.5rem;
+  }
+  
+  .navbar-item a {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.5rem;
+  }
+}
+
+/* ==================== MENU MOBILE ==================== */
+@media (max-width: 767px) {
+  .navbar-toggle {
+    display: flex;
+  }
+
+  .navbar-menu {
+    position: fixed;
+    top: 70px;
+    left: -100%;
+    width: 100%;
+    height: calc(100vh - 70px);
+    background: var(--branco);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--espacamento-lg);
+    gap: var(--espacamento-md);
+    box-shadow: var(--sombra-forte);
+    transition: left 0.3s ease;
+    overflow-y: auto;
+  }
+
+  .navbar-menu.aberto {
+    left: 0;
+  }
+
+  .navbar-item {
+    width: 100%;
+  }
+
+  .navbar-item a {
+    display: block;
+    width: 100%;
+    padding: var(--espacamento-sm);
+    font-size: 1.125rem;
+  }
+  
+  /* Dropdown Mobile */
+  .navbar-dropdown {
+    width: 100%;
+  }
+  
+  .navbar-submenu {
+    position: static;
+    box-shadow: none;
+    background: var(--cinza-muito-claro);
+    margin-top: var(--espacamento-xs);
+    border-radius: var(--borda-arredondada-sm);
+    padding: var(--espacamento-xs);
+    border: none;
+  }
+  
+  .navbar-submenu::before,
+  .navbar-submenu::after {
+    display: none;
+  }
+  
+  .navbar-submenu a {
+    font-size: 1rem;
+    padding: var(--espacamento-xs) var(--espacamento-md);
+  }
+  
+  .navbar-submenu a:hover {
+    padding-left: var(--espacamento-md);
+  }
+}
+
+/* ==================== IMPRESSÃO ==================== */
+@media print {
+  .navbar,
+  .acessibilidade-botoes,
+  .footer-redes-sociais {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+    color: #000;
+    background: #fff;
+  }
+
+  a {
+    text-decoration: underline;
+    color: #000;
+  }
+
+  .secao {
+    page-break-inside: avoid;
+  }
+}
+
+/* Fim desktop.css */

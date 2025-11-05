@@ -1,0 +1,132 @@
+{
+  "programas": [
+    {
+      "id": 1,
+      "titulo": "dia da reforma protestante.",
+      "dia": "31",
+      "mes": "out",
+      "horario": "19h30",
+      "local": "Templo Principal",
+      "categoria": "Comemoração",
+      "corCategoria": "#1A4731",
+      "link": "slide01",
+      "cor1": "#1A4731",
+      "cor2": "#2D5F4A",
+      "imagem": "https://scontent.cdninstagram.com/v/t51.82787-15/573591580_18404962117189099_358280805714428351_n.webp?_nc_cat=108&ig_cache_key=Mzc1NTQ1NTU0OTEzNjgyMzc0Nw%3D%3D.3-ccb1-7&ccb=1-7&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjEyMjJ4MTQ0MC5zZHIuQzMifQ%3D%3D&_nc_ohc=oqHWmA9bpMMQ7kNvwGyi4FX&_nc_oc=AdmcknSO3l56gDlFnJokpzmzx2WZMf02J0WiGk8M9NnCOhGNWTI0MAIyvT-EbaCBx82MqIe5V-95sjlQ1xAZSozg&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=qcM_wVz67t3t8_EkNc6NqA&oh=00_AfgwUvb6x6d4gFKFkY8qNcBPZ8pED2sPSxEhaLTE4pLxgw&oe=69105CB9"
+    },
+    {
+      "id": 2,
+      "titulo": "Escola Bíblica Dominical",
+      "dia": "10",
+      "mes": "nov",
+      "horario": "09h00",
+      "local": "Salas de Aula",
+      "categoria": "ENSINO",
+      "corCategoria": "#2C3E50",
+      "link": "slide02",
+      "cor1": "#2C3E50",
+      "cor2": "#34495E",
+      "imagem": "assets/images/foto02.png"
+    },
+    {
+      "id": 3,
+      "titulo": "Reunião de Oração",
+      "dia": "13",
+      "mes": "nov",
+      "horario": "20h00",
+      "local": "Templo",
+      "categoria": "ORAÇÃO",
+      "corCategoria": "#8B3A62",
+      "link": "slide03",
+      "cor1": "#8B3A62",
+      "cor2": "#A94976",
+      "imagem": "assets/images/foto-igreja.png"
+    },
+    {
+      "id": 4,
+      "titulo": "Estudo Bíblico de Quarta",
+      "dia": "13",
+      "mes": "nov",
+      "horario": "19h30",
+      "local": "Salão",
+      "categoria": "ESTUDO",
+      "corCategoria": "#D4AF37",
+      "link": "slide04",
+      "cor1": "#D4AF37",
+      "cor2": "#C9A352",
+      "imagem": "assets/images/programacao/estudo.svg"
+    },
+    {
+      "id": 5,
+      "titulo": "Culto de Jovens e Adolescentes",
+      "dia": "15",
+      "mes": "nov",
+      "horario": "19h00",
+      "local": "Salão Jovem",
+      "categoria": "JOVENS",
+      "corCategoria": "#3498DB",
+      "link": "slide05",
+      "cor1": "#3498DB",
+      "cor2": "#5DADE2",
+      "imagem": "assets/images/programacao/jovens.svg"
+    },
+    {
+      "id": 6,
+      "titulo": "Ministério Infantil",
+      "dia": "10",
+      "mes": "nov",
+      "horario": "10h00",
+      "local": "Sala Infantil",
+      "categoria": "CRIANÇAS",
+      "corCategoria": "#E74C3C",
+      "link": "slide06",
+      "cor1": "#E74C3C",
+      "cor2": "#EC7063",
+      "imagem": "assets/images/programacao/infantil.svg"
+    }
+  ],
+  "eventos": [
+    {
+      "id": 1,
+      "titulo": "Conferência Anual",
+      "data": "2024-03-15",
+      "horario": "19h00",
+      "local": "Templo Principal",
+      "descricao": "Conferência com palestrantes renomados sobre teologia reformada",
+      "imagem": "assets/images/eventos/conferencia.jpg",
+      "inscricaoAberta": true,
+      "linkInscricao": "#"
+    },
+    {
+      "id": 2,
+      "titulo": "Retiro de Carnaval",
+      "data": "2024-02-10",
+      "horario": "Dia todo",
+      "local": "Sítio Betânia",
+      "descricao": "Três dias de comunhão, louvor e estudo da Palavra",
+      "imagem": "assets/images/eventos/retiro.jpg",
+      "inscricaoAberta": true,
+      "linkInscricao": "#"
+    },
+    {
+      "id": 3,
+      "titulo": "Jantar Missionário",
+      "data": "2024-04-20",
+      "horario": "19h30",
+      "local": "Salão da Igreja",
+      "descricao": "Jantar especial de apoio às missões transculturais",
+      "imagem": "assets/images/eventos/jantar.jpg",
+      "inscricaoAberta": false,
+      "linkInscricao": "#"
+    }
+  ],
+  "configuracoes": {
+    "slidesPorPagina": {
+      "mobile": 1,
+      "tablet": 2,
+      "desktop": 3
+    },
+    "autoplay": true,
+    "tempoAutoplay": 5000
+  }
+}

@@ -1,0 +1,253 @@
+/* ============================================
+   GLOBAIS.CSS - Sistema de Design IPV Online
+   Tipografia moderna + cores + reset CSS
+   ============================================ */
+
+/* Importar fontes do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Roboto:wght@300;400;500;700&display=swap');
+
+/* Reset CSS básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+/* Alpine.js - Esconder elementos antes de inicializar */
+[x-cloak] {
+  display: none !important;
+}
+
+/* Variáveis CSS */
+:root {
+  /* Cores Principais */
+  --verde-escuro: #1A4731;
+  --verde-medio: #2D6A4F;
+  --verde-claro: #52B788;
+  --verde-muito-claro: #D8F3DC;
+  --dourado: #AD0F0E;
+  --dourado-hover: #8c0c0b;
+  
+  /* Cores Neutras */
+  --branco: #FFFFFF;
+  --cinza-muito-claro: #F8F9FA;
+  --cinza-leve: #E9ECEF;
+  --cinza-medio: #6C757D;
+  --cinza-escuro: #343A40;
+  --preto: #212529;
+  
+  /* Cores Semânticas */
+  --sucesso: #28A745;
+  --erro: #DC3545;
+  --aviso: #FFC107;
+  --info: #17A2B8;
+  
+  /* Tipografia */
+  --fonte-principal: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fonte-secundaria: 'Roboto', Arial, sans-serif;
+  --peso-leve: 300;
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-semi-negrito: 600;
+  --peso-bold: 700;
+  --peso-negrito: 700;
+  --peso-black: 900;
+  
+  /* Espaçamentos */
+  --espacamento-xs: 0.5rem;
+  --espacamento-sm: 1rem;
+  --espacamento-md: 1.5rem;
+  --espacamento-lg: 2rem;
+  --espacamento-xl: 3rem;
+  --espacamento-xxl: 4rem;
+  
+  /* Bordas e Sombras */
+  --borda-arredondada-sm: 6px;
+  --borda-arredondada: 12px;
+  --borda-arredondada-lg: 20px;
+  --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --sombra-media: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --sombra-forte: 0 8px 32px rgba(0, 0, 0, 0.16);
+  
+  /* Transições */
+  --transicao-rapida: all 0.2s ease;
+  --transicao-padrao: all 0.3s ease;
+  --transicao-lenta: all 0.5s ease;
+  
+  /* Z-index */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+/* Modo Alto Contraste */
+body.alto-contraste {
+  --verde-escuro: #000000;
+  --verde-medio: #1A1A1A;
+  --dourado: #FFFF00;
+  --branco: #FFFFFF;
+  --cinza-leve: #000000;
+  --cinza-medio: #FFFFFF;
+  --preto: #FFFFFF;
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Tipografia Base */
+body {
+  font-family: var(--fonte-principal);
+  font-size: 1rem;
+  font-weight: var(--peso-normal);
+  line-height: 1.6;
+  color: var(--preto);
+  background-color: var(--branco);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--fonte-principal);
+  font-weight: var(--peso-bold);
+  line-height: 1.2;
+  margin-bottom: var(--espacamento-sm);
+  color: var(--verde-escuro);
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: var(--peso-black);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 2.5rem;
+  font-weight: var(--peso-bold);
+}
+
+h3 {
+  font-size: 2rem;
+  font-weight: var(--peso-bold);
+}
+
+h4 {
+  font-size: 1.5rem;
+  font-weight: var(--peso-medio);
+}
+
+h5 {
+  font-size: 1.25rem;
+  font-weight: var(--peso-medio);
+}
+
+h6 {
+  font-size: 1rem;
+  font-weight: var(--peso-medio);
+}
+
+/* Parágrafos e Texto */
+p {
+  margin-bottom: var(--espacamento-sm);
+  color: var(--cinza-escuro);
+}
+
+a {
+  color: var(--verde-medio);
+  text-decoration: none;
+  transition: var(--transicao-rapida);
+}
+
+a:hover {
+  color: var(--dourado);
+  text-decoration: underline;
+}
+
+/* Listas */
+ul, ol {
+  margin-bottom: var(--espacamento-sm);
+  padding-left: var(--espacamento-md);
+}
+
+li {
+  margin-bottom: var(--espacamento-xs);
+}
+
+/* Imagens */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Botões (reset) */
+button {
+  font-family: var(--fonte-principal);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* Containers */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--espacamento-md);
+}
+
+.container-fluid {
+  width: 100%;
+  padding: 0 var(--espacamento-md);
+}
+
+/* Utilitários de Espaçamento */
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: var(--espacamento-xs) !important; }
+.mb-2 { margin-bottom: var(--espacamento-sm) !important; }
+.mb-3 { margin-bottom: var(--espacamento-md) !important; }
+.mb-4 { margin-bottom: var(--espacamento-lg) !important; }
+.mb-5 { margin-bottom: var(--espacamento-xl) !important; }
+
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: var(--espacamento-xs) !important; }
+.mt-2 { margin-top: var(--espacamento-sm) !important; }
+.mt-3 { margin-top: var(--espacamento-md) !important; }
+.mt-4 { margin-top: var(--espacamento-lg) !important; }
+.mt-5 { margin-top: var(--espacamento-xl) !important; }
+
+.py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
+.py-1 { padding-top: var(--espacamento-xs) !important; padding-bottom: var(--espacamento-xs) !important; }
+.py-2 { padding-top: var(--espacamento-sm) !important; padding-bottom: var(--espacamento-sm) !important; }
+.py-3 { padding-top: var(--espacamento-md) !important; padding-bottom: var(--espacamento-md) !important; }
+.py-4 { padding-top: var(--espacamento-lg) !important; padding-bottom: var(--espacamento-lg) !important; }
+.py-5 { padding-top: var(--espacamento-xl) !important; padding-bottom: var(--espacamento-xl) !important; }
+
+/* Utilitários de Texto */
+.text-center { text-align: center !important; }
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+
+.text-verde { color: var(--verde-medio) !important; }
+.text-dourado { color: var(--dourado) !important; }
+.text-cinza { color: var(--cinza-medio) !important; }
+
+/* Utilitários de Display */
+.d-none { display: none !important; }
+.d-block { display: block !important; }
+.d-flex { display: flex !important; }
+.d-grid { display: grid !important; }
+
+/* Fim globais.css */
+
+.footer-bottom p{
+    color: #F8F9FA;
+}

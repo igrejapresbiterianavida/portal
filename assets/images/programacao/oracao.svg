@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B3A62;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A94976;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#grad3)"/>
+  <path d="M 350 200 Q 350 150, 400 150 Q 450 150, 450 200 L 450 280 Q 450 320, 400 350 Q 350 320, 350 280 Z" 
+        fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.4)" stroke-width="3"/>
+  <circle cx="380" cy="220" r="8" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="420" cy="220" r="8" fill="rgba(255,255,255,0.3)"/>
+  <path d="M 380 260 Q 400 270, 420 260" 
+        stroke="rgba(255,255,255,0.3)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <text x="400" y="420" font-family="Arial, sans-serif" font-size="48" font-weight="bold" 
+        fill="white" text-anchor="middle" opacity="0.8">
+    Reunião de Oração
+  </text>
+  <text x="400" y="480" font-family="Arial, sans-serif" font-size="32" 
+        fill="white" text-anchor="middle" opacity="0.6">
+    Intercessão e Súplicas
+  </text>
+</svg>

@@ -7,20 +7,20 @@
   },
   "endereco": {
     "logradouro": "R. Rozalindo de Souza",
-    "numero": "08",
+    "numero": "s/n",
     "complemento": "",
     "bairro": "Residencial Cosmos",
     "cidade": "Campinas",
     "estado": "SP",
     "cep": "13059-582",
-    "enderecoCompleto": "R. Rozalindo de Souza, 08 - Residencial Cosmos, Campinas - SP, CEP: 13059-582"
+    "enderecoCompleto": "R. Rozalindo de Souza, s/n - Residencial Cosmos, Campinas - SP, CEP: 13059-582"
   },
   "contato": {
     "telefone": "(19) 99516-1006",
     "telefoneFormatado": "+55 19 99516-1006",
     "whatsapp": "5519995161006",
-    "email": "contato@ipbvida.com.br",
-    "emailSecretaria": "secretaria@ipbvida.com.br"
+    "email": "ipvida.res.cosmos@gmail.com",
+    "emailSecretaria": "ipvida.res.cosmos@gmail.com"
   },
   "localizacao": {
     "latitude": -22.947046,

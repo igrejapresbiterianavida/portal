@@ -2,15 +2,19 @@
 // API-INTEGRACAO.JS - Integrações Externas
 // ============================================
 
-// YouTube Data API
-const YOUTUBE_API_KEY = 'SUA_API_KEY_AQUI';
-const CANAL_ID = 'UC-XXXXXXXXX'; // @ipbvida
-
 // Buscar vídeos do canal
 async function buscarVideosYouTube(maxResults = 6) {
   try {
+    const apiKey = CONFIG.YOUTUBE_API_KEY;
+    const canalId = CONFIG.CANAL_ID;
+    
+    if (!apiKey || !canalId) {
+      console.warn('⚠️ Credenciais do YouTube não configuradas');
+      return [];
+    }
+    
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CANAL_ID}&part=snippet,id&order=date&maxResults=${maxResults}&type=video`
+      `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${canalId}&part=snippet,id&order=date&maxResults=${maxResults}&type=video`
     );
     
     if (!response.ok) {
@@ -36,8 +40,16 @@ async function buscarVideosYouTube(maxResults = 6) {
 // Verificar se há transmissão ao vivo
 async function verificarLiveYouTube() {
   try {
+    const apiKey = CONFIG.YOUTUBE_API_KEY;
+    const canalId = CONFIG.CANAL_ID;
+    
+    if (!apiKey || !canalId) {
+      console.warn('⚠️ Credenciais do YouTube não configuradas');
+      return { aoVivo: false };
+    }
+    
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CANAL_ID}&part=snippet&eventType=live&type=video`
+      `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${canalId}&part=snippet&eventType=live&type=video`
     );
     
     if (!response.ok) {
@@ -126,7 +138,7 @@ const LIVROS_VERSICULO = 'GEN,EXO,LEV,NUM,DEU,JOS,JDG,RUT,1SA,2SA,1KI,2KI,1CH,2C
 // Versículo do Dia - APENAS livros que NÃO sejam Salmos (PSA) ou Provérbios (PRO)
 async function buscarVersiculoAleatorio() {
   try {
-    const url = `https://bible-api.com/data/almeida/random/${LIVROS_VERSICULO}`;
+    const url = `${CONFIG.BIBLE_API_URL}/random/${CONFIG.LIVROS_VERSICULO}`;
     console.log('🔍 Buscando versículo em:', url);
     const response = await fetch(url);
     
@@ -161,7 +173,7 @@ async function buscarVersiculoAleatorio() {
 async function buscarSalmoAleatorio() {
   try {
     // BLOQUEIO: USA APENAS o livro de Salmos (PSA)
-    const url = 'https://bible-api.com/data/almeida/random/PSA';
+    const url = `${CONFIG.BIBLE_API_URL}/random/PSA`;
     console.log('🔍 Buscando salmo em:', url);
     const response = await fetch(url);
     
@@ -196,7 +208,7 @@ async function buscarSalmoAleatorio() {
 async function buscarProverbioAleatorio() {
   try {
     // BLOQUEIO: USA APENAS o livro de Provérbios (PRO)
-    const url = 'https://bible-api.com/data/almeida/random/PRO';
+    const url = `${CONFIG.BIBLE_API_URL}/random/PRO`;
     console.log('🔍 Buscando provérbio em:', url);
     const response = await fetch(url);
     
@@ -227,22 +239,75 @@ async function buscarProverbioAleatorio() {
   }
 }
 
-// Supabase (configurar quando tiver credenciais)
-const SUPABASE_URL = 'https://seu-projeto.supabase.co';
-const SUPABASE_ANON_KEY = 'sua-chave-anonima';
-
-// EmailJS (configurar quando tiver credenciais)
-const EMAILJS_SERVICE_ID = 'seu_service_id';
-const EMAILJS_TEMPLATE_ID = 'seu_template_id';
-const EMAILJS_USER_ID = 'seu_user_id';
-
+// Configurações de terceiros (usar variáveis de ambiente em produção)
 async function enviarEmail(dados) {
   try {
-    // Integrar com EmailJS quando configurado
-    console.log('Enviando email:', dados);
-    return { sucesso: true };
+    const serviceId = CONFIG.EMAILJS_SERVICE_ID;
+    const templateId = CONFIG.EMAILJS_TEMPLATE_ID;
+    const publicKey = CONFIG.EMAILJS_PUBLIC_KEY;
+    
+    if (!publicKey) {
+      console.warn('⚠️ EmailJS não configurado');
+      return { sucesso: false, erro: 'EmailJS não configurado' };
+    }
+    
+    // Verificar se EmailJS está carregado
+    if (typeof emailjs === 'undefined') {
+      console.error('❌ EmailJS não carregado');
+      return { sucesso: false, erro: 'EmailJS não carregado' };
+    }
+    
+    // Inicializar EmailJS
+    emailjs.init(publicKey);
+    
+    // Enviar email usando EmailJS
+    console.log('📧 Dados sendo enviados:', {
+      service: serviceId,
+      template: templateId,
+      publicKey: publicKey.substring(0, 5) + '...',
+      destinatario: CONFIG.EMAILJS_TO_EMAIL
+    });
+    
+    const response = await emailjs.send(serviceId, templateId, {
+      // Dados principais (compatível com templates padrão)
+      name: dados.nome,
+      email: dados.email,
+      phone: dados.telefone || 'Não informado',
+      subject: dados.assunto,
+      message: dados.mensagem,
+      
+      // Variações de nomenclatura para compatibilidade
+      from_name: dados.nome,
+      from_email: dados.email,
+      user_name: dados.nome,
+      user_email: dados.email,
+      user_phone: dados.telefone || 'Não informado',
+      user_subject: dados.assunto,
+      user_message: dados.mensagem,
+      reply_to: dados.email
+    });
+    
+    console.log('✅ Email enviado:', response);
+    
+    // Verificar se foi enviado com sucesso
+    if (response.status === 200) {
+      return { sucesso: true, response };
+    } else {
+      return { sucesso: false, erro: `Status: ${response.status}` };
+    }
   } catch (erro) {
-    console.error('Erro ao enviar email:', erro);
-    return { sucesso: false, erro: erro.message };
+    console.error('❌ Erro ao enviar email:', erro);
+    
+    // Melhor tratamento de erros
+    let mensagemErro = 'Erro desconhecido';
+    if (erro.text) {
+      mensagemErro = erro.text;
+    } else if (erro.message) {
+      mensagemErro = erro.message;
+    } else if (erro.status) {
+      mensagemErro = `Erro HTTP ${erro.status}`;
+    }
+    
+    return { sucesso: false, erro: mensagemErro };
   }
 }

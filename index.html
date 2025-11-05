@@ -34,6 +34,9 @@
   
   <!-- VLibras -->
   <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body x-data="aplicacao()">
   
@@ -783,8 +786,21 @@
             <textarea id="mensagem" class="formulario-textarea" x-model="dados.mensagem" required></textarea>
           </div>
           
-          <button type="submit" class="botao botao-primario botao-grande" style="width: 100%;">
-            <span class="material-icons" style="vertical-align: middle;">send</span> Enviar Mensagem
+          <!-- Mensagens de Status -->
+          <div x-show="mensagemErro" class="alerta alerta-erro" x-text="mensagemErro"></div>
+          <div x-show="mensagemSucesso" class="alerta alerta-sucesso">
+            ✅ Mensagem enviada com sucesso! Entraremos em contato em breve.
+          </div>
+          
+          <button type="submit" class="botao botao-primario botao-grande" 
+                  style="width: 100%;" 
+                  :disabled="enviando">
+            <span x-show="!enviando">
+              <span class="material-icons" style="vertical-align: middle;">send</span> Enviar Mensagem
+            </span>
+            <span x-show="enviando">
+              <span class="material-icons" style="vertical-align: middle; animation: spin 1s linear infinite;">refresh</span> Enviando...
+            </span>
           </button>
         </form>
       </div>
@@ -984,6 +1000,8 @@
   </div>
   
   <!-- JavaScript -->
+  <script src="js/env-dev.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/data-manager.js"></script>
   <script src="js/aplicacao.js"></script>
   <script src="js/api-integracao.js"></script>

@@ -1,0 +1,35 @@
+# Arquivos e diretórios a serem ignorados pelo Git
+
+# Credenciais e configurações sensíveis
+.env
+.env.local
+.env.production
+config/credentials.js
+js/env-dev.js
+
+# Dependências
+node_modules/
+npm-debug.log*
+
+# Cache e temporários
+.cache/
+.temp/
+.tmp/
+
+# Logs
+logs/
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Build
+dist/
+build/

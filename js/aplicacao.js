@@ -606,27 +606,49 @@ function formularioContato() {
       assunto: '',
       mensagem: ''
     },
+    enviando: false,
+    mensagemSucesso: false,
+    mensagemErro: '',
     
     async enviar() {
       // Validação básica
-      if (!this.dados.nome || !this.dados.email || !this.dados.mensagem) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
+      if (!this.dados.nome || !this.dados.email || !this.dados.assunto || !this.dados.mensagem) {
+        this.mensagemErro = 'Por favor, preencha todos os campos obrigatórios.';
         return;
       }
       
-      // Aqui você integraria com EmailJS ou backend
-      console.log('Enviando formulário:', this.dados);
+      this.enviando = true;
+      this.mensagemErro = '';
       
-      alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');
-      
-      // Limpar formulário
-      this.dados = {
-        nome: '',
-        email: '',
-        telefone: '',
-        assunto: '',
-        mensagem: ''
-      };
+      try {
+        console.log('📧 Enviando email via EmailJS:', this.dados);
+        const resultado = await enviarEmail(this.dados);
+        
+        if (resultado.sucesso) {
+          this.mensagemSucesso = true;
+          this.mensagemErro = '';
+          
+          // Limpar formulário após sucesso
+          setTimeout(() => {
+            this.dados = {
+              nome: '',
+              email: '',
+              telefone: '',
+              assunto: '',
+              mensagem: ''
+            };
+            this.mensagemSucesso = false;
+          }, 3000);
+        } else {
+          this.mensagemErro = `Erro: ${resultado.erro}`;
+          console.error('❌ Falha no envio:', resultado.erro);
+        }
+      } catch (erro) {
+        this.mensagemErro = 'Erro inesperado. Tente novamente.';
+        console.error('❌ Erro no formulário:', erro);
+      } finally {
+        this.enviando = false;
+      }
     }
   };
 }

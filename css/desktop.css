@@ -400,44 +400,8 @@
 }
 
 /* ==================== MENU MOBILE ==================== */
+/* Regras de navbar mobile foram movidas para mobile.css para evitar conflitos */
 @media (max-width: 767px) {
-  .navbar-toggle {
-    display: flex;
-  }
-
-  .navbar-menu {
-    position: fixed;
-    top: 70px;
-    left: -100%;
-    width: 100%;
-    height: calc(100vh - 70px);
-    background: var(--branco);
-    flex-direction: column;
-    align-items: flex-start;
-    padding: var(--espacamento-lg);
-    gap: var(--espacamento-md);
-    box-shadow: var(--sombra-forte);
-    transition: left 0.3s ease;
-    overflow-y: auto;
-  }
-
-  .navbar-menu.aberto {
-    left: 0;
-  }
-
-  .navbar-item {
-    width: 100%;
-  }
-
-  .navbar-item a {
-    display: block;
-    width: 100%;
-    padding: var(--espacamento-sm);
-    font-size: 1.125rem;
-  }
-  
-  /* Sistema de autenticação mobile - removido, agora controlado no componentes.css */
-  
   .user-button {
     padding: 0.3rem;
     border-radius: 12px;
@@ -455,35 +419,6 @@
   .dropdown-content {
     right: 0;
     min-width: 180px;
-  }
-  
-  /* Dropdown Mobile */
-  .navbar-dropdown {
-    width: 100%;
-  }
-  
-  .navbar-submenu {
-    position: static;
-    box-shadow: none;
-    background: var(--cinza-muito-claro);
-    margin-top: var(--espacamento-xs);
-    border-radius: var(--borda-arredondada-sm);
-    padding: var(--espacamento-xs);
-    border: none;
-  }
-  
-  .navbar-submenu::before,
-  .navbar-submenu::after {
-    display: none;
-  }
-  
-  .navbar-submenu a {
-    font-size: 1rem;
-    padding: var(--espacamento-xs) var(--espacamento-md);
-  }
-  
-  .navbar-submenu a:hover {
-    padding-left: var(--espacamento-md);
   }
 }
 

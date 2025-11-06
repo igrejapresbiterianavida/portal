@@ -67,9 +67,10 @@ html {
   --espacamento-xxl: 4rem;
   
   /* Bordas e Sombras */
-  --borda-arredondada-sm: 6px;
-  --borda-arredondada: 12px;
-  --borda-arredondada-lg: 20px;
+  --borda-arredondada-sm: 8px;
+  --borda-arredondada: 25px;
+  --borda-arredondada-lg: 50px;
+  --borda-arredondada-pill: 50rem;
   --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.08);
   --sombra-media: 0 4px 16px rgba(0, 0, 0, 0.12);
   --sombra-forte: 0 8px 32px rgba(0, 0, 0, 0.16);

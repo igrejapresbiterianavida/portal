@@ -1,13 +1,6 @@
 {
   "midias": [
     {
-      "nome": "Ícone 192x192 (PNG)",
-      "arquivo": "assets/midia/icon-192.png",
-      "tipo": "imagem",
-      "tamanho": "192x192px",
-      "descricao": "Ícone da IPV para PWA e redes sociais"
-    },
-    {
       "nome": "Logo IPV para Pefil (PNG)",
       "arquivo": "assets/midia/ipvida.png",
       "tipo": "imagem",
@@ -55,6 +48,34 @@
       "tipo": "imagem",
       "tamanho": "Vetorial",
       "descricao": "Logo IPV vertical completo em formato vetorial"
+    },
+    {
+      "nome": "Favicon 96x96 (PNG)",
+      "arquivo": "assets/midia/favicon-96x96.png",
+      "tipo": "imagem",
+      "tamanho": "96x96px",
+      "descricao": "Favicon da IPV para navegadores modernos"
+    },
+    {
+      "nome": "Favicon (SVG)",
+      "arquivo": "assets/midia/favicon.svg",
+      "tipo": "imagem",
+      "tamanho": "Vetorial",
+      "descricao": "Favicon da IPV em formato vetorial escalável"
+    },
+    {
+      "nome": "Favicon (ICO)",
+      "arquivo": "assets/midia/favicon.ico",
+      "tipo": "arquivo",
+      "tamanho": "Multi-size",
+      "descricao": "Favicon da IPV para navegadores antigos"
+    },
+    {
+      "nome": "Apple Touch Icon (PNG)",
+      "arquivo": "assets/midia/apple-touch-icon.png",
+      "tipo": "imagem",
+      "tamanho": "180x180px",
+      "descricao": "Ícone da IPV para dispositivos Apple (iOS/iPadOS)"
     }
   ],
   "categorias": {

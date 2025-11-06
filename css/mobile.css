@@ -1276,4 +1276,91 @@
   font-size: 0.875rem;
 }
 
+/* ==================== NAVBAR MOBILE ==================== */
+@media (max-width: 767px) {
+  /* Menu hamburguer */
+  .navbar-toggle {
+    display: flex !important;
+  }
+
+  /* Menu principal mobile */
+  .navbar-menu {
+    position: fixed;
+    top: 70px;
+    left: -100%;
+    width: 100%;
+    height: calc(100vh - 70px);
+    background: var(--branco);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--espacamento-lg);
+    gap: var(--espacamento-md);
+    box-shadow: var(--sombra-forte);
+    transition: left 0.3s ease;
+    overflow-y: auto;
+  }
+
+  .navbar-menu.aberto {
+    left: 0;
+  }
+
+  .navbar-item {
+    width: 100%;
+  }
+
+  .navbar-item a {
+    display: block;
+    width: 100%;
+    padding: var(--espacamento-sm);
+    font-size: 1.125rem;
+  }
+
+  /* Dropdown no mobile - FIX CRÍTICO */
+  .navbar-dropdown {
+    width: 100%;
+  }
+
+  .navbar-dropdown-toggle {
+    width: 100%;
+    padding: var(--espacamento-sm);
+    justify-content: space-between;
+  }
+
+  /* Submenu mobile - corrigido para aparecer abaixo */
+  .navbar-submenu {
+    position: static !important;
+    box-shadow: none !important;
+    background: var(--cinza-muito-claro) !important;
+    margin-top: var(--espacamento-xs) !important;
+    margin-left: var(--espacamento-md) !important;
+    border-radius: var(--borda-arredondada-sm) !important;
+    padding: var(--espacamento-xs) !important;
+    border: 1px solid var(--cinza-leve) !important;
+    width: 100% !important;
+    min-width: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .navbar-submenu::before,
+  .navbar-submenu::after {
+    display: none !important;
+  }
+
+  .navbar-submenu li {
+    width: 100%;
+  }
+
+  .navbar-submenu a {
+    font-size: 1rem !important;
+    padding: var(--espacamento-xs) var(--espacamento-md) !important;
+    display: block;
+    width: 100%;
+  }
+
+  .navbar-submenu a:hover {
+    padding-left: var(--espacamento-md) !important;
+  }
+}
+
 /* Fim mobile.css */

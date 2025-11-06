@@ -863,7 +863,6 @@ function authNavbar() {
     
     toggleDropdown() {
       this.dropdownAberto = !this.dropdownAberto;
-      console.log('Dropdown toggled:', this.dropdownAberto);
     },
     
     fecharDropdown() {

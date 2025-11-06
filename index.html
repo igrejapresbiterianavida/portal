@@ -55,11 +55,10 @@
         </div>
         
         <!-- Logado - Mostrar dropdown do usuário -->
-        <div x-show="estaLogado" class="user-dropdown">
+        <div x-show="estaLogado" class="user-dropdown" @click.away="fecharDropdown()">
           <button 
             class="user-button" 
             @click="toggleDropdown()"
-            @click.away="fecharDropdown()"
           >
             <img :src="usuario?.avatar" :alt="usuario?.nome" class="user-avatar">
             <span class="user-name" x-text="saudacao"></span>
@@ -69,7 +68,6 @@
           <div 
             class="dropdown-content" 
             :class="{ 'show': dropdownAberto }"
-            @click.away="fecharDropdown()"
           >
             <!-- Link para Dashboard (apenas membros) -->
             <div x-show="usuario?.tipo === 'membro'">

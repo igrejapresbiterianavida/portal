@@ -9,16 +9,34 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "assets/images/logo.svg",
+      "src": "assets/icons/ipvida.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/images/logo.svg",
+      "src": "assets/icons/ipvida.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/ipvida.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/ipvida.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/ipvida.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "categories": ["religion", "church", "community"],
@@ -33,7 +51,7 @@
       "url": "/index.html#devocionais",
       "icons": [
         {
-          "src": "assets/images/logo.svg",
+          "src": "assets/icons/ipvida.png",
           "sizes": "192x192"
         }
       ]
@@ -45,7 +63,7 @@
       "url": "/index.html#videos",
       "icons": [
         {
-          "src": "assets/images/logo.svg",
+          "src": "assets/icons/ipvida.png",
           "sizes": "192x192"
         }
       ]
@@ -57,7 +75,7 @@
       "url": "/index.html#contribuicoes",
       "icons": [
         {
-          "src": "assets/images/logo.svg",
+          "src": "assets/icons/ipvida.png",
           "sizes": "192x192"
         }
       ]
@@ -65,7 +83,7 @@
   ],
   "screenshots": [
     {
-      "src": "assets/images/foto-igreja.png",
+      "src": "assets/icons/ipvida.png",
       "sizes": "1280x720",
       "type": "image/png"
     }

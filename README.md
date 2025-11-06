@@ -80,7 +80,7 @@ ipvida/
 │   ├── acessibilidade.js # Recursos acessibilidade
 │   ├── interface.js     # Interações UI
 │   └── service-worker.js # PWA offline
-├── paginas/
+├── pagina/
 │   └── confissao-fe.html # Confissão Westminster
 ├── index.html           # Página principal SPA
 ├── manifest.json        # Configuração PWA

@@ -6,15 +6,17 @@
   <meta name="description" content="Login - Igreja Presbiteriana Vida">
   <title>Login | IPV - Igreja Presbiteriana Vida</title>
   
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛪</text></svg>">
+  <!-- Favicons e Ícones -->
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/ipvida.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" href="../assets/icons/ipvida.png">
   
   <!-- CSS -->
-  <link rel="stylesheet" href="css/globais.css">
-  <link rel="stylesheet" href="css/componentes.css">
-  <link rel="stylesheet" href="css/animacoes.css">
-  <link rel="stylesheet" href="css/mobile.css">
-  <link rel="stylesheet" href="css/desktop.css">
+  <link rel="stylesheet" href="../css/globais.css">
+  <link rel="stylesheet" href="../css/componentes.css">
+  <link rel="stylesheet" href="../css/animacoes.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+  <link rel="stylesheet" href="../css/desktop.css">
   
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -393,7 +395,7 @@
 <body>
   
   <!-- Link para voltar ao site -->
-  <a href="index.html" class="voltar-site">
+  <a href="../index.html" class="voltar-site">
     <span class="material-icons" style="font-size: 18px;">arrow_back</span>
 
   </a>
@@ -481,18 +483,28 @@
   </div>
   
   <!-- Scripts -->
-  <script src="js/auth.js"></script>
+  <script src="../js/auth.js"></script>
   
   <script>
-    // Verificar se já está logado
+    // Verificar se já está logado - APENAS se não for forçado a mostrar o login
     document.addEventListener('DOMContentLoaded', () => {
-      if (auth.verificarSessaoAtiva()) {
+      // Verificar se tem parâmetro ?force na URL (usado quando o usuário clica em "Entrar")
+      const urlParams = new URLSearchParams(window.location.search);
+      const forceLogin = urlParams.get('force');
+      
+      console.log('🔍 Login.html carregado. Force:', forceLogin);
+      
+      // Se não for forçado, verificar se já está logado
+      if (!forceLogin && auth.verificarSessaoAtiva()) {
+        console.log('✅ Usuário já está logado, redirecionando...');
         if (auth.ehAdmin()) {
           window.location.href = 'admin.html';
         } else {
           // Redirecionar para a home logado ao invés do dashboard
-          window.location.href = 'index.html';
+          window.location.href = '../index.html';
         }
+      } else {
+        console.log('👤 Mostrando tela de login');
       }
     });
   </script>

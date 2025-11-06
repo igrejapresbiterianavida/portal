@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Meu Perfil - Igreja Presbiteriana Vida">
+  <title>Meu Perfil | IPV - Igreja Presbiteriana Vida</title>
+  
+  <!-- Favicons e Ícones -->
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/ipvida.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" href="../assets/icons/ipvida.png">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/globais.css">
+  <link rel="stylesheet" href="../css/componentes.css">
+  <link rel="stylesheet" href="../css/animacoes.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+  <link rel="stylesheet" href="../css/desktop.css">
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <style>
+    body {
+      background: var(--cinza-muito-claro);
+      min-height: 100vh;
+      font-family: var(--fonte-principal);
+    }
+    
+    .perfil-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    
+    .perfil-header {
+      background: linear-gradient(135deg, var(--verde-escuro), var(--verde-medio));
+      color: var(--branco);
+      padding: 30px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      box-shadow: var(--sombra-media);
+    }
+    
+    .avatar-section {
+      position: relative;
+    }
+    
+    .avatar-grande {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid var(--branco);
+      object-fit: cover;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .avatar-upload {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: var(--dourado);
+      color: var(--branco);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid var(--branco);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transicao-padrao);
+    }
+    
+    .avatar-upload:hover {
+      transform: scale(1.1);
+      background: #e0a030;
+    }
+    
+    .avatar-upload input {
+      display: none;
+    }
+    
+    .perfil-info h1 {
+      margin: 0 0 5px 0;
+      font-size: 1.8rem;
+    }
+    
+    .perfil-tipo {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    
+    .perfil-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .perfil-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .perfil-card {
+      background: var(--branco);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: var(--sombra-suave);
+    }
+    
+    .perfil-card h2 {
+      color: var(--verde-escuro);
+      margin: 0 0 20px 0;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: var(--peso-medium);
+      color: var(--cinza-escuro);
+      font-size: 0.9rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid var(--cinza-leve);
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: var(--transicao-padrao);
+      background: var(--cinza-muito-claro);
+      box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--verde-medio);
+      background: var(--branco);
+      box-shadow: 0 0 0 3px rgba(45, 122, 62, 0.1);
+    }
+    
+    .form-input:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .btn {
+      padding: 12px 25px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: var(--peso-medium);
+      cursor: pointer;
+      transition: var(--transicao-padrao);
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--verde-medio), var(--verde-escuro));
+      color: var(--branco);
+      flex: 1;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(45, 122, 62, 0.3);
+    }
+    
+    .btn-secondary {
+      background: var(--cinza-leve);
+      color: var(--cinza-escuro);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--cinza-medio);
+      color: var(--branco);
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+      color: var(--branco);
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .alerta {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+    }
+    
+    .alerta-sucesso {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .alerta-erro {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .alerta-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+    
+    .topbar {
+      background: var(--branco);
+      padding: 15px 20px;
+      box-shadow: var(--sombra-suave);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0;
+    }
+    
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .btn-voltar {
+      background: var(--cinza-muito-claro);
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transicao-padrao);
+      text-decoration: none;
+      color: var(--cinza-escuro);
+    }
+    
+    .btn-voltar:hover {
+      background: var(--cinza-leve);
+    }
+    
+    .topbar h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--verde-escuro);
+    }
+    
+    .zona-perigo {
+      border: 2px solid #dc3545;
+      border-radius: 15px;
+      padding: 25px;
+      margin-top: 20px;
+    }
+    
+    .zona-perigo h3 {
+      color: #dc3545;
+      margin: 0 0 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .zona-perigo p {
+      color: var(--cinza-escuro);
+      margin: 0 0 20px 0;
+      line-height: 1.6;
+    }
+    
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .perfil-container {
+        padding: 20px 15px;
+      }
+      
+      .perfil-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px;
+      }
+      
+      .perfil-info h1 {
+        font-size: 1.5rem;
+      }
+      
+      .perfil-meta {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .perfil-card {
+        padding: 20px 15px;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body x-data="perfilUsuario()">
+  
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="#" @click.prevent="voltar()" class="btn-voltar">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <h1>Meu Perfil</h1>
+    </div>
+  </div>
+  
+  <div class="perfil-container">
+    
+    <!-- Header com Avatar -->
+    <div class="perfil-header">
+      <div class="avatar-section">
+        <img :src="dados.avatar" :alt="dados.nome" class="avatar-grande">
+        <label class="avatar-upload" title="Alterar foto">
+          <span class="material-icons" style="font-size: 20px;">camera_alt</span>
+          <input type="file" accept="image/*" @change="alterarAvatar($event)">
+        </label>
+      </div>
+      
+      <div class="perfil-info">
+        <h1 x-text="dados.nome + ' ' + dados.sobrenome"></h1>
+        <span class="perfil-tipo" x-text="tipoFormatado"></span>
+        <div class="perfil-meta">
+          <span>
+            <span class="material-icons" style="font-size: 18px;">email</span>
+            <span x-text="dados.email"></span>
+          </span>
+          <span>
+            <span class="material-icons" style="font-size: 18px;">phone</span>
+            <span x-text="dados.telefone"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Alertas -->
+    <div x-show="alerta.mostrar" :class="'alerta alerta-' + alerta.tipo" x-transition>
+      <span class="material-icons" x-text="alerta.icone"></span>
+      <span x-text="alerta.mensagem"></span>
+    </div>
+    
+    <!-- Formulário de Dados Pessoais -->
+    <div class="perfil-card">
+      <h2>
+        <span class="material-icons">person</span>
+        Dados Pessoais
+      </h2>
+      
+      <form @submit.prevent="salvarPerfil()">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="nome">Nome</label>
+            <input 
+              type="text" 
+              id="nome" 
+              class="form-input" 
+              x-model="dados.nome"
+              required
+              :disabled="salvando"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="sobrenome">Sobrenome</label>
+            <input 
+              type="text" 
+              id="sobrenome" 
+              class="form-input" 
+              x-model="dados.sobrenome"
+              required
+              :disabled="salvando"
+            >
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="email">E-mail</label>
+            <input 
+              type="email" 
+              id="email" 
+              class="form-input" 
+              x-model="dados.email"
+              disabled
+              title="O e-mail não pode ser alterado"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="telefone">Telefone</label>
+            <input 
+              type="tel" 
+              id="telefone" 
+              class="form-input" 
+              x-model="dados.telefone"
+              :disabled="salvando"
+              placeholder="(00) 00000-0000"
+            >
+          </div>
+        </div>
+        
+        <div class="form-group full-width">
+          <label class="form-label" for="tipo">Tipo de Usuário</label>
+          <input 
+            type="text" 
+            id="tipo" 
+            class="form-input" 
+            :value="tipoFormatado"
+            disabled
+            title="O tipo de usuário não pode ser alterado"
+          >
+        </div>
+        
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary" @click="cancelar()" :disabled="salvando">
+            <span class="material-icons">close</span>
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" :disabled="salvando">
+            <span class="material-icons" x-show="!salvando">save</span>
+            <span class="material-icons" x-show="salvando" style="animation: spin 1s linear infinite;">refresh</span>
+            <span x-text="salvando ? 'Salvando...' : 'Salvar Alterações'"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Alterar Senha -->
+    <div class="perfil-card">
+      <h2>
+        <span class="material-icons">lock</span>
+        Alterar Senha
+      </h2>
+      
+      <form @submit.prevent="alterarSenha()">
+        <div class="form-group">
+          <label class="form-label" for="senha-atual">Senha Atual</label>
+          <input 
+            type="password" 
+            id="senha-atual" 
+            class="form-input" 
+            x-model="senha.atual"
+            :disabled="alterandoSenha"
+            placeholder="••••••••"
+          >
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="senha-nova">Nova Senha</label>
+            <input 
+              type="password" 
+              id="senha-nova" 
+              class="form-input" 
+              x-model="senha.nova"
+              :disabled="alterandoSenha"
+              placeholder="••••••••"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="senha-confirmar">Confirmar Nova Senha</label>
+            <input 
+              type="password" 
+              id="senha-confirmar" 
+              class="form-input" 
+              x-model="senha.confirmar"
+              :disabled="alterandoSenha"
+              placeholder="••••••••"
+            >
+          </div>
+        </div>
+        
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary" @click="limparSenha()" :disabled="alterandoSenha">
+            <span class="material-icons">close</span>
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" :disabled="alterandoSenha">
+            <span class="material-icons" x-show="!alterandoSenha">lock</span>
+            <span class="material-icons" x-show="alterandoSenha" style="animation: spin 1s linear infinite;">refresh</span>
+            <span x-text="alterandoSenha ? 'Alterando...' : 'Alterar Senha'"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Zona de Perigo -->
+    <div class="perfil-card">
+      <div class="zona-perigo">
+        <h3>
+          <span class="material-icons">warning</span>
+          Zona de Perigo
+        </h3>
+        <p>
+          <strong>Atenção:</strong> Excluir sua conta é uma ação permanente e irreversível. 
+          Todos os seus dados serão removidos do sistema e você perderá o acesso à plataforma.
+        </p>
+        <button type="button" class="btn btn-danger" @click="confirmarExclusao()">
+          <span class="material-icons">delete_forever</span>
+          Excluir Minha Conta
+        </button>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Scripts -->
+  <script src="../js/auth.js"></script>
+  <script src="../js/data-manager.js"></script>
+  
+  <script>
+    function perfilUsuario() {
+      return {
+        dados: {
+          id: '',
+          nome: '',
+          sobrenome: '',
+          email: '',
+          telefone: '',
+          tipo: '',
+          avatar: '',
+          status: ''
+        },
+        senha: {
+          atual: '',
+          nova: '',
+          confirmar: ''
+        },
+        dadosOriginais: null,
+        salvando: false,
+        alterandoSenha: false,
+        alerta: {
+          mostrar: false,
+          tipo: 'info',
+          mensagem: '',
+          icone: 'info'
+        },
+        
+        get tipoFormatado() {
+          const tipos = {
+            'administracao': 'Administração',
+            'lideranca': 'Liderança',
+            'membro': 'Membro'
+          };
+          return tipos[this.dados.tipo] || this.dados.tipo;
+        },
+        
+        init() {
+          // Verificar autenticação
+          if (!auth.verificarSessaoAtiva()) {
+            console.log('🚫 Usuário não logado - redirecionando');
+            window.location.href = 'login.html?force=true';
+            return;
+          }
+          
+          // Carregar dados do usuário
+          this.carregarDados();
+        },
+        
+        carregarDados() {
+          if (auth.usuario) {
+            this.dados = { ...auth.usuario };
+            this.dadosOriginais = { ...auth.usuario };
+            console.log('✅ Dados do perfil carregados:', this.dados.nome);
+          }
+        },
+        
+        async alterarAvatar(event) {
+          const file = event.target.files[0];
+          if (!file) return;
+          
+          // Validar tipo de arquivo
+          if (!file.type.startsWith('image/')) {
+            this.mostrarAlerta('erro', 'Por favor, selecione uma imagem válida.', 'error');
+            return;
+          }
+          
+          // Validar tamanho (máx 2MB)
+          if (file.size > 2 * 1024 * 1024) {
+            this.mostrarAlerta('erro', 'A imagem deve ter no máximo 2MB.', 'error');
+            return;
+          }
+          
+          try {
+            // Ler arquivo como base64
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              this.dados.avatar = e.target.result;
+              this.mostrarAlerta('sucesso', 'Foto alterada! Não esqueça de salvar.', 'check_circle');
+            };
+            reader.readAsDataURL(file);
+          } catch (erro) {
+            console.error('Erro ao ler arquivo:', erro);
+            this.mostrarAlerta('erro', 'Erro ao processar imagem.', 'error');
+          }
+        },
+        
+        async salvarPerfil() {
+          if (!this.dados.nome || !this.dados.sobrenome) {
+            this.mostrarAlerta('erro', 'Preencha nome e sobrenome.', 'error');
+            return;
+          }
+          
+          this.salvando = true;
+          
+          try {
+            // Simular salvamento (em produção seria no Supabase)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Atualizar dados no auth
+            auth.usuario = { ...this.dados };
+            auth.salvarSessao(auth.usuario, auth.token);
+            
+            this.dadosOriginais = { ...this.dados };
+            
+            this.mostrarAlerta('sucesso', 'Perfil atualizado com sucesso!', 'check_circle');
+            console.log('✅ Perfil salvo:', this.dados);
+          } catch (erro) {
+            console.error('Erro ao salvar perfil:', erro);
+            this.mostrarAlerta('erro', 'Erro ao salvar perfil.', 'error');
+          } finally {
+            this.salvando = false;
+          }
+        },
+        
+        cancelar() {
+          this.dados = { ...this.dadosOriginais };
+          this.mostrarAlerta('info', 'Alterações canceladas.', 'info');
+        },
+        
+        async alterarSenha() {
+          if (!this.senha.atual || !this.senha.nova || !this.senha.confirmar) {
+            this.mostrarAlerta('erro', 'Preencha todos os campos de senha.', 'error');
+            return;
+          }
+          
+          if (this.senha.nova !== this.senha.confirmar) {
+            this.mostrarAlerta('erro', 'As senhas não coincidem.', 'error');
+            return;
+          }
+          
+          if (this.senha.nova.length < 6) {
+            this.mostrarAlerta('erro', 'A senha deve ter pelo menos 6 caracteres.', 'error');
+            return;
+          }
+          
+          if (this.senha.atual !== this.dados.senha) {
+            this.mostrarAlerta('erro', 'Senha atual incorreta.', 'error');
+            return;
+          }
+          
+          this.alterandoSenha = true;
+          
+          try {
+            // Simular alteração (em produção seria no Supabase)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            this.dados.senha = this.senha.nova;
+            auth.usuario.senha = this.senha.nova;
+            auth.salvarSessao(auth.usuario, auth.token);
+            
+            this.limparSenha();
+            this.mostrarAlerta('sucesso', 'Senha alterada com sucesso!', 'check_circle');
+          } catch (erro) {
+            console.error('Erro ao alterar senha:', erro);
+            this.mostrarAlerta('erro', 'Erro ao alterar senha.', 'error');
+          } finally {
+            this.alterandoSenha = false;
+          }
+        },
+        
+        limparSenha() {
+          this.senha = {
+            atual: '',
+            nova: '',
+            confirmar: ''
+          };
+        },
+        
+        confirmarExclusao() {
+          const confirmar = confirm(
+            '⚠️ ATENÇÃO: Você está prestes a excluir sua conta permanentemente.\n\n' +
+            'Esta ação NÃO pode ser desfeita e todos os seus dados serão removidos.\n\n' +
+            'Tem certeza que deseja continuar?'
+          );
+          
+          if (confirmar) {
+            const confirmarNovamente = confirm(
+              '🚨 ÚLTIMA CONFIRMAÇÃO:\n\n' +
+              'Digite "EXCLUIR" na próxima caixa de diálogo para confirmar a exclusão da sua conta.'
+            );
+            
+            if (confirmarNovamente) {
+              const texto = prompt('Digite "EXCLUIR" para confirmar:');
+              if (texto === 'EXCLUIR') {
+                this.excluirConta();
+              } else {
+                this.mostrarAlerta('info', 'Exclusão cancelada.', 'info');
+              }
+            }
+          }
+        },
+        
+        async excluirConta() {
+          try {
+            // Simular exclusão (em produção seria no Supabase)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Fazer logout e limpar tudo
+            auth.limparSessao();
+            
+            alert('✅ Sua conta foi excluída com sucesso. Você será redirecionado para a página inicial.');
+            window.location.href = '../index.html';
+          } catch (erro) {
+            console.error('Erro ao excluir conta:', erro);
+            this.mostrarAlerta('erro', 'Erro ao excluir conta.', 'error');
+          }
+        },
+        
+        mostrarAlerta(tipo, mensagem, icone) {
+          this.alerta = {
+            mostrar: true,
+            tipo: tipo,
+            mensagem: mensagem,
+            icone: icone
+          };
+          
+          // Ocultar após 5 segundos
+          setTimeout(() => {
+            this.alerta.mostrar = false;
+          }, 5000);
+        },
+        
+        voltar() {
+          // Verificar de onde veio
+          if (auth.ehAdmin()) {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = '../index.html';
+          }
+        }
+      };
+    }
+  </script>
+  
+</body>
+</html>

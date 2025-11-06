@@ -14,6 +14,16 @@ class DataManager {
       usuarios: null,
       visitantes: null
     };
+    
+    // Detectar caminho base
+    this.basePath = window.location.pathname.includes('/pagina/') ? '../' : '';
+  }
+  
+  /**
+   * Resolve o caminho correto baseado na localização atual
+   */
+  resolvePath(path) {
+    return this.basePath + path;
   }
 
   /**
@@ -26,13 +36,16 @@ class DataManager {
     try {
       // Adiciona timestamp para evitar cache do navegador
       const timestamp = new Date().getTime();
-      const response = await fetch(`data/${arquivo}.json?v=${timestamp}`);
+      const caminho = this.resolvePath(`data/${arquivo}.json?v=${timestamp}`);
+      console.log(`🔍 Carregando ${arquivo} de:`, caminho);
+      
+      const response = await fetch(caminho);
       if (!response.ok) {
         throw new Error(`Erro ao carregar ${arquivo}: ${response.status}`);
       }
       
       const dados = await response.json();
-      console.log(`✅ ${arquivo}.json carregado:`, dados);
+      console.log(`✅ ${arquivo}.json carregado com sucesso`);
       return dados;
     } catch (erro) {
       console.error(`❌ Erro ao carregar ${arquivo}:`, erro);
@@ -129,7 +142,8 @@ class DataManager {
     this.cache[arquivo] = null;
     const timestamp = new Date().getTime();
     try {
-      const response = await fetch(`data/${arquivo}.json?v=${timestamp}`);
+      const caminho = this.resolvePath(`data/${arquivo}.json?v=${timestamp}`);
+      const response = await fetch(caminho);
       if (!response.ok) {
         throw new Error(`Erro ao recarregar ${arquivo}: ${response.status}`);
       }

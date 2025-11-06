@@ -9,7 +9,15 @@ class AuthSystem {
     this.sessaoExpiresAt = null;
     this.tentativasLogin = {};
     
+    // Detectar caminho base
+    this.basePath = window.location.pathname.includes('/pagina/') ? '../' : '';
+    
     this.init();
+  }
+  
+  // Helper para resolver caminhos corretamente
+  resolvePath(path) {
+    return this.basePath + path;
   }
 
   init() {
@@ -30,8 +38,17 @@ class AuthSystem {
       }
 
       // Buscar dados dos usuários
-      const response = await fetch('data/usuarios.json');
+      const caminhoUsuarios = this.resolvePath('data/usuarios.json');
+      console.log('🔍 Buscando usuários em:', caminhoUsuarios);
+      
+      const response = await fetch(caminhoUsuarios);
+      
+      if (!response.ok) {
+        throw new Error(`Erro ao carregar dados: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('✅ Dados de usuários carregados:', data.usuarios?.length || 0, 'usuários');
       
       // Procurar usuário
       const usuario = data.usuarios.find(u => 
@@ -65,6 +82,57 @@ class AuthSystem {
   }
 
   logout() {
+    console.log('🚪 Realizando logout...');
+    
+    // Usar função de limpeza
+    this.limparSessao();
+    
+    // Redirecionar para index.html
+    window.location.href = window.location.pathname.includes('/pagina/') 
+      ? '../index.html' 
+      : '/index.html';
+  }
+
+  // ==================== VERIFICAÇÕES ====================
+  
+  verificarSessaoAtiva() {
+    const token = localStorage.getItem('auth_token');
+    const usuarioString = localStorage.getItem('auth_usuario');
+    const expires = localStorage.getItem('auth_expires');
+
+    console.log('🔍 Verificando sessão ativa...', {
+      temToken: !!token,
+      temUsuario: !!usuarioString,
+      temExpires: !!expires
+    });
+
+    if (token && usuarioString && expires) {
+      const expiresAt = new Date(expires);
+      const agora = new Date();
+      
+      console.log('🔍 Verificando expiração:', {
+        expiraEm: expiresAt.toLocaleString(),
+        agora: agora.toLocaleString(),
+        valido: expiresAt > agora
+      });
+      
+      if (expiresAt > agora) {
+        this.token = token;
+        this.usuario = JSON.parse(usuarioString);
+        this.sessaoExpiresAt = expiresAt;
+        console.log('🔐 Sessão ativa:', this.usuario.nome, '| Tipo:', this.usuario.tipo);
+        return true;
+      } else {
+        console.log('⏰ Sessão expirada - limpando...');
+        this.limparSessao();
+      }
+    }
+    
+    console.log('❌ Nenhuma sessão ativa encontrada');
+    return false;
+  }
+  
+  limparSessao() {
     // Limpar dados locais
     this.usuario = null;
     this.token = null;
@@ -76,37 +144,7 @@ class AuthSystem {
     localStorage.removeItem('auth_expires');
     localStorage.removeItem('ipv_sessao');
     
-    console.log('🚪 Logout realizado');
-    
-    // Redirecionar para login
-    if (window.location.pathname !== '/login.html') {
-      window.location.href = '/login.html';
-    }
-  }
-
-  // ==================== VERIFICAÇÕES ====================
-  
-  verificarSessaoAtiva() {
-    const token = localStorage.getItem('auth_token');
-    const usuarioString = localStorage.getItem('auth_usuario');
-    const expires = localStorage.getItem('auth_expires');
-
-    if (token && usuarioString && expires) {
-      const expiresAt = new Date(expires);
-      
-      if (expiresAt > new Date()) {
-        this.token = token;
-        this.usuario = JSON.parse(usuarioString);
-        this.sessaoExpiresAt = expiresAt;
-        console.log('🔐 Sessão ativa:', this.usuario.nome);
-        return true;
-      } else {
-        console.log('⏰ Sessão expirada');
-        this.logout();
-      }
-    }
-    
-    return false;
+    console.log('🧹 Sessão limpa');
   }
 
   verificarBloqueio(email) {
@@ -211,12 +249,12 @@ class AuthSystem {
   // ==================== PROTEÇÃO DE ROTAS ====================
   
   protegerRota() {
-    const paginasPublicas = ['/', '/index.html', '/login.html'];
+    const paginaPublicas = ['/', '/index.html', '/pagina/login.html'];
     const paginaAtual = window.location.pathname;
     
-    if (!paginasPublicas.includes(paginaAtual) && !this.usuario) {
+    if (!paginaPublicas.includes(paginaAtual) && !this.usuario) {
       console.log('🚫 Acesso negado - redirecionando para login');
-      window.location.href = '/login.html';
+      window.location.href = '/pagina/login.html';
       return false;
     }
     
@@ -224,12 +262,24 @@ class AuthSystem {
   }
 
   protegerAdmin() {
-    if (!this.ehAdmin()) {
-      console.log('🚫 Acesso negado - não é administrador');
-      window.location.href = '/index.html';
+    console.log('🔐 Verificando proteção de admin...');
+    
+    // Primeiro verificar se está logado
+    if (!this.verificarSessaoAtiva()) {
+      console.log('🚫 Não está logado - redirecionando para login');
+      window.location.href = 'login.html';
       return false;
     }
     
+    // Verificar se é admin
+    if (!this.ehAdmin()) {
+      console.log('🚫 Não é admin - redirecionando para home. Tipo atual:', this.usuario ? this.usuario.tipo : 'nenhum');
+      alert('🚫 Acesso negado! Esta área é restrita para administradores.');
+      window.location.href = '../index.html';
+      return false;
+    }
+    
+    console.log('✅ Proteção admin: acesso autorizado para', this.usuario.nome);
     return true;
   }
 
@@ -285,7 +335,7 @@ function loginForm() {
         if (resultado.sucesso) {
           // Redirecionar baseado no tipo de usuário
           if (auth.ehAdmin()) {
-            window.location.href = '/admin.html';
+            window.location.href = '/pagina/admin.html';
           } else {
             // Redirecionar para a home logado ao invés do dashboard
             window.location.href = '/index.html';

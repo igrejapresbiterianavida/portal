@@ -9,8 +9,30 @@
   
   <title>Igreja Presbiteriana Vida | Campinas-SP</title>
   
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛪</text></svg>">
+  <!-- Favicons e Ícones PWA -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/ipvida.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="assets/icons/ipvida.png">
+  
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="IPV - Igreja Presbiteriana Vida">
+  <meta name="apple-mobile-web-app-title" content="IPV">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- Microsoft Tiles -->
+  <meta name="msapplication-TileImage" content="assets/icons/ipvida.png">
+  <meta name="msapplication-TileColor" content="#1A4731">
+  <meta name="msapplication-config" content="browserconfig.xml">
   
   <!-- CSS -->
   <link rel="stylesheet" href="css/globais.css">
@@ -48,10 +70,10 @@
         <!-- Não logado - Mostrar saudação e botão de login -->
         <div x-show="!estaLogado" class="auth-section">
           <span class="user-greeting">Olá visitante!</span>
-          <a href="login.html" class="login-button">
+          <button type="button" @click="irParaLogin()" class="login-button">
             <i class="bi bi-box-arrow-in-right"></i>
             <span>Entrar</span>
-          </a>
+          </button>
         </div>
         
         <!-- Logado - Mostrar dropdown do usuário -->
@@ -69,6 +91,12 @@
             class="dropdown-content" 
             :class="{ 'show': dropdownAberto }"
           >
+            <!-- Meu Perfil - para todos os usuários logados -->
+            <a href="pagina/perfil.html">
+              <i class="bi bi-person-circle"></i>
+              Meu Perfil
+            </a>
+            
             <!-- Link para Dashboard (apenas membros) -->
             <div x-show="usuario?.tipo === 'membro'">
               <a href="#eventos-internos" @click="scrollToSection('eventos-internos')">
@@ -87,7 +115,7 @@
             
             <!-- Link para área administrativa (apenas administração) -->
             <div x-show="usuario?.tipo === 'administracao'">
-              <a href="admin.html">
+              <a href="#" @click.prevent="irParaAdmin()">
                 <i class="bi bi-gear"></i>
                 Painel Administrativo
               </a>
@@ -165,6 +193,17 @@
           <a href="#sobre" class="botao botao-primario botao-grande">
           Sobre Nós
         </a>
+        
+        <!-- Botão PWA Install - só aparece quando pode instalar -->
+        <button 
+          id="pwa-install-btn" 
+          class="botao botao-especial botao-grande"
+          style="display: none;"
+          @click="instalarApp()"
+        >
+          <i class="bi bi-download"></i>
+          Baixar App
+        </button>
       </div><!-- hero-botoes !-->
     </div><!-- hero-conteudo !-->
   </section><!-- hero !-->
@@ -701,7 +740,7 @@
       </div>
       
       <div class="text-center mt-5">
-        <a href="paginas/confissao-fe.html" class="botao botao-primario botao-grande">
+        <a href="pagina/confissao-fe.html" class="botao botao-primario botao-grande">
           <span class="material-icons" style="vertical-align: middle;">description</span> Continuar lendo
         </a>
       </div>
@@ -888,7 +927,7 @@
             <li><a href="#sobre">Sobre Nós</a></li>
             <li><a href="#devocionais">Devocionais</a></li>
             <li><a href="#programacao">Programação</a></li>
-            <li><a href="paginas/confissao-fe.html">Confissão de Fé</a></li>
+            <li><a href="pagina/confissao-fe.html">Confissão de Fé</a></li>
             <li><a href="#contribuicoes">Contribuir</a></li>
           </ul>
         </div><!-- footer-secao !-->
@@ -1063,6 +1102,7 @@
   <!-- JavaScript -->
   <script src="js/env-dev.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/data-manager.js"></script>
   <script src="js/aplicacao.js"></script>
   <script src="js/api-integracao.js"></script>
@@ -1072,6 +1112,63 @@
   <!-- VLibras Init -->
   <script>
     new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
+  
+  <!-- PWA Install -->
+  <script>
+    let deferredPrompt;
+    const installButton = document.getElementById('pwa-install-btn');
+    
+    // Detectar quando o app pode ser instalado
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('🎯 PWA pode ser instalado');
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Mostrar botão install apenas em mobile
+      if (window.innerWidth <= 768) {
+        installButton.style.display = 'inline-flex';
+      }
+    });
+    
+    // Função para instalar o app
+    window.instalarApp = async function() {
+      if (!deferredPrompt) {
+        console.log('❌ PWA não disponível para instalação');
+        return;
+      }
+      
+      // Mostrar prompt de instalação
+      deferredPrompt.prompt();
+      
+      // Aguardar resposta do usuário
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        console.log('✅ PWA instalado com sucesso');
+      } else {
+        console.log('❌ Usuário cancelou a instalação');
+      }
+      
+      // Limpar deferredPrompt
+      deferredPrompt = null;
+      installButton.style.display = 'none';
+    };
+    
+    // Detectar quando o app foi instalado
+    window.addEventListener('appinstalled', () => {
+      console.log('🎉 PWA foi instalado!');
+      installButton.style.display = 'none';
+      deferredPrompt = null;
+    });
+    
+    // Verificar se já está instalado
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('📱 App já está instalado');
+        installButton.style.display = 'none';
+      }
+    });
   </script>
   
   <!-- Service Worker -->

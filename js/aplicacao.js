@@ -20,6 +20,7 @@ function aplicacao() {
     configurarScrollSuave() {
       document.querySelectorAll('a[href^="#"]').forEach(link => {
         link.addEventListener('click', (e) => {
+          console.log('🔗 Scroll suave interceptou:', link.getAttribute('href'));
           e.preventDefault();
           const id = link.getAttribute('href');
           if (id === '#') return;
@@ -855,9 +856,11 @@ function authNavbar() {
     init() {
       this.verificarSessao();
       
-      // Escutar evento de abertura de modal
-      document.addEventListener('abrir-modal-visitante', () => {
-        // A função será chamada pelo Alpine.js via $dispatch
+      // Debug: Verificar estado inicial
+      console.log('🔍 AuthNavbar iniciado - Estado:', {
+        estaLogado: this.estaLogado,
+        usuario: this.usuario,
+        saudacao: this.saudacao
       });
     },
     
@@ -870,7 +873,16 @@ function authNavbar() {
     },
     
     verificarSessao() {
-      // Verificar se existe uma sessão ativa
+      // PRIORIZAR o sistema auth.js principal
+      if (window.auth && auth.verificarSessaoAtiva()) {
+        this.estaLogado = true;
+        this.usuario = auth.usuario;
+        this.atualizarSaudacao();
+        console.log('✅ Sessão ativa via auth.js:', this.usuario.nome);
+        return;
+      }
+      
+      // FALLBACK: Verificar se existe uma sessão ativa no formato antigo
       const sessao = localStorage.getItem('ipv_sessao');
       if (sessao) {
         try {
@@ -882,7 +894,7 @@ function authNavbar() {
             this.estaLogado = true;
             this.usuario = dadosSessao.usuario;
             this.atualizarSaudacao();
-            console.log('✅ Sessão ativa encontrada:', this.usuario.nome);
+            console.log('✅ Sessão ativa encontrada (fallback):', this.usuario.nome);
             return;
           } else {
             // Sessão expirada
@@ -916,8 +928,17 @@ function authNavbar() {
     },
     
     logout() {
-      // Remover sessão
+      // Usar o sistema auth.js principal se disponível
+      if (window.auth && typeof auth.logout === 'function') {
+        auth.logout();
+        return;
+      }
+      
+      // FALLBACK: Remover sessão manualmente
       localStorage.removeItem('ipv_sessao');
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_usuario');
+      localStorage.removeItem('auth_expires');
       
       // Resetar estado
       this.estaLogado = false;
@@ -938,6 +959,36 @@ function authNavbar() {
           top: offsetTop,
           behavior: 'smooth'
         });
+      }
+    },
+    
+    irParaLogin() {
+      console.log('🚀 Navegando para página de login...');
+      // Adicionar parâmetro ?force=true para evitar redirecionamento automático
+      window.location.href = 'pagina/login.html?force=true';
+    },
+    
+    irParaAdmin() {
+      console.log('🚀 Tentando acessar área administrativa...');
+      
+      // Verificar se há sistema de autenticação ativo
+      if (window.auth && typeof auth.ehAdmin === 'function') {
+        if (auth.ehAdmin()) {
+          console.log('✅ Admin confirmado - navegando para admin.html');
+          window.location.href = 'pagina/admin.html';
+        } else {
+          console.log('🚫 Usuário não é admin');
+          alert('🚫 Acesso negado! Área restrita para administradores.');
+        }
+      } else {
+        // Fallback: verificar pelo objeto usuario diretamente
+        if (this.usuario && this.usuario.tipo === 'administracao') {
+          console.log('✅ Admin confirmado (fallback) - navegando para admin.html');
+          window.location.href = 'pagina/admin.html';
+        } else {
+          console.log('🚫 Usuário não é admin (fallback)');
+          alert('🚫 Acesso negado! Área restrita para administradores.');
+        }
       }
     }
   };

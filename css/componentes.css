@@ -715,6 +715,32 @@
     width: 28px;
     height: 28px;
   }
+  
+  /* Dropdown posicionamento mobile - ajustado para não sair da tela */
+  .dropdown-content {
+    right: auto !important;
+    left: 0 !important;
+    min-width: 160px;
+    max-width: calc(100vw - 40px);
+    transform: translateY(-10px) translateX(0) !important;
+    margin-top: 0.5rem;
+  }
+  
+  .dropdown-content.show {
+    transform: translateY(0) translateX(0) !important;
+  }
+  
+  /* Garantir que o dropdown não saia da tela */
+  .user-dropdown {
+    position: relative;
+  }
+  
+  .user-dropdown .dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: auto;
+  }
 }
 
 /* Desktop: manter à direita com layout original */

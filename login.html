@@ -30,6 +30,8 @@
       align-items: center;
       justify-content: center;
       font-family: var(--fonte-principal);
+      margin: 0;
+      padding: 20px;
     }
     
     .login-container {
@@ -39,7 +41,6 @@
       overflow: hidden;
       width: 100%;
       max-width: 400px;
-      margin: 20px;
     }
     
     .login-header {
@@ -97,6 +98,7 @@
       font-size: 1rem;
       transition: var(--transicao-padrao);
       background: var(--cinza-muito-claro);
+      box-sizing: border-box;
     }
     
     .form-input:focus {
@@ -198,6 +200,7 @@
       align-items: center;
       gap: 5px;
       font-size: 0.9rem;
+      z-index: 10;
     }
     
     .voltar-site:hover {
@@ -215,24 +218,174 @@
       to { transform: rotate(360deg); }
     }
     
+    /* ==================== MOBILE OTIMIZADO ==================== */
     @media (max-width: 480px) {
+      body {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 20px;
+      }
+      
       .login-container {
-        margin: 10px;
+        margin: 0;
         border-radius: 15px;
+        max-width: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       }
       
       .login-header {
-        padding: 30px 20px;
+        padding: 25px 20px;
+      }
+      
+      .login-logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+      }
+      
+      .login-header h1 {
+        font-size: 1.3rem;
+        margin-bottom: 5px;
+      }
+      
+      .login-header p {
+        font-size: 0.85rem;
       }
       
       .login-form {
-        padding: 30px 20px;
+        padding: 25px 20px;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-label {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+      }
+      
+      .form-input {
+        padding: 12px 15px;
+        font-size: 16px; /* Evita zoom no iOS */
+        border-radius: 8px;
+      }
+      
+      .btn-login {
+        padding: 14px;
+        font-size: 1rem;
+        border-radius: 8px;
+        min-height: 48px; /* Tamanho mínimo para touch */
+      }
+      
+      .demo-buttons {
+        margin-top: 25px;
+        padding-top: 15px;
+      }
+      
+      .demo-buttons h4 {
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+      }
+      
+      .demo-button {
+        padding: 14px 12px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        min-height: 48px; /* Tamanho mínimo para touch */
       }
       
       .voltar-site {
         position: static;
-        margin: 20px auto 0;
+        margin: 0 auto 20px;
         width: fit-content;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        border-radius: 20px;
+      }
+      
+      .alerta-erro {
+        padding: 12px;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+        border-radius: 8px;
+      }
+    }
+    
+    /* ==================== MOBILE MUITO PEQUENO ==================== */
+    @media (max-width: 360px) {
+      body {
+        padding: 5px;
+      }
+      
+      .login-header {
+        padding: 20px 15px;
+      }
+      
+      .login-form {
+        padding: 20px 15px;
+      }
+      
+      .login-header h1 {
+        font-size: 1.2rem;
+      }
+      
+      .form-input {
+        padding: 10px 12px;
+      }
+      
+      .btn-login {
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+      
+      .demo-button {
+        padding: 12px 10px;
+        font-size: 0.8rem;
+      }
+    }
+    
+    /* ==================== LANDSCAPE MOBILE ==================== */
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        align-items: flex-start;
+        padding-top: 10px;
+      }
+      
+      .login-container {
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      
+      .login-header {
+        padding: 15px 20px;
+      }
+      
+      .login-logo {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+      
+      .login-header h1 {
+        font-size: 1.1rem;
+        margin-bottom: 3px;
+      }
+      
+      .login-header p {
+        font-size: 0.8rem;
+      }
+      
+      .login-form {
+        padding: 20px;
+      }
+      
+      .demo-buttons {
+        margin-top: 15px;
+        padding-top: 10px;
       }
     }
   </style>
@@ -242,7 +395,7 @@
   <!-- Link para voltar ao site -->
   <a href="index.html" class="voltar-site">
     <span class="material-icons" style="font-size: 18px;">arrow_back</span>
-    Voltar ao Site
+
   </a>
   
   <!-- Container de Login -->
@@ -337,7 +490,8 @@
         if (auth.ehAdmin()) {
           window.location.href = 'admin.html';
         } else {
-          window.location.href = 'dashboard.html';
+          // Redirecionar para a home logado ao invés do dashboard
+          window.location.href = 'index.html';
         }
       }
     });

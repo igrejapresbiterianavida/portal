@@ -287,7 +287,8 @@ function loginForm() {
           if (auth.ehAdmin()) {
             window.location.href = '/admin.html';
           } else {
-            window.location.href = '/dashboard.html';
+            // Redirecionar para a home logado ao invés do dashboard
+            window.location.href = '/index.html';
           }
         } else {
           this.erro = resultado.erro;

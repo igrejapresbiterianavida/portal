@@ -1120,23 +1120,41 @@ function mostrarModalMidias(midias, instrucoes) {
         this.style.transform='translateY(0)';
         this.style.boxShadow='none';
       ">
-        <div style="
-          width: 50px;
-          height: 50px;
-          background: linear-gradient(135deg, #2D7A3E, #1A4731);
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        ">
-          <i class="bi bi-${icone}" style="font-size: 1.5rem; color: white;"></i>
-        </div>
+        ${midia.tipo === 'imagem' ? `
+          <div style="
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid #e0e0e0;
+          ">
+            <img src="${midia.arquivo}" alt="${midia.nome}" style="
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            ">
+          </div>
+        ` : `
+          <div style="
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #2D7A3E, #1A4731);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          ">
+            <i class="bi bi-${icone}" style="font-size: 1.8rem; color: white;"></i>
+          </div>
+        `}
         <div style="flex: 1; min-width: 0;">
           <div style="font-weight: 600; color: #1A4731; margin-bottom: 3px;">${midia.nome}</div>
           <div style="font-size: 0.85rem; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
             ${midia.descricao}
           </div>
+          ${midia.tamanho ? `<div style="font-size: 0.75rem; color: #999; margin-top: 2px;">${midia.tamanho}</div>` : ''}
         </div>
         <div style="flex-shrink: 0;">
           <i class="bi bi-download" style="font-size: 1.2rem; color: #2D7A3E;"></i>

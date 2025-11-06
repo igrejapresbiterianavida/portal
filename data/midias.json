@@ -1,18 +1,60 @@
 {
   "midias": [
     {
-      "nome": "Logo IPV (PNG)",
-      "arquivo": "assets/icons/ipvida.png",
+      "nome": "Ícone 192x192 (PNG)",
+      "arquivo": "assets/midia/icon-192.png",
       "tipo": "imagem",
-      "tamanho": "pequeno",
-      "descricao": "Logo oficial da Igreja Presbiteriana Vida em formato PNG"
+      "tamanho": "192x192px",
+      "descricao": "Ícone da IPV para PWA e redes sociais"
+    },
+    {
+      "nome": "Logo IPV para Pefil (PNG)",
+      "arquivo": "assets/midia/ipvida.png",
+      "tipo": "imagem",
+      "tamanho": "Alta Resolução",
+      "descricao": "Logo oficial da Igreja Presbiteriana Vida em PNG"
     },
     {
       "nome": "Logo IPV (SVG)",
-      "arquivo": "assets/images/logo.svg",
+      "arquivo": "assets/midia/ipvida.svg",
       "tipo": "imagem",
-      "tamanho": "vetorial",
-      "descricao": "Logo oficial da Igreja Presbiteriana Vida em formato vetorial"
+      "tamanho": "Vetorial",
+      "descricao": "Logo oficial da IPV em formato vetorial escalável"
+    },
+    {
+      "nome": "Logo Branco (SVG)",
+      "arquivo": "assets/midia/logo-branco.svg",
+      "tipo": "imagem",
+      "tamanho": "Vetorial",
+      "descricao": "Logo IPV em branco para fundos escuros"
+    },
+    {
+      "nome": "Logo Preto (SVG)",
+      "arquivo": "assets/midia/logo-preto.svg",
+      "tipo": "imagem",
+      "tamanho": "Vetorial",
+      "descricao": "Logo IPV em preto para fundos claros"
+    },
+    {
+      "nome": "Logo Verde (SVG)",
+      "arquivo": "assets/midia/logo-verde.svg",
+      "tipo": "imagem",
+      "tamanho": "Vetorial",
+      "descricao": "Logo IPV na cor verde institucional"
+    },
+    {
+      "nome": "Logo Vermelho (SVG)",
+      "arquivo": "assets/midia/logo-vermelho.svg",
+      "tipo": "imagem",
+      "tamanho": "Vetorial",
+      "descricao": "Logo IPV na cor vermelha"
+    },
+    {
+      "nome": "Logo Vertical (SVG)",
+      "arquivo": "assets/midia/logo.svg",
+      "tipo": "imagem",
+      "tamanho": "Vetorial",
+      "descricao": "Logo IPV vertical completo em formato vetorial"
     }
   ],
   "categorias": {

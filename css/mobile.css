@@ -1263,7 +1263,7 @@
 
 .footer-rede-social:hover {
   background: var(--dourado);
-  color: var(--preto);
+  color: var(--branco);
   transform: translateY(-3px);
 }
 

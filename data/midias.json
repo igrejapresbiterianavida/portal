@@ -1,0 +1,37 @@
+{
+  "midias": [
+    {
+      "nome": "Logo IPV (PNG)",
+      "arquivo": "assets/icons/ipvida.png",
+      "tipo": "imagem",
+      "tamanho": "pequeno",
+      "descricao": "Logo oficial da Igreja Presbiteriana Vida em formato PNG"
+    },
+    {
+      "nome": "Logo IPV (SVG)",
+      "arquivo": "assets/images/logo.svg",
+      "tipo": "imagem",
+      "tamanho": "vetorial",
+      "descricao": "Logo oficial da Igreja Presbiteriana Vida em formato vetorial"
+    }
+  ],
+  "categorias": {
+    "logos": {
+      "nome": "Logos e Identidade Visual",
+      "descricao": "Logos oficiais da igreja em diversos formatos"
+    },
+    "banners": {
+      "nome": "Banners e Cartazes",
+      "descricao": "Materiais para divulgação de eventos"
+    },
+    "fundos": {
+      "nome": "Fundos para Apresentações",
+      "descricao": "Imagens de fundo para slides e apresentações"
+    }
+  },
+  "instrucoes": {
+    "uso": "Estes materiais são de uso exclusivo da Igreja Presbiteriana Vida e seus membros.",
+    "licenca": "Não é permitida a modificação ou uso comercial sem autorização prévia.",
+    "contato": "Para dúvidas sobre uso das mídias, entre em contato com a secretaria."
+  }
+}

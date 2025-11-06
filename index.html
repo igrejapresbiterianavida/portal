@@ -154,6 +154,7 @@
             <li><a href="#programacao" @click="fecharMenu; dropdown = false">Programação</a></li>
             <li><a href="#noticias-ipb" @click="fecharMenu; dropdown = false">Notícias IPB</a></li>
             <li><a href="#cremos" @click="fecharMenu; dropdown = false">O Que Cremos</a></li>
+            <li><a href="#" @click.prevent="baixarMidias(); fecharMenu(); dropdown = false">Mídias</a></li>
           </ul>
         </li><!-- navbar-dropdown !-->
         
@@ -626,8 +627,8 @@
            rel="noopener noreferrer"
            class="botao botao-primario"
            style="display: inline-flex; align-items: center; gap: 10px; font-size: 1rem;">
-          <i class="bi bi-phone"></i>
-          Baixar App Símbolos de Fé IPB
+          <i class="bi bi-download"></i>
+          App Símbolos de Fé IPB
           <i class="bi bi-google-play"></i>
         </a>
         <p style="margin-top: var(--espacamento-xs); color: var(--cinza-medio); font-size: 0.875rem;">

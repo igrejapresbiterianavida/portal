@@ -87,10 +87,12 @@ class AuthSystem {
     // Usar função de limpeza
     this.limparSessao();
     
-    // Redirecionar para index.html
-    window.location.href = window.location.pathname.includes('/pagina/') 
-      ? '../index.html' 
-      : '/index.html';
+    // Redirecionar para index.html - usar caminho relativo correto
+    if (window.location.pathname.includes('/pagina/')) {
+      window.location.href = '../index.html';
+    } else {
+      window.location.href = 'index.html';
+    }
   }
 
   // ==================== VERIFICAÇÕES ====================
@@ -335,10 +337,10 @@ function loginForm() {
         if (resultado.sucesso) {
           // Redirecionar baseado no tipo de usuário
           if (auth.ehAdmin()) {
-            window.location.href = '/pagina/admin.html';
+            window.location.href = 'admin.html';
           } else {
             // Redirecionar para a home logado ao invés do dashboard
-            window.location.href = '/index.html';
+            window.location.href = '../index.html';
           }
         } else {
           this.erro = resultado.erro;

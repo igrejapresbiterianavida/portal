@@ -993,3 +993,228 @@ function authNavbar() {
     }
   };
 }
+
+// ============================================
+// FUNÇÃO PARA BAIXAR MÍDIAS
+// ============================================
+
+async function baixarMidias() {
+  console.log('📥 Iniciando download de mídias...');
+  
+  try {
+    // Carregar lista de mídias do JSON
+    const response = await fetch('data/midias.json');
+    const dados = await response.json();
+    const midias = dados.midias;
+    
+    console.log(`📂 ${midias.length} mídias encontradas`);
+    
+    // Mostrar modal com as opções de download
+    mostrarModalMidias(midias, dados.instrucoes);
+    
+  } catch (erro) {
+    console.error('❌ Erro ao carregar mídias:', erro);
+    alert('❌ Erro ao carregar lista de mídias. Tente novamente.');
+  }
+}
+
+// Função para mostrar modal com links de download
+function mostrarModalMidias(midias, instrucoes) {
+  // Criar modal dinamicamente
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    animation: fadeIn 0.3s;
+  `;
+  
+  const conteudo = document.createElement('div');
+  conteudo.style.cssText = `
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: slideUp 0.3s;
+  `;
+  
+  let html = `
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+      <h2 style="margin: 0; color: #1A4731; display: flex; align-items: center; gap: 10px;">
+        <i class="bi bi-images" style="font-size: 1.8rem;"></i>
+        <span>Mídias IPV</span>
+      </h2>
+      <button onclick="this.closest('[data-modal-midias]').remove()" style="
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s;
+      " onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='none'">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    
+    <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #2D7A3E;">
+      <p style="margin: 0; color: #1A4731; font-size: 0.9rem;">
+        <i class="bi bi-info-circle" style="margin-right: 5px;"></i>
+        <strong>Instruções de Uso:</strong>
+      </p>
+      <p style="margin: 10px 0 0 0; color: #2D7A3E; font-size: 0.85rem; line-height: 1.5;">
+        ${instrucoes?.uso || 'Clique nos itens abaixo para baixar as mídias individualmente.'}
+      </p>
+    </div>
+    
+    <div style="margin-bottom: 15px;">
+      <h3 style="font-size: 0.95rem; color: #666; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+        Arquivos Disponíveis (${midias.length})
+      </h3>
+    </div>
+    
+    <div style="display: grid; gap: 12px;">
+  `;
+  
+  midias.forEach(midia => {
+    const nomeArquivo = midia.arquivo.split('/').pop();
+    const icone = midia.tipo === 'imagem' ? 'file-earmark-image' : 'file-earmark';
+    
+    html += `
+      <a href="${midia.arquivo}" download="${nomeArquivo}" style="
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 18px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+        border-radius: 10px;
+        text-decoration: none;
+        color: #1A4731;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+      " onmouseover="
+        this.style.background='linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)';
+        this.style.borderColor='#2D7A3E';
+        this.style.transform='translateY(-2px)';
+        this.style.boxShadow='0 5px 15px rgba(45,122,62,0.2)';
+      " onmouseout="
+        this.style.background='linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%)';
+        this.style.borderColor='transparent';
+        this.style.transform='translateY(0)';
+        this.style.boxShadow='none';
+      ">
+        <div style="
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, #2D7A3E, #1A4731);
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        ">
+          <i class="bi bi-${icone}" style="font-size: 1.5rem; color: white;"></i>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-weight: 600; color: #1A4731; margin-bottom: 3px;">${midia.nome}</div>
+          <div style="font-size: 0.85rem; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            ${midia.descricao}
+          </div>
+        </div>
+        <div style="flex-shrink: 0;">
+          <i class="bi bi-download" style="font-size: 1.2rem; color: #2D7A3E;"></i>
+        </div>
+      </a>
+    `;
+  });
+  
+  html += `
+    </div>
+    
+    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+      <button onclick="baixarTodasMidias(${JSON.stringify(midias).replace(/"/g, '&quot;')})" style="
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #2D7A3E, #1A4731);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s;
+      " onmouseover="
+        this.style.background='linear-gradient(135deg, #1A4731, #0d2318)';
+        this.style.transform='translateY(-2px)';
+        this.style.boxShadow='0 5px 20px rgba(26,71,49,0.4)';
+      " onmouseout="
+        this.style.background='linear-gradient(135deg, #2D7A3E, #1A4731)';
+        this.style.transform='translateY(0)';
+        this.style.boxShadow='none';
+      ">
+        <i class="bi bi-cloud-download" style="font-size: 1.3rem;"></i>
+        <span>Baixar Todas as Mídias</span>
+      </button>
+      
+      <p style="text-align: center; margin: 15px 0 0 0; font-size: 0.8rem; color: #999;">
+        ${instrucoes?.licenca || ''}
+      </p>
+    </div>
+  `;
+  
+  conteudo.innerHTML = html;
+  modal.appendChild(conteudo);
+  modal.setAttribute('data-modal-midias', 'true');
+  
+  // Fechar ao clicar fora
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+  
+  document.body.appendChild(modal);
+}
+
+// Função para baixar todas as mídias de uma vez (abre em novas abas)
+function baixarTodasMidias(midias) {
+  console.log('📥 Baixando todas as mídias...');
+  
+  let contador = 0;
+  midias.forEach((midia, index) => {
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.href = midia.arquivo;
+      link.download = midia.arquivo.split('/').pop();
+      link.click();
+      contador++;
+      
+      if (contador === midias.length) {
+        console.log('✅ Download de todas as mídias iniciado!');
+      }
+    }, index * 300); // Delay de 300ms entre cada download
+  });
+  
+  alert(`✅ Download de ${midias.length} mídias iniciado!\nOs arquivos serão baixados automaticamente.`);
+}

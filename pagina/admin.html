@@ -654,7 +654,7 @@
         if (!window.auth) {
           console.log('❌ Sistema de autenticação não carregado');
           alert('Erro no sistema de autenticação. Redirecionando...');
-          window.location.href = 'login.html';
+          window.location.href = 'login.html?force=true';
           return;
         }
         
@@ -662,7 +662,7 @@
         if (!auth.verificarSessaoAtiva()) {
           console.log('🚫 Usuário não autenticado - redirecionando para login');
           alert('⚠️ Você precisa fazer login para acessar esta área.');
-          window.location.href = 'login.html';
+          window.location.href = 'login.html?force=true';
           return;
         }
         
@@ -713,7 +713,7 @@
           // Verificar se o usuário está logado
           if (!auth.verificarSessaoAtiva()) {
             console.log('🚫 Usuário não logado - redirecionando para login');
-            window.location.href = 'login.html';
+            window.location.href = 'login.html?force=true';
             return;
           }
           

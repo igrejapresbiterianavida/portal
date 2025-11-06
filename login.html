@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login - Igreja Presbiteriana Vida">
+  <title>Login | IPV - Igreja Presbiteriana Vida</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛪</text></svg>">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/globais.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/animacoes.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/desktop.css">
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde-medio) 50%, var(--dourado) 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--fonte-principal);
+    }
+    
+    .login-container {
+      background: var(--branco);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      overflow: hidden;
+      width: 100%;
+      max-width: 400px;
+      margin: 20px;
+    }
+    
+    .login-header {
+      background: linear-gradient(135deg, var(--verde-escuro), var(--verde-medio));
+      color: var(--branco);
+      text-align: center;
+      padding: 40px 30px;
+    }
+    
+    .login-logo {
+      width: 80px;
+      height: 80px;
+      background: var(--branco);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2rem;
+    }
+    
+    .login-header h1 {
+      font-size: 1.5rem;
+      margin: 0 0 10px 0;
+      font-weight: var(--peso-bold);
+    }
+    
+    .login-header p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+    
+    .login-form {
+      padding: 40px 30px;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: var(--peso-medium);
+      color: var(--cinza-escuro);
+      font-size: 0.9rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid var(--cinza-leve);
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: var(--transicao-padrao);
+      background: var(--cinza-muito-claro);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--verde-medio);
+      background: var(--branco);
+      box-shadow: 0 0 0 3px rgba(45, 122, 62, 0.1);
+    }
+    
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, var(--verde-medio), var(--verde-escuro));
+      color: var(--branco);
+      border: none;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: var(--peso-medium);
+      cursor: pointer;
+      transition: var(--transicao-padrao);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(45, 122, 62, 0.3);
+    }
+    
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    .alerta-erro {
+      background: #fee;
+      color: #c33;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #fcc;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .demo-buttons {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--cinza-leve);
+    }
+    
+    .demo-buttons h4 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: var(--cinza-medio);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .demo-button {
+      width: 100%;
+      background: var(--cinza-muito-claro);
+      color: var(--cinza-escuro);
+      border: 1px solid var(--cinza-leve);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transicao-padrao);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .demo-button:hover {
+      background: var(--cinza-leve);
+      border-color: var(--verde-medio);
+    }
+    
+    .voltar-site {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255,255,255,0.9);
+      color: var(--verde-escuro);
+      padding: 10px 15px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: var(--peso-medium);
+      transition: var(--transicao-padrao);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+    }
+    
+    .voltar-site:hover {
+      background: var(--branco);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .spinner {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 480px) {
+      .login-container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+      
+      .login-header {
+        padding: 30px 20px;
+      }
+      
+      .login-form {
+        padding: 30px 20px;
+      }
+      
+      .voltar-site {
+        position: static;
+        margin: 20px auto 0;
+        width: fit-content;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Link para voltar ao site -->
+  <a href="index.html" class="voltar-site">
+    <span class="material-icons" style="font-size: 18px;">arrow_back</span>
+    Voltar ao Site
+  </a>
+  
+  <!-- Container de Login -->
+  <div class="login-container" x-data="loginForm()">
+    
+    <!-- Header -->
+    <div class="login-header">
+      <div class="login-logo">
+        ⛪
+      </div>
+      <h1>Área Restrita</h1>
+      <p>Igreja Presbiteriana Vida</p>
+    </div>
+    
+    <!-- Formulário -->
+    <div class="login-form">
+      
+      <!-- Mensagem de Erro -->
+      <div x-show="erro" class="alerta-erro">
+        <span class="material-icons" style="font-size: 20px;">error</span>
+        <span x-text="erro"></span>
+      </div>
+      
+      <!-- Formulário -->
+      <form @submit.prevent="enviar()">
+        
+        <div class="form-group">
+          <label class="form-label" for="email">E-mail</label>
+          <input 
+            type="email" 
+            id="email" 
+            class="form-input" 
+            x-model="dados.email"
+            placeholder="seu@email.com"
+            required
+            :disabled="carregando"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="senha">Senha</label>
+          <input 
+            type="password" 
+            id="senha" 
+            class="form-input" 
+            x-model="dados.senha"
+            placeholder="••••••••"
+            required
+            :disabled="carregando"
+          >
+        </div>
+        
+        <button type="submit" class="btn-login" :disabled="carregando">
+          <span x-show="!carregando">
+            <span class="material-icons">login</span>
+            Entrar
+          </span>
+          <span x-show="carregando">
+            <span class="material-icons spinner">refresh</span>
+            Entrando...
+          </span>
+        </button>
+        
+      </form>
+      
+      <!-- Botões Demo -->
+      <div class="demo-buttons">
+        <h4>Login de Demonstração</h4>
+        
+        <button type="button" class="demo-button" @click="preencherDemo('admin')" :disabled="carregando">
+          <span class="material-icons">admin_panel_settings</span>
+          Administrador
+        </button>
+        
+        <button type="button" class="demo-button" @click="preencherDemo('membro')" :disabled="carregando">
+          <span class="material-icons">person</span>
+          Membro
+        </button>
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <!-- Scripts -->
+  <script src="js/auth.js"></script>
+  
+  <script>
+    // Verificar se já está logado
+    document.addEventListener('DOMContentLoaded', () => {
+      if (auth.verificarSessaoAtiva()) {
+        if (auth.ehAdmin()) {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'dashboard.html';
+        }
+      }
+    });
+  </script>
+  
+</body>
+</html>

@@ -843,3 +843,103 @@ async function copiarPix() {
     alert('Erro ao copiar chave PIX');
   }
 }
+
+// Sistema de Autenticação da Navbar
+function authNavbar() {
+  return {
+    estaLogado: false,
+    usuario: null,
+    saudacao: 'Olá visitante!',
+    dropdownAberto: false,
+    
+    init() {
+      this.verificarSessao();
+      
+      // Escutar evento de abertura de modal
+      document.addEventListener('abrir-modal-visitante', () => {
+        // A função será chamada pelo Alpine.js via $dispatch
+      });
+    },
+    
+    toggleDropdown() {
+      this.dropdownAberto = !this.dropdownAberto;
+      console.log('Dropdown toggled:', this.dropdownAberto);
+    },
+    
+    fecharDropdown() {
+      this.dropdownAberto = false;
+    },
+    
+    verificarSessao() {
+      // Verificar se existe uma sessão ativa
+      const sessao = localStorage.getItem('ipv_sessao');
+      if (sessao) {
+        try {
+          const dadosSessao = JSON.parse(sessao);
+          const agora = new Date().getTime();
+          
+          // Verificar se a sessão não expirou (24 horas)
+          if (dadosSessao.expiresAt && agora < dadosSessao.expiresAt) {
+            this.estaLogado = true;
+            this.usuario = dadosSessao.usuario;
+            this.atualizarSaudacao();
+            console.log('✅ Sessão ativa encontrada:', this.usuario.nome);
+            return;
+          } else {
+            // Sessão expirada
+            localStorage.removeItem('ipv_sessao');
+          }
+        } catch (erro) {
+          console.error('Erro ao verificar sessão:', erro);
+          localStorage.removeItem('ipv_sessao');
+        }
+      }
+      
+      // Se não há sessão ou expirou
+      this.estaLogado = false;
+      this.usuario = null;
+      this.saudacao = 'Olá visitante!';
+    },
+    
+    atualizarSaudacao() {
+      if (this.usuario) {
+        const nome = this.usuario.nome;
+        if (this.usuario.tipo === 'administracao') {
+          this.saudacao = `Olá ${nome}!`;
+        } else if (this.usuario.tipo === 'lideranca') {
+          this.saudacao = `Olá ${nome}!`;
+        } else {
+          this.saudacao = `Olá ${nome}!`;
+        }
+      } else {
+        this.saudacao = 'Olá visitante!';
+      }
+    },
+    
+    logout() {
+      // Remover sessão
+      localStorage.removeItem('ipv_sessao');
+      
+      // Resetar estado
+      this.estaLogado = false;
+      this.usuario = null;
+      this.saudacao = 'Olá visitante!';
+      
+      // Redirecionar para a página inicial
+      window.location.href = 'index.html';
+      
+      console.log('👋 Logout realizado com sucesso');
+    },
+    
+    scrollToSection(sectionId) {
+      const elemento = document.querySelector(`#${sectionId}`);
+      if (elemento) {
+        const offsetTop = elemento.offsetTop - 70;
+        window.scrollTo({
+          top: offsetTop,
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+}

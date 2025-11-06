@@ -43,6 +43,68 @@
   <!-- ==================== NAVBAR ==================== -->
   <nav class="navbar">
     <div class="navbar-container">
+      <!-- Sistema de Autenticação - PRIMEIRO (esquerda no mobile) -->
+      <div class="navbar-auth" x-data="authNavbar()">
+        <!-- Não logado - Mostrar saudação e botão de login -->
+        <div x-show="!estaLogado" class="auth-section">
+          <span class="user-greeting">Olá visitante!</span>
+          <a href="login.html" class="login-button">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>Entrar</span>
+          </a>
+        </div>
+        
+        <!-- Logado - Mostrar dropdown do usuário -->
+        <div x-show="estaLogado" class="user-dropdown">
+          <button 
+            class="user-button" 
+            @click="toggleDropdown()"
+            @click.away="fecharDropdown()"
+          >
+            <img :src="usuario?.avatar" :alt="usuario?.nome" class="user-avatar">
+            <span class="user-name" x-text="saudacao"></span>
+            <i class="bi bi-chevron-down" :class="{ 'rotate-180': dropdownAberto }"></i>
+          </button>
+          
+          <div 
+            class="dropdown-content" 
+            :class="{ 'show': dropdownAberto }"
+            @click.away="fecharDropdown()"
+          >
+            <!-- Link para Dashboard (apenas membros) -->
+            <div x-show="usuario?.tipo === 'membro'">
+              <a href="#eventos-internos" @click="scrollToSection('eventos-internos')">
+                <i class="bi bi-calendar-event"></i>
+                Eventos Internos
+              </a>
+              <a href="#grupos-whatsapp" @click="scrollToSection('grupos-whatsapp')">
+                <i class="bi bi-whatsapp"></i>
+                Grupos WhatsApp
+              </a>
+              <a href="#recursos-membros" @click="scrollToSection('recursos-membros')">
+                <i class="bi bi-file-text"></i>
+                Recursos para Membros
+              </a>
+            </div>
+            
+            <!-- Link para área administrativa (apenas administração) -->
+            <div x-show="usuario?.tipo === 'administracao'">
+              <a href="admin.html">
+                <i class="bi bi-gear"></i>
+                Painel Administrativo
+              </a>
+            </div>
+            
+            <!-- Logout para todos -->
+            <a href="#" @click.prevent="logout()" class="logout">
+              <i class="bi bi-box-arrow-right"></i>
+              Sair
+            </a>
+          </div>
+        </div>
+      </div><!-- navbar-auth !-->
+      
+      <!-- Logo - SEGUNDO (centro no mobile) -->
       <div class="navbar-logo">
         <img src="assets/images/logo.svg" alt="Logo IPV">
         <span class="navbar-logo-texto"></span>
@@ -74,6 +136,7 @@
         <li class="navbar-item"><a href="#contato" @click="fecharMenu">Contato</a></li>
       </ul><!-- navbar-menu !-->
       
+      <!-- Menu Hamburger - TERCEIRO (direita no mobile) -->
       <button class="navbar-toggle" @click="menuAberto = !menuAberto" aria-label="Menu">
         <span></span>
         <span></span>

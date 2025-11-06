@@ -10,7 +10,9 @@ class DataManager {
       programacao: null,
       dadosIgreja: null,
       dadosBancarios: null,
-      redesSociais: null
+      redesSociais: null,
+      usuarios: null,
+      visitantes: null
     };
   }
 
@@ -81,6 +83,20 @@ class DataManager {
   }
 
   /**
+   * Carrega dados dos usuários
+   */
+  async carregarUsuarios() {
+    return await this.carregar('usuarios');
+  }
+
+  /**
+   * Carrega dados dos visitantes
+   */
+  async carregarVisitantes() {
+    return await this.carregar('visitantes');
+  }
+
+  /**
    * Carrega todos os dados de uma vez
    */
   async carregarTodos() {
@@ -90,7 +106,9 @@ class DataManager {
       this.carregarProgramacao(),
       this.carregarDadosIgreja(),
       this.carregarDadosBancarios(),
-      this.carregarRedesSociais()
+      this.carregarRedesSociais(),
+      this.carregarUsuarios(),
+      this.carregarVisitantes()
     ]);
   }
 

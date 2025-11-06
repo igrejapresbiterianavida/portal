@@ -1,0 +1,107 @@
+{
+  "usuarios": [
+    {
+      "id": "usr_001",
+      "email": "admin@ipbvida.com.br",
+      "senha": "admin123",
+      "nome": "Pastor",
+      "sobrenome": "Administrador",
+      "telefone": "(19) 99999-0001",
+      "tipo": "administracao",
+      "status": "ativo",
+      "permissoes": [
+        "usuarios:read",
+        "usuarios:write", 
+        "usuarios:delete",
+        "devocionais:read",
+        "devocionais:write",
+        "devocionais:delete",
+        "videos:read",
+        "videos:write",
+        "videos:delete",
+        "programacao:read",
+        "programacao:write",
+        "programacao:delete",
+        "visitantes:read",
+        "visitantes:write",
+        "visitantes:delete",
+        "dados-igreja:read",
+        "dados-igreja:write",
+        "dados-bancarios:read",
+        "dados-bancarios:write",
+        "redes-sociais:read",
+        "redes-sociais:write"
+      ],
+      "avatar": "https://ui-avatars.com/api/?name=Pastor+Administrador&background=1A4731&color=fff&size=128",
+      "dataCriacao": "2025-01-01T00:00:00Z",
+      "ultimoLogin": "2025-11-05T10:30:00Z",
+      "configuracoes": {
+        "tema": "claro",
+        "notificacoes": true,
+        "emailNotificacoes": true
+      }
+    },
+    {
+      "id": "usr_002",
+      "email": "membro@ipbvida.com.br",
+      "senha": "membro123",
+      "nome": "João",
+      "sobrenome": "Silva",
+      "telefone": "(19) 99999-0002",
+      "tipo": "membro",
+      "status": "ativo",
+      "permissoes": [
+        "devocionais:read",
+        "videos:read",
+        "programacao:read",
+        "visitantes:read",
+        "dados-igreja:read"
+      ],
+      "avatar": "https://ui-avatars.com/api/?name=João+Silva&background=2D7A3E&color=fff&size=128",
+      "dataCriacao": "2025-01-15T08:00:00Z",
+      "ultimoLogin": "2025-11-04T18:45:00Z",
+      "configuracoes": {
+        "tema": "claro",
+        "notificacoes": true,
+        "emailNotificacoes": false
+      }
+    },
+    {
+      "id": "usr_003",
+      "email": "lider@ipbvida.com.br",
+      "senha": "lider123",
+      "nome": "Maria",
+      "sobrenome": "Santos",
+      "telefone": "(19) 99999-0003",
+      "tipo": "lideranca",
+      "status": "ativo",
+      "permissoes": [
+        "devocionais:read",
+        "devocionais:write",
+        "videos:read",
+        "programacao:read",
+        "programacao:write",
+        "visitantes:read",
+        "visitantes:write",
+        "dados-igreja:read"
+      ],
+      "avatar": "https://ui-avatars.com/api/?name=Maria+Santos&background=D4AF37&color=fff&size=128",
+      "dataCriacao": "2025-02-01T12:00:00Z",
+      "ultimoLogin": "2025-11-03T14:20:00Z",
+      "configuracoes": {
+        "tema": "escuro",
+        "notificacoes": true,
+        "emailNotificacoes": true
+      }
+    }
+  ],
+  "configuracoes": {
+    "sessaoExpiraEm": 86400000,
+    "tentativasMaxLogin": 3,
+    "bloqueioTempo": 300000,
+    "senhaMinLength": 6,
+    "requireUppercase": false,
+    "requireNumbers": false,
+    "requireSpecialChars": false
+  }
+}

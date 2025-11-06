@@ -4,6 +4,66 @@
 
 /* ==================== TABLETS (768px+) ==================== */
 @media (min-width: 768px) {
+  /* Navbar desktop - reset mobile styles */
+  .navbar-auth {
+    position: static;
+    transform: none;
+    margin-left: clamp(0.5rem, 2vw, 1.5rem);
+    z-index: auto;
+  }
+  
+  .auth-section {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .user-greeting {
+    font-size: 0.875rem;
+    order: 1;
+    line-height: normal;
+  }
+  
+  .login-button {
+    order: 2;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 20px;
+  }
+  
+  .login-button i {
+    font-size: 1rem;
+  }
+  
+  .login-button span {
+    font-size: 0.875rem;
+  }
+  
+  .user-button {
+    padding: 0.5rem;
+    border-radius: 20px;
+  }
+  
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .user-name {
+    display: inline; /* Mostrar nome no desktop */
+    font-size: 0.875rem;
+  }
+
+  /* Navbar - ajustes para telas médias */
+  .navbar-menu {
+    gap: clamp(0.75rem, 1.2vw, 1rem);
+  }
+  
+  .navbar-item a {
+    font-size: clamp(0.8rem, 0.85vw, 0.88rem);
+    padding: var(--espacamento-xs) clamp(0.4rem, 0.8vw, 0.65rem);
+  }
+
   /* Navbar */
   .navbar-logo-texto {
     font-size: 1.5rem;
@@ -130,6 +190,24 @@
 
 /* ==================== DESKTOP (1024px+) ==================== */
 @media (min-width: 1024px) {
+  /* Navbar Desktop - espaçamento otimizado */
+  .navbar-container {
+    padding: var(--espacamento-md) var(--espacamento-lg);
+  }
+
+  .navbar-menu {
+    gap: clamp(0.8rem, 1.5vw, 1.2rem);
+  }
+
+  .navbar-item a {
+    font-size: clamp(0.85rem, 0.9vw, 0.95rem);
+    padding: var(--espacamento-xs) clamp(0.5rem, 1vw, 0.8rem);
+  }
+  
+  .navbar-auth {
+    margin-left: clamp(1rem, 2vw, 2rem);
+  }
+
   /* Typography */
   h1 {
     font-size: 3.5rem;
@@ -141,20 +219,6 @@
 
   h3 {
     font-size: 2.25rem;
-  }
-
-  /* Navbar Desktop */
-  .navbar-container {
-    padding: var(--espacamento-md) var(--espacamento-lg);
-  }
-
-  .navbar-menu {
-    gap: var(--espacamento-xl);
-  }
-
-  .navbar-item a {
-    font-size: 1.05rem;
-    padding: var(--espacamento-xs) var(--espacamento-md);
   }
 
   /* Hero Desktop */
@@ -287,6 +351,23 @@
   }
 }
 
+/* ==================== LARGE DESKTOP (1440px+) ==================== */
+@media (min-width: 1440px) {
+  /* Navbar para telas grandes - pode usar mais espaço */
+  .navbar-menu {
+    gap: clamp(1rem, 1.8vw, 1.5rem);
+  }
+
+  .navbar-item a {
+    font-size: clamp(0.9rem, 1vw, 1rem);
+    padding: var(--espacamento-xs) clamp(0.6rem, 1.2vw, 1rem);
+  }
+  
+  .navbar-auth {
+    margin-left: clamp(1.5rem, 3vw, 2.5rem);
+  }
+}
+
 /* ==================== NAVBAR ADAPTATIVA (quando fonte aumenta) ==================== */
 @media (max-width: 1200px) {
   .navbar-menu {
@@ -355,6 +436,27 @@
     font-size: 1.125rem;
   }
   
+  /* Sistema de autenticação mobile - removido, agora controlado no componentes.css */
+  
+  .user-button {
+    padding: 0.3rem;
+    border-radius: 12px;
+  }
+  
+  .user-avatar {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .user-name {
+    display: none; /* Esconder nome no mobile */
+  }
+  
+  .dropdown-content {
+    right: 0;
+    min-width: 180px;
+  }
+  
   /* Dropdown Mobile */
   .navbar-dropdown {
     width: 100%;
@@ -382,6 +484,31 @@
   
   .navbar-submenu a:hover {
     padding-left: var(--espacamento-md);
+  }
+}
+
+/* ==================== MOBILE PEQUENO (max 480px) ==================== */
+@media (max-width: 480px) {
+  .navbar-auth {
+    right: 50px;
+  }
+  
+  .login-button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+  }
+  
+  .login-button i {
+    font-size: 0.75rem;
+  }
+  
+  .user-greeting {
+    font-size: 0.6rem;
+  }
+  
+  .user-avatar {
+    width: 22px;
+    height: 22px;
   }
 }
 

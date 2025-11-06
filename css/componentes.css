@@ -251,12 +251,14 @@
   font-size: 1rem;
   font-weight: var(--peso-medio);
   padding: 0.75rem 1.5rem;
-  border-radius: var(--borda-arredondada);
+  min-height: 44px;
+  border-radius: var(--borda-arredondada-botao);
   border: 2px solid transparent;
   cursor: pointer;
   transition: var(--transicao-rapida);
   text-decoration: none;
   white-space: nowrap;
+  line-height: 1;
 }
 
 .botao-primario {
@@ -293,7 +295,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: var(--branco);
   border: 2px solid transparent;
-  border-radius: var(--borda-arredondada);
+  border-radius: var(--borda-arredondada-botao);
   position: relative;
   overflow: hidden;
 }
@@ -326,11 +328,13 @@
 
 .botao-grande {
   padding: 1rem 2rem;
+  min-height: 52px;
   font-size: 1.125rem;
 }
 
 .botao-pequeno {
   padding: 0.5rem 1rem;
+  min-height: 36px;
   font-size: 0.875rem;
 }
 
@@ -821,7 +825,7 @@
   color: var(--branco);
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: var(--borda-arredondada);
+  border-radius: var(--borda-arredondada-botao);
   font-weight: 600;
   text-decoration: none;
   display: inline-flex;
@@ -858,7 +862,7 @@
   gap: 0.5rem;
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: var(--borda-arredondada);
+  border-radius: 20px;
   transition: all 0.3s ease;
   color: var(--cinza-escuro);
 }
@@ -891,7 +895,7 @@
   background: var(--branco);
   min-width: 200px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  border-radius: var(--borda-arredondada);
+  border-radius: 12px;
   z-index: 1100;
   opacity: 0;
   visibility: hidden;

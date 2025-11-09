@@ -1286,9 +1286,9 @@
   /* Menu principal mobile */
   .navbar-menu {
     position: fixed !important;
-    top: 70px !important;
-    left: -100% !important;
-    width: 100% !important;
+    top: 92px !important;
+    left: -110% !important;
+    width: 100vw !important;
     height: calc(100vh - 70px) !important;
     background: var(--branco) !important;
     display: flex !important;
@@ -1299,8 +1299,11 @@
     box-shadow: var(--sombra-forte) !important;
     transition: left 0.3s ease !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     list-style: none !important;
     margin: 0 !important;
+    z-index: 9999 !important;
+    box-sizing: border-box !important;
   }
 
   .navbar-menu.aberto {
@@ -1313,6 +1316,8 @@
     padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   .navbar-item > a {
@@ -1334,6 +1339,8 @@
     width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   .navbar-dropdown-toggle {
@@ -1352,17 +1359,18 @@
     box-shadow: none !important;
     background: var(--cinza-muito-claro) !important;
     margin-top: var(--espacamento-xs) !important;
-    margin-left: var(--espacamento-md) !important;
-    margin-right: var(--espacamento-md) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     border-radius: var(--borda-arredondada-sm) !important;
     padding: var(--espacamento-xs) !important;
     border: 1px solid var(--cinza-leve) !important;
-    width: calc(100% - 2 * var(--espacamento-md)) !important;
+    width: 100% !important;
     min-width: auto !important;
     max-height: none !important;
     overflow: visible !important;
     flex-direction: column !important;
     list-style: none !important;
+    box-sizing: border-box !important;
     /* Removido display: flex fixo para permitir que Alpine controle */
   }
 
@@ -1379,17 +1387,22 @@
 
   .navbar-submenu a {
     font-size: 1rem !important;
-    padding: var(--espacamento-xs) var(--espacamento-md) !important;
+    padding: var(--espacamento-xs) var(--espacamento-sm) !important;
     display: block !important;
     width: 100% !important;
     box-sizing: border-box !important;
     text-decoration: none !important;
     color: var(--cinza-escuro) !important;
+    border-radius: var(--borda-arredondada-sm) !important;
+    transition: var(--transicao-rapida) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .navbar-submenu a:hover {
-    padding-left: var(--espacamento-md) !important;
     background: var(--cinza-leve) !important;
+    color: var(--verde-escuro) !important;
   }
 }
 

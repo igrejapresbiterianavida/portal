@@ -2,25 +2,38 @@
 // SERVICE-WORKER.JS - PWA Offline Support
 // ============================================
 
-const CACHE_NAME = 'ipv-online-v1';
-const CACHE_ESTATICO = 'ipv-estatico-v1';
-const CACHE_DINAMICO = 'ipv-dinamico-v1';
+const CACHE_NAME = 'ipv-online-v2';
+const CACHE_ESTATICO = 'ipv-estatico-v2';
+const CACHE_DINAMICO = 'ipv-dinamico-v2';
+
+// Detectar base path automaticamente
+const getBasePath = () => {
+  const path = self.location.pathname;
+  if (path.includes('/portal/')) {
+    return '/portal';
+  }
+  return '';
+};
+
+const BASE_PATH = getBasePath();
 
 const urlsParaCachear = [
-  '/',
-  '/index.html',
-  '/css/globais.css',
-  '/css/componentes.css',
-  '/css/animacoes.css',
-  '/css/mobile.css',
-  '/css/desktop.css',
-  '/js/aplicacao.js',
-  '/js/acessibilidade.js',
-  '/js/interface.js',
-  '/js/api-integracao.js',
-  '/assets/images/logo.svg',
-  '/assets/images/logo-branco.svg',
-  '/manifest.json'
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/css/globais.css`,
+  `${BASE_PATH}/css/componentes.css`,
+  `${BASE_PATH}/css/animacoes.css`,
+  `${BASE_PATH}/css/mobile.css`,
+  `${BASE_PATH}/css/desktop.css`,
+  `${BASE_PATH}/js/config.js`,
+  `${BASE_PATH}/js/aplicacao.js`,
+  `${BASE_PATH}/js/acessibilidade.js`,
+  `${BASE_PATH}/js/interface.js`,
+  `${BASE_PATH}/js/api-integracao.js`,
+  `${BASE_PATH}/js/auth.js`,
+  `${BASE_PATH}/assets/images/logo.svg`,
+  `${BASE_PATH}/assets/images/logo-branco.svg`,
+  `${BASE_PATH}/manifest.json`
 ];
 
 // Instalação do Service Worker
@@ -64,11 +77,41 @@ self.addEventListener('fetch', evento => {
   
   // Apenas cachear requisições do mesmo domínio
   if (url.origin === location.origin) {
-    evento.respondWith(cacheFirst(request));
+    // Se for uma navegação para uma página HTML, ajustar o caminho
+    if (request.mode === 'navigate') {
+      evento.respondWith(handleNavigation(request));
+    } else {
+      evento.respondWith(cacheFirst(request));
+    }
   } else {
     evento.respondWith(networkFirst(request));
   }
 });
+
+// Lidar com navegação de páginas
+async function handleNavigation(request) {
+  try {
+    // Tentar buscar a página normalmente primeiro
+    const response = await fetch(request);
+    return response;
+  } catch (erro) {
+    // Se falhar, tentar o cache ou redirecionar para index
+    const cache = await caches.open(CACHE_ESTATICO);
+    const cached = await cache.match(request);
+    
+    if (cached) {
+      return cached;
+    }
+    
+    // Fallback para index.html
+    const indexCached = await cache.match(`${BASE_PATH}/index.html`);
+    if (indexCached) {
+      return indexCached;
+    }
+    
+    return new Response('Offline', { status: 503 });
+  }
+}
 
 // Estratégia: Cache First (arquivos estáticos)
 async function cacheFirst(request) {
@@ -81,7 +124,9 @@ async function cacheFirst(request) {
   
   try {
     const response = await fetch(request);
-    cache.put(request, response.clone());
+    if (response.status === 200) {
+      cache.put(request, response.clone());
+    }
     return response;
   } catch (erro) {
     return new Response('Offline', { status: 503 });

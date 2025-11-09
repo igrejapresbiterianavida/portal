@@ -87,12 +87,9 @@ class AuthSystem {
     // Usar função de limpeza
     this.limparSessao();
     
-    // Redirecionar para index.html - usar caminho relativo correto
-    if (window.location.pathname.includes('/pagina/')) {
-      window.location.href = '../index.html';
-    } else {
-      window.location.href = 'index.html';
-    }
+    // Redirecionar para index.html usando CONFIG para caminho correto
+    const indexUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : 'index.html';
+    window.location.href = indexUrl;
   }
 
   // ==================== VERIFICAÇÕES ====================
@@ -269,7 +266,8 @@ class AuthSystem {
     // Primeiro verificar se está logado
     if (!this.verificarSessaoAtiva()) {
       console.log('🚫 Não está logado - redirecionando para login');
-      window.location.href = 'login.html';
+      const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') : 'login.html';
+      window.location.href = loginUrl;
       return false;
     }
     
@@ -277,7 +275,8 @@ class AuthSystem {
     if (!this.ehAdmin()) {
       console.log('🚫 Não é admin - redirecionando para home. Tipo atual:', this.usuario ? this.usuario.tipo : 'nenhum');
       alert('🚫 Acesso negado! Esta área é restrita para administradores.');
-      window.location.href = '../index.html';
+      const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+      window.location.href = homeUrl;
       return false;
     }
     
@@ -335,12 +334,14 @@ function loginForm() {
         const resultado = await auth.login(this.dados.email, this.dados.senha);
         
         if (resultado.sucesso) {
-          // Redirecionar baseado no tipo de usuário
+          // Redirecionar baseado no tipo de usuário usando CONFIG
           if (auth.ehAdmin()) {
-            window.location.href = 'admin.html';
+            const adminUrl = window.CONFIG ? window.CONFIG.buildPageUrl('admin.html') : 'admin.html';
+            window.location.href = adminUrl;
           } else {
-            // Redirecionar para a home logado ao invés do dashboard
-            window.location.href = '../index.html';
+            // Redirecionar para a home logado
+            const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+            window.location.href = homeUrl;
           }
         } else {
           this.erro = resultado.erro;

@@ -483,11 +483,17 @@
   </div>
   
   <!-- Scripts -->
+  <script src="../js/config.js"></script>
   <script src="../js/auth.js"></script>
   
   <script>
     // Verificar se já está logado - APENAS se não for forçado a mostrar o login
     document.addEventListener('DOMContentLoaded', () => {
+      // Log do caminho base detectado
+      if (window.CONFIG) {
+        window.CONFIG.logBasePath();
+      }
+      
       // Verificar se tem parâmetro ?force na URL (usado quando o usuário clica em "Entrar")
       const urlParams = new URLSearchParams(window.location.search);
       const forceLogin = urlParams.get('force');
@@ -498,10 +504,12 @@
       if (!forceLogin && auth.verificarSessaoAtiva()) {
         console.log('✅ Usuário já está logado, redirecionando...');
         if (auth.ehAdmin()) {
-          window.location.href = 'admin.html';
+          const adminUrl = window.CONFIG ? window.CONFIG.buildPageUrl('admin.html') : 'admin.html';
+          window.location.href = adminUrl;
         } else {
-          // Redirecionar para a home logado ao invés do dashboard
-          window.location.href = '../index.html';
+          // Redirecionar para a home logado
+          const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+          window.location.href = homeUrl;
         }
       } else {
         console.log('👤 Mostrando tela de login');

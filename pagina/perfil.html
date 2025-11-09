@@ -577,6 +577,7 @@
   </div>
   
   <!-- Scripts -->
+  <script src="../js/config.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/data-manager.js"></script>
   
@@ -804,11 +805,13 @@
         },
         
         voltar() {
-          // Verificar de onde veio
+          // Verificar de onde veio usando CONFIG
           if (auth.ehAdmin()) {
-            window.location.href = 'admin.html';
+            const adminUrl = window.CONFIG ? window.CONFIG.buildPageUrl('admin.html') : 'admin.html';
+            window.location.href = adminUrl;
           } else {
-            window.location.href = '../index.html';
+            const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+            window.location.href = homeUrl;
           }
         }
       };

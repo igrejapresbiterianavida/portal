@@ -964,8 +964,11 @@ function authNavbar() {
     
     irParaLogin() {
       console.log('🚀 Navegando para página de login...');
-      // Adicionar parâmetro ?force=true para evitar redirecionamento automático
-      window.location.href = 'pagina/login.html?force=true';
+      // Usar CONFIG para construir URL correta
+      const loginUrl = window.CONFIG ? 
+        window.CONFIG.buildPageUrl('login.html?force=true') : 
+        'pagina/login.html?force=true';
+      window.location.href = loginUrl;
     },
     
     irParaAdmin() {
@@ -975,7 +978,10 @@ function authNavbar() {
       if (window.auth && typeof auth.ehAdmin === 'function') {
         if (auth.ehAdmin()) {
           console.log('✅ Admin confirmado - navegando para admin.html');
-          window.location.href = 'pagina/admin.html';
+          const adminUrl = window.CONFIG ? 
+            window.CONFIG.buildPageUrl('admin.html') : 
+            'pagina/admin.html';
+          window.location.href = adminUrl;
         } else {
           console.log('🚫 Usuário não é admin');
           alert('🚫 Acesso negado! Área restrita para administradores.');
@@ -984,7 +990,10 @@ function authNavbar() {
         // Fallback: verificar pelo objeto usuario diretamente
         if (this.usuario && this.usuario.tipo === 'administracao') {
           console.log('✅ Admin confirmado (fallback) - navegando para admin.html');
-          window.location.href = 'pagina/admin.html';
+          const adminUrl = window.CONFIG ? 
+            window.CONFIG.buildPageUrl('admin.html') : 
+            'pagina/admin.html';
+          window.location.href = adminUrl;
         } else {
           console.log('🚫 Usuário não é admin (fallback)');
           alert('🚫 Acesso negado! Área restrita para administradores.');

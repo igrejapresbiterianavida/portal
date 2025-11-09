@@ -1103,6 +1103,14 @@
   <script src="js/interface.js"></script>
   <script src="js/acessibilidade.js"></script>
   
+  <!-- Inicializar CONFIG -->
+  <script>
+    // Log do caminho base detectado para debug
+    if (window.CONFIG) {
+      window.CONFIG.logBasePath();
+    }
+  </script>
+  
   <!-- VLibras Init -->
   <script>
     new window.VLibras.Widget('https://vlibras.gov.br/app');

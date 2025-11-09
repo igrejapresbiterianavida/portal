@@ -253,7 +253,8 @@ class AuthSystem {
     
     if (!paginaPublicas.includes(paginaAtual) && !this.usuario) {
       console.log('🚫 Acesso negado - redirecionando para login');
-      window.location.href = '/pagina/login.html';
+      const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') : '/pagina/login.html';
+      window.location.href = loginUrl;
       return false;
     }
     

@@ -945,8 +945,9 @@ function authNavbar() {
       this.usuario = null;
       this.saudacao = 'Olá visitante!';
       
-      // Redirecionar para a página inicial
-      window.location.href = 'index.html';
+      // Redirecionar para a página inicial usando CONFIG
+      const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : 'index.html';
+      window.location.href = homeUrl;
       
       console.log('👋 Logout realizado com sucesso');
     },

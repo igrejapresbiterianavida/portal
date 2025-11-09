@@ -395,9 +395,9 @@
 <body>
   
   <!-- Link para voltar ao site -->
-  <a href="../index.html" class="voltar-site">
+  <a href="#" class="voltar-site" onclick="voltarParaSite(event)">
     <span class="material-icons" style="font-size: 18px;">arrow_back</span>
-
+    Voltar ao site
   </a>
   
   <!-- Container de Login -->
@@ -487,6 +487,13 @@
   <script src="../js/auth.js"></script>
   
   <script>
+    // Função para voltar ao site com caminho correto
+    function voltarParaSite(event) {
+      event.preventDefault();
+      const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+      window.location.href = homeUrl;
+    }
+    
     // Verificar se já está logado - APENAS se não for forçado a mostrar o login
     document.addEventListener('DOMContentLoaded', () => {
       // Log do caminho base detectado
@@ -500,7 +507,7 @@
       
       console.log('🔍 Login.html carregado. Force:', forceLogin);
       
-      // Se não for forçado, verificar se já está logado
+      // Se não ser forçado, verificar se já está logado
       if (!forceLogin && auth.verificarSessaoAtiva()) {
         console.log('✅ Usuário já está logado, redirecionando...');
         if (auth.ehAdmin()) {

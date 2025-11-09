@@ -9,9 +9,12 @@ const CACHE_DINAMICO = 'ipv-dinamico-v2';
 // Detectar base path automaticamente
 const getBasePath = () => {
   const path = self.location.pathname;
+  console.log('[Service Worker] Detectando base path. Location:', self.location.href);
   if (path.includes('/portal/')) {
+    console.log('[Service Worker] GitHub Pages detectado - usando /portal');
     return '/portal';
   }
+  console.log('[Service Worker] Localhost detectado - sem base path');
   return '';
 };
 

@@ -6,14 +6,14 @@
     "fundacao": "2010"
   },
   "endereco": {
-    "logradouro": "R. Rozalindo de Souza",
-    "numero": "s/n",
+    "logradouro": "Av. Antonio Carlos do Amaral",
+    "numero": "Sem número",
     "complemento": "",
-    "bairro": "Residencial Cosmos",
+    "bairro": "Res. Cosmos",
     "cidade": "Campinas",
     "estado": "SP",
     "cep": "13059-582",
-    "enderecoCompleto": "R. Rozalindo de Souza, s/n - Residencial Cosmos, Campinas - SP, CEP: 13059-582"
+    "enderecoCompleto": "Av. Antonio Carlos do Amaral, Sem número - Res. Cosmos, Campinas - SP, CEP: 13059-582"
   },
   "contato": {
     "telefone": "(19) 99516-1006",
@@ -25,10 +25,10 @@
   "localizacao": {
     "latitude": -22.947046,
     "longitude": -47.159194,
-    "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d229.63039820932624!2d-47.159194!3d-22.947046!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c8b7beca27d1e1%3A0x782b1183a25ff854!2sComunidade%20Viver%20-%20Residencial%20Cosmos!5e0!3m2!1spt-BR!2sbr!4v1762275962246!5m2!1spt-BR!2sbr",
-    "googleMapsUrl": "https://maps.app.goo.gl/roQKMucnRyLw1yQy9",
-    "wazeUrl": "https://waze.com/ul?q=R.+Rozalindo+de+Souza,+08,+Campinas&navigate=yes",
-    "uberUrl": "https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=R.%20Rozalindo%20de%20Souza,%2008,%20Residencial%20Cosmos,%20Campinas%20-%20SP,%2013059-582"
+    "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3679.4234567890123!2d-47.159194!3d-22.947046!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDU2JzQ5LjQiUyA0N8KwMDknMzMuMSJX!5e0!3m2!1spt-BR!2sbr!4v1762275962246!5m2!1spt-BR!2sbr",
+    "googleMapsUrl": "https://maps.app.goo.gl/search/Av.%20Antonio%20Carlos%20do%20Amaral%20Res.%20Cosmos%20Campinas%20SP",
+    "wazeUrl": "https://waze.com/ul?q=Av.+Antonio+Carlos+do+Amaral,+Res.+Cosmos,+Campinas&navigate=yes",
+    "uberUrl": "https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=Av.%20Antonio%20Carlos%20do%20Amaral,%20Sem%20número%20-%20Res.%20Cosmos,%20Campinas%20-%20SP,%2013059-582"
   },
   "horarios": {
     "cultos": [

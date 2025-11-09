@@ -508,103 +508,6 @@
     </div><!-- container !-->
   </section><!-- noticias-ipb !-->
   
-  <!-- ==================== 5 PONTOS DO CALVINISMO ==================== -->
-  <section id="calvinismo" class="secao">
-    <div class="container">
-      <h2 class="secao-titulo">Os 5 Pontos do Calvinismo</h2>
-      <p class="secao-subtitulo">
-        Conheça as doutrinas da graça (TULIP) que fundamentam nossa teologia reformada
-      </p>
-      
-      <div class="grid grid-2" x-data="{ pontoExpandido: null }">
-        <!-- Depravação Total -->
-        <div class="card">
-          <div class="card-corpo">
-            <h3 class="card-titulo" style="color: var(--verde-medio); display: flex; align-items: center; gap: 8px;">
-              <span class="material-icons">eco</span> Depravação Total
-            </h3>
-            <p class="card-texto">
-              <strong>Total Depravity:</strong> Todos os seres humanos nascem com uma natureza pecaminosa 
-              que afeta cada aspecto do seu ser. O pecado corrompeu totalmente nossa vontade, 
-              tornando-nos incapazes de buscar a Deus por nós mesmos.
-            </p>
-            <p class="card-texto">
-              <em>"Não há justo, nem um sequer" (Romanos 3:10)</em>
-            </p>
-          </div><!-- card-corpo !-->
-        </div><!-- card !-->
-        
-        <!-- Eleição Incondicional -->
-        <div class="card">
-          <div class="card-corpo">
-            <h3 class="card-titulo" style="color: var(--verde-medio); display: flex; align-items: center; gap: 8px;">
-              <span class="material-icons">stars</span> Eleição Incondicional
-            </h3>
-            <p class="card-texto">
-              <strong>Unconditional Election:</strong> Deus escolheu desde a eternidade aqueles 
-              que seriam salvos, não baseado em méritos humanos, mas segundo o beneplácito de 
-              Sua vontade e para a glória de Sua graça.
-            </p>
-            <p class="card-texto">
-              <em>"Nos elegeu nele antes da fundação do mundo" (Efésios 1:4)</em>
-            </p>
-          </div><!-- card-corpo !-->
-        </div><!-- card !-->
-        
-        <!-- Expiação Limitada -->
-        <div class="card">
-          <div class="card-corpo">
-            <h3 class="card-titulo" style="color: var(--verde-medio); display: flex; align-items: center; gap: 8px;">
-              <span class="material-icons">favorite</span> Expiação Limitada
-            </h3>
-            <p class="card-texto">
-              <strong>Limited Atonement:</strong> Cristo morreu para garantir a salvação dos 
-              eleitos. Sua morte na cruz foi suficiente para todos, mas eficaz apenas para 
-              aqueles que Deus escolheu salvar.
-            </p>
-            <p class="card-texto">
-              <em>"O bom pastor dá a vida pelas suas ovelhas" (João 10:11)</em>
-            </p>
-          </div><!-- card-corpo !-->
-        </div><!-- card !-->
-        
-        <!-- Graça Irresistível -->
-        <div class="card">
-          <div class="card-corpo">
-            <h3 class="card-titulo" style="color: var(--verde-medio); display: flex; align-items: center; gap: 8px;">
-              <span class="material-icons">bolt</span> Graça Irresistível
-            </h3>
-            <p class="card-texto">
-              <strong>Irresistible Grace:</strong> O Espírito Santo atrai eficazmente os eleitos 
-              para Cristo, vencendo toda resistência e tornando-os dispostos a crer. A graça de 
-              Deus não pode ser frustrada.
-            </p>
-            <p class="card-texto">
-              <em>"Todo aquele que o Pai me dá, esse virá a mim" (João 6:37)</em>
-            </p>
-          </div><!-- card-corpo !-->
-        </div><!-- card !-->
-        
-        <!-- Perseverança dos Santos -->
-        <div class="card">
-          <div class="card-corpo">
-            <h3 class="card-titulo" style="color: var(--verde-medio); display: flex; align-items: center; gap: 8px;">
-              <span class="material-icons">shield</span> Perseverança dos Santos
-            </h3>
-            <p class="card-texto">
-              <strong>Perseverance of the Saints:</strong> Aqueles que foram genuinamente salvos 
-              por Deus perseverarão na fé até o fim. Deus preservará Seus eleitos, garantindo 
-              que não perderão a salvação.
-            </p>
-            <p class="card-texto">
-              <em>"Aquele que começou boa obra em vós há de completá-la" (Filipenses 1:6)</em>
-            </p>
-          </div><!-- card-corpo !-->
-        </div><!-- card !-->
-      </div><!-- grid !-->
-    </div><!-- container !-->
-  </section><!-- calvinismo !-->
-  
   <!-- ==================== O QUE CREMOS ==================== -->
   <section id="cremos" class="secao" style="background: var(--cinza-muito-claro);">
     <div class="container">
@@ -727,6 +630,121 @@
               <p class="card-texto">
                 <em>"Este Jesus que dentre vós foi assunto ao céu, assim virá do modo como o vistes subir" 
                 (Atos 1:11)</em>
+              </p>
+            </div>
+          </div><!-- card-corpo !-->
+        </div><!-- card !-->
+        
+        <!-- Os 5 Pontos do Calvinismo -->
+        <div style="margin-top: var(--espacamento-xl); text-align: center;">
+          <h3 style="color: var(--verde-escuro); margin-bottom: var(--espacamento-lg); font-size: 1.5rem;">
+            Os Cinco Pontos do Calvinismo
+          </h3>
+          <p style="color: var(--cinza-medio); margin-bottom: var(--espacamento-xl);">
+            As doutrinas da graça que fundamentam nossa compreensão da salvação
+          </p>
+        </div>
+        
+        <!-- 1. Depravação Total -->
+        <div class="card mb-2">
+          <div class="card-corpo">
+            <h3 class="card-titulo" @click="aberto = aberto === 6 ? null : 6" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 8px;"><span class="material-icons">warning</span>1. Depravação Total</span>
+              <span x-text="aberto === 6 ? '−' : '+'"></span>
+            </h3>
+            <div x-show="aberto === 6" x-collapse>
+              <p class="card-texto">
+                O homem em seu estado natural é completamente incapaz de fazer qualquer coisa que agrade a Deus. 
+                Todos os aspectos da natureza humana foram afetados pelo pecado, tornando-nos mortos espiritualmente 
+                e incapazes de buscar a Deus por nossa própria vontade.
+              </p>
+              <p class="card-texto">
+                <em>"Não há justo, nem um sequer, não há quem entenda, não há quem busque a Deus" (Romanos 3:10-11)</em>
+              </p>
+            </div>
+          </div><!-- card-corpo !-->
+        </div><!-- card !-->
+        
+        <!-- 2. Eleição Incondicional -->
+        <div class="card mb-2">
+          <div class="card-corpo">
+            <h3 class="card-titulo" @click="aberto = aberto === 7 ? null : 7" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 8px;"><span class="material-icons">how_to_vote</span>2. Eleição Incondicional</span>
+              <span x-text="aberto === 7 ? '−' : '+'"></span>
+            </h3>
+            <div x-show="aberto === 7" x-collapse>
+              <p class="card-texto">
+                Deus escolheu desde a eternidade aqueles que seriam salvos, não baseado em qualquer mérito 
+                ou obra prevista neles, mas somente por Sua graça e soberana vontade. Esta escolha é 
+                incondicional e imutável.
+              </p>
+              <p class="card-texto">
+                <em>"Assim como nos escolheu nele antes da fundação do mundo, para sermos santos e irrepreensíveis 
+                perante ele; e em amor nos predestinou para ele" (Efésios 1:4-5)</em>
+              </p>
+            </div>
+          </div><!-- card-corpo !-->
+        </div><!-- card !-->
+        
+        <!-- 3. Expiação Limitada -->
+        <div class="card mb-2">
+          <div class="card-corpo">
+            <h3 class="card-titulo" @click="aberto = aberto === 8 ? null : 8" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 8px;"><span class="material-icons">favorite</span>3. Expiação Limitada</span>
+              <span x-text="aberto === 8 ? '−' : '+'"></span>
+            </h3>
+            <div x-show="aberto === 8" x-collapse>
+              <p class="card-texto">
+                Cristo morreu especificamente pelos eleitos. Sua morte foi suficiente para todos, 
+                mas eficaz somente para aqueles que Deus escolheu. Jesus garantiu a salvação 
+                definitiva de Seu povo através de Seu sacrifício.
+              </p>
+              <p class="card-texto">
+                <em>"O bom Pastor dá a vida pelas ovelhas" (João 10:11). "Cristo amou a igreja 
+                e se entregou por ela" (Efésios 5:25)</em>
+              </p>
+            </div>
+          </div><!-- card-corpo !-->
+        </div><!-- card !-->
+        
+        <!-- 4. Graça Irresistível -->
+        <div class="card mb-2">
+          <div class="card-corpo">
+            <h3 class="card-titulo" @click="aberto = aberto === 9 ? null : 9" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 8px;"><span class="material-icons">bolt</span>4. Graça Irresistível</span>
+              <span x-text="aberto === 9 ? '−' : '+'"></span>
+            </h3>
+            <div x-show="aberto === 9" x-collapse>
+              <p class="card-texto">
+                Quando Deus chama eficazmente uma pessoa para a salvação, ela não pode resistir. 
+                O Espírito Santo regenera o coração, concedendo fé e arrependimento, fazendo com que 
+                o eleito venha voluntária e alegremente a Cristo.
+              </p>
+              <p class="card-texto">
+                <em>"Todo aquele que o Pai me dá, esse virá a mim; e o que vem a mim, 
+                de modo nenhum o lançarei fora" (João 6:37)</em>
+              </p>
+            </div>
+          </div><!-- card-corpo !-->
+        </div><!-- card !-->
+        
+        <!-- 5. Perseverança dos Santos -->
+        <div class="card mb-2">
+          <div class="card-corpo">
+            <h3 class="card-titulo" @click="aberto = aberto === 10 ? null : 10" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <span style="display: flex; align-items: center; gap: 8px;"><span class="material-icons">shield</span>5. Perseverança dos Santos</span>
+              <span x-text="aberto === 10 ? '−' : '+'"></span>
+            </h3>
+            <div x-show="aberto === 10" x-collapse>
+              <p class="card-texto">
+                Aqueles que foram verdadeiramente salvos perseverarão na fé até o fim. Deus preserva 
+                Seus eleitos, garantindo que não perderão a salvação. Esta é uma obra do próprio Deus, 
+                não dependendo da força humana.
+              </p>
+              <p class="card-texto">
+                <em>"Estou certo de que aquele que começou boa obra em vós há de completá-la até ao dia de Cristo Jesus" 
+                (Filipenses 1:6). "As minhas ovelhas ouvem a minha voz; eu as conheço, e elas me seguem. 
+                Eu lhes dou a vida eterna; jamais perecerão, e ninguém as arrebatará da minha mão" (João 10:27-28)</em>
               </p>
             </div>
           </div><!-- card-corpo !-->

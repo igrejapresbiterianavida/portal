@@ -12,7 +12,8 @@
     "build:copy": "shx cp -r assets dist/assets && shx cp -r css dist/css && shx cp -r pagina dist/pagina && shx cp index.html dist/index.html && shx cp manifest.json dist/manifest.json && shx cp browserconfig.xml dist/browserconfig.xml && shx cp -r data dist/data",
     "build:js": "node build-js.js",
     "build": "npm-run-all build:clean build:copy build:js",
-    "deploy": "npm run build && gh-pages -d dist"
+    "predeploy": "shx rm -rf node_modules/.cache/gh-pages || true",
+    "deploy": "npm run build && gh-pages -d dist -b gh-pages"
   },
   "repository": {
     "type": "git",

@@ -15,8 +15,20 @@ class DataManager {
       visitantes: null
     };
     
-    // Detectar caminho base
-    this.basePath = window.location.pathname.includes('/pagina/') ? '../' : '';
+    // Usar CONFIG.BASE_PATH se disponível, senão detectar manualmente
+    if (typeof window.CONFIG !== 'undefined' && window.CONFIG.BASE_PATH) {
+      this.basePath = window.CONFIG.BASE_PATH;
+    } else {
+      // Fallback: detectar caminho base manualmente
+      const pathname = window.location.pathname;
+      if (pathname.includes('/portal/')) {
+        this.basePath = '/portal/';
+      } else if (pathname.includes('/pagina/')) {
+        this.basePath = '../';
+      } else {
+        this.basePath = '';
+      }
+    }
   }
   
   /**

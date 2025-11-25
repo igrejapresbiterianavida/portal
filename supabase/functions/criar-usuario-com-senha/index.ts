@@ -31,6 +31,16 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    // GARANTIA DE SEGURANÇA: SEMPRE criar como visitante
+    // Apenas administradores podem alterar o tipo depois via edição no painel admin
+    // Isso é mais seguro do que validar no momento da criação
+    const tipoUsuario = 'visitante';
+    
+    // Se foi passado um tipo diferente de visitante, ignorar (sempre criar como visitante)
+    if (tipo && tipo !== 'visitante') {
+      console.warn('⚠️ Tentativa de criar usuário com tipo diferente de visitante. Ignorando e criando como visitante (mais seguro). Tipo desejado:', tipo);
+    }
+
     // 1. Criar usuário no Supabase Auth
     const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
       email: email.toLowerCase(),
@@ -64,7 +74,7 @@ serve(async (req: Request) => {
         sobrenome: sobrenome || '',
         email: email.toLowerCase(),
         telefone: telefone || null,
-        tipo: tipo || 'visitante',
+        tipo: tipoUsuario, // Usar tipo validado (sempre visitante se não for admin)
         status: 'ativo'
       })
       .select()

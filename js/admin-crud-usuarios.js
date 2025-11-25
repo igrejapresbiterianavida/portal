@@ -47,6 +47,12 @@ function crudUsuarios() {
     },
 
     abrirModal(usuario = null) {
+      // Verificar se é admin antes de permitir criar/editar
+      if (!window.auth || !window.auth.ehAdmin()) {
+        alert('Apenas administradores podem criar ou editar usuários.');
+        return;
+      }
+      
       this.usuarioEditando = usuario;
       if (usuario) {
         this.formulario = {
@@ -60,12 +66,13 @@ function crudUsuarios() {
           confirmarSenha: ''
         };
       } else {
+        // Ao criar, sempre começar como visitante (admin pode alterar depois)
         this.formulario = {
           nome: '',
           sobrenome: '',
           email: '',
           telefone: '',
-          tipo: 'visitante',
+          tipo: 'visitante', // Sempre visitante por padrão
           status: 'ativo',
           senha: '',
           confirmarSenha: ''
@@ -90,6 +97,12 @@ function crudUsuarios() {
     },
 
     async salvar() {
+      // Verificar se é admin antes de salvar
+      if (!window.auth || !window.auth.ehAdmin()) {
+        alert('Apenas administradores podem criar ou editar usuários.');
+        return;
+      }
+      
       if (!this.formulario.nome || !this.formulario.email) {
         alert('Nome e email são obrigatórios');
         return;
@@ -100,6 +113,16 @@ function crudUsuarios() {
       if (!emailRegex.test(this.formulario.email)) {
         alert('Por favor, insira um email válido');
         return;
+      }
+      
+      // Garantir que apenas admins podem criar usuários com tipo diferente de visitante
+      if (!this.usuarioEditando && this.formulario.tipo !== 'visitante') {
+        // Se não é admin tentando criar um usuário não-visitante, bloquear
+        if (!window.auth || !window.auth.ehAdmin()) {
+          alert('Apenas administradores podem criar usuários com tipos diferentes de visitante.');
+          this.formulario.tipo = 'visitante';
+          return;
+        }
       }
 
       // Validar senha ao criar novo usuário
@@ -182,11 +205,21 @@ function crudUsuarios() {
           try {
             const functionUrl = `${window.supabaseClient.url}/functions/v1/criar-usuario-com-senha`;
             
+            // Verificar se é admin antes de criar
+            if (!window.auth || !window.auth.ehAdmin()) {
+              alert('Apenas administradores podem criar usuários.');
+              this.carregando = false;
+              return;
+            }
+            
+            // Obter token do usuário logado para validação na Edge Function
+            const token = window.auth.token || window.supabaseClient.anonKey;
+            
             const response = await fetch(functionUrl, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+                'Authorization': `Bearer ${token || window.supabaseClient.anonKey || ''}`,
                 'apikey': window.supabaseClient.anonKey || ''
               },
               body: JSON.stringify({
@@ -195,7 +228,8 @@ function crudUsuarios() {
                 email: this.formulario.email.toLowerCase(),
                 senha: this.formulario.senha,
                 telefone: this.formulario.telefone || '',
-                tipo: this.formulario.tipo || 'visitante'
+                tipo: 'visitante' // SEMPRE criar como visitante (Edge Function força isso por segurança)
+                // O admin pode alterar o tipo depois via edição se necessário
               })
             });
             
@@ -310,6 +344,12 @@ function crudUsuarios() {
     },
 
     async alterarTipo(usuarioId, novoTipo) {
+      // Verificar se é admin antes de alterar tipo
+      if (!window.auth || !window.auth.ehAdmin()) {
+        alert('Apenas administradores podem alterar o tipo de usuário.');
+        return;
+      }
+      
       if (!confirm(`Alterar tipo do usuário para "${novoTipo}"?`)) return;
 
       this.carregando = true;

@@ -690,7 +690,10 @@
                     <td style="padding: 15px; text-align: center;">
                       <select @change="alterarTipo(usuario.id, $event.target.value)" 
                               :value="usuario.tipo"
-                              style="padding: 5px 10px; border: 1px solid var(--cinza-leve); border-radius: 5px; cursor: pointer;">
+                              :disabled="!auth || !auth.ehAdmin()"
+                              style="padding: 5px 10px; border: 1px solid var(--cinza-leve); border-radius: 5px; cursor: pointer;"
+                              :style="(!auth || !auth.ehAdmin()) ? 'background: #f3f4f6; cursor: not-allowed;' : ''"
+                              :title="(!auth || !auth.ehAdmin()) ? 'Apenas administradores podem alterar o tipo' : ''">
                         <option value="visitante">Visitante</option>
                         <option value="membro">Membro</option>
                         <option value="lideranca">Liderança</option>
@@ -843,8 +846,18 @@
               </div>
               
               <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Tipo</label>
-                <select x-model="formulario.tipo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">
+                  Tipo de Usuário
+                  <small style="color: var(--cinza-medio); font-weight: normal; display: block; margin-top: 3px;">
+                    Apenas administradores podem alterar o tipo. Novos usuários sempre começam como visitantes.
+                  </small>
+                </label>
+                <select 
+                  x-model="formulario.tipo" 
+                  :disabled="!auth || !auth.ehAdmin()"
+                  style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"
+                  :style="(!auth || !auth.ehAdmin()) ? 'background: #f3f4f6; cursor: not-allowed;' : ''"
+                  title="Apenas administradores podem alterar o tipo de usuário">
                   <template x-for="tipo in tipos" :key="tipo.valor">
                     <option :value="tipo.valor" x-text="tipo.label"></option>
                   </template>

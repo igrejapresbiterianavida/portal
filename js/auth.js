@@ -508,6 +508,7 @@ function loginForm() {
     sucessoReset: '',
     
     abrirModalSignUp() {
+      console.log('🔵 Abrindo modal Sign Up...');
       this.modalSignUpAberto = true;
       this.erroSignUp = '';
       this.sucessoSignUp = '';
@@ -519,6 +520,7 @@ function loginForm() {
         senha: '',
         confirmarSenha: ''
       };
+      console.log('✅ Modal Sign Up aberto:', this.modalSignUpAberto);
     },
     
     fecharModalSignUp() {
@@ -528,10 +530,12 @@ function loginForm() {
     },
     
     abrirModalReset() {
+      console.log('🔵 Abrindo modal Reset...');
       this.modalResetAberto = true;
       this.erroReset = '';
       this.sucessoReset = '';
       this.dadosReset = { email: '' };
+      console.log('✅ Modal Reset aberto:', this.modalResetAberto);
     },
     
     fecharModalReset() {
@@ -766,3 +770,12 @@ function loginForm() {
     }
   };
 }
+
+// Exportar loginForm para uso global (Alpine.js precisa acessar)
+if (typeof window !== 'undefined') {
+  window.loginForm = loginForm;
+  console.log('✅ loginForm exportada para window');
+}
+
+// Exportar loginForm para uso global (Alpine.js precisa acessar)
+window.loginForm = loginForm;

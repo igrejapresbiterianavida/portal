@@ -237,7 +237,7 @@
   </a>
   
   <!-- Container de Login -->
-  <div class="login-container" x-data="loginForm()">
+  <div class="login-container" x-data="window.loginForm ? window.loginForm() : {}" x-init="console.log('Alpine inicializado:', typeof window.loginForm)">
     
     <!-- Título -->
     <h1 class="login-title">Sign In</h1>
@@ -286,7 +286,7 @@
       
       <!-- Link Esqueci minha senha -->
       <div style="text-align: center; margin-top: 15px; margin-bottom: 20px;">
-        <a href="#" @click.prevent="abrirModalReset()" style="color: #2D6A4F; text-decoration: none; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: color 0.3s ease;" onmouseover="this.style.color='#1A4731'" onmouseout="this.style.color='#2D6A4F'">
+        <a href="#" @click.prevent="console.log('Click no Esqueci senha'); abrirModalReset()" style="color: #2D6A4F; text-decoration: none; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: color 0.3s ease; display: inline-block;" onmouseover="this.style.color='#1A4731'" onmouseout="this.style.color='#2D6A4F'">
           Esqueci minha senha
         </a>
       </div>
@@ -319,7 +319,7 @@
         </p>
         <button 
           type="button" 
-          @click="abrirModalSignUp()"
+          @click="console.log('Click no Criar Conta'); abrirModalSignUp()"
           style="background: transparent; border: 2px solid #2D6A4F; color: #2D6A4F; padding: 12px 30px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; min-width: 150px;"
           :disabled="carregando"
           onmouseover="this.style.backgroundColor='#2D6A4F'; this.style.color='#ffffff'"
@@ -506,6 +506,25 @@
         window.CONFIG.logBasePath();
       }
       
+      // Verificar se loginForm está disponível
+      if (typeof window.loginForm === 'function') {
+        console.log('✅ loginForm está disponível globalmente');
+      } else {
+        console.error('❌ loginForm NÃO está disponível! Verifique js/auth.js');
+        // Tentar acessar diretamente se estiver no escopo
+        if (typeof loginForm === 'function') {
+          window.loginForm = loginForm;
+          console.log('✅ loginForm exportado manualmente');
+        }
+      }
+      
+      // Verificar se Alpine.js está carregado
+      if (typeof Alpine !== 'undefined') {
+        console.log('✅ Alpine.js está carregado');
+      } else {
+        console.warn('⚠️ Alpine.js não está carregado!');
+      }
+      
       // Verificar se tem parâmetro ?force na URL (usado quando o usuário clica em "Entrar")
       const urlParams = new URLSearchParams(window.location.search);
       const forceLogin = urlParams.get('force');
@@ -513,7 +532,7 @@
       console.log('🔍 Login.html carregado. Force:', forceLogin);
       
       // Se não ser forçado, verificar se já está logado
-      if (!forceLogin && auth.verificarSessaoAtiva()) {
+      if (!forceLogin && auth && auth.verificarSessaoAtiva && auth.verificarSessaoAtiva()) {
         console.log('✅ Usuário já está logado, redirecionando...');
         if (auth.ehAdmin()) {
           const adminUrl = window.CONFIG ? window.CONFIG.buildPageUrl('admin.html') : 'admin.html';

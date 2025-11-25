@@ -19,12 +19,15 @@ class SupabaseClient {
    */
   async chamarEdgeFunction(nomeFunction, dados = {}) {
     if (!this.url) {
+      console.error('❌ URL do Supabase não configurada');
       throw new Error('URL do Supabase não configurada');
     }
 
     const functionUrl = `${this.url}/functions/v1/${nomeFunction}`;
     
     try {
+      console.log(`🔍 Chamando Edge Function: ${nomeFunction}`, { url: functionUrl, dados });
+      
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -33,15 +36,25 @@ class SupabaseClient {
         body: JSON.stringify(dados)
       });
       
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ HTTP ${response.status} na Edge Function ${nomeFunction}:`, errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
       const result = await response.json();
       
       if (!result.success) {
+        console.error(`❌ Edge Function ${nomeFunction} retornou erro:`, result.error);
         throw new Error(result.error || 'Erro na Edge Function');
       }
       
+      console.log(`✅ Edge Function ${nomeFunction} executada com sucesso`);
       return result.data;
     } catch (erro) {
       console.error(`❌ Erro ao chamar Edge Function ${nomeFunction}:`, erro);
+      console.error(`   URL tentada: ${functionUrl}`);
+      console.error(`   Dados enviados:`, dados);
       throw erro;
     }
   }
@@ -55,7 +68,22 @@ class SupabaseClient {
     try {
       return await this.chamarEdgeFunction('listar', { tabela, filtros });
     } catch (erro) {
-      console.error(`❌ Erro ao listar ${tabela}:`, erro);
+      console.error(`❌ Erro ao listar ${tabela} via Edge Function:`, erro);
+      console.warn(`⚠️ Tentando fallback para JSON...`);
+      
+      // Fallback para JSON se Edge Function falhar
+      try {
+        const jsonData = await window.dataManager?.carregar(tabela.replace('_', '-'));
+        if (jsonData && Array.isArray(jsonData[tabela])) {
+          return jsonData[tabela];
+        }
+        if (jsonData && Array.isArray(jsonData)) {
+          return jsonData;
+        }
+      } catch (jsonErro) {
+        console.error(`❌ Erro no fallback JSON para ${tabela}:`, jsonErro);
+      }
+      
       return [];
     }
   }
@@ -123,7 +151,26 @@ class SupabaseClient {
     try {
       return await this.chamarEdgeFunction('get-devocional-ativo', {});
     } catch (erro) {
-      console.error('❌ Erro ao buscar devocional ativo:', erro);
+      console.error('❌ Erro ao buscar devocional ativo via Edge Function:', erro);
+      console.warn('⚠️ Tentando fallback para JSON...');
+      
+      // Fallback para JSON
+      try {
+        const devocionais = await window.dataManager?.carregarDevocionais();
+        if (devocionais && devocionais.versiculos) {
+          // Retornar formato similar ao Supabase
+          return {
+            id: 'json-1',
+            titulo: 'Devocional Diário',
+            texto: devocionais.versiculos[0]?.texto || '',
+            data_publicacao: new Date().toISOString().split('T')[0],
+            ativo: true
+          };
+        }
+      } catch (jsonErro) {
+        console.error('❌ Erro no fallback JSON:', jsonErro);
+      }
+      
       return null;
     }
   }
@@ -135,7 +182,39 @@ class SupabaseClient {
     try {
       return await this.chamarEdgeFunction('get-dados-igreja', {});
     } catch (erro) {
-      console.error('❌ Erro ao buscar dados da igreja:', erro);
+      console.error('❌ Erro ao buscar dados da igreja via Edge Function:', erro);
+      console.warn('⚠️ Tentando fallback para JSON...');
+      
+      // Fallback para JSON
+      try {
+        const dados = await window.dataManager?.carregarDadosIgreja();
+        if (dados) {
+          // Converter formato JSON para formato Supabase
+          return {
+            id: 'json-1',
+            logradouro: dados.endereco?.logradouro || '',
+            numero: dados.endereco?.numero || '',
+            complemento: dados.endereco?.complemento || '',
+            bairro: dados.endereco?.bairro || '',
+            cidade: dados.endereco?.cidade || '',
+            estado: dados.endereco?.estado || '',
+            cep: dados.endereco?.cep || '',
+            telefone: dados.contato?.telefone || '',
+            whatsapp: dados.contato?.whatsapp || '',
+            email: dados.contato?.email || '',
+            email_secretaria: dados.contato?.emailSecretaria || '',
+            latitude: dados.localizacao?.latitude || null,
+            longitude: dados.localizacao?.longitude || null,
+            google_maps_embed: dados.localizacao?.googleMapsEmbed || '',
+            google_maps_url: dados.localizacao?.googleMapsUrl || '',
+            waze_url: dados.localizacao?.wazeUrl || '',
+            uber_url: dados.localizacao?.uberUrl || ''
+          };
+        }
+      } catch (jsonErro) {
+        console.error('❌ Erro no fallback JSON:', jsonErro);
+      }
+      
       return null;
     }
   }

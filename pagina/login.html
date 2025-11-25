@@ -336,7 +336,7 @@
       x-show="modalSignUpAberto"
       x-transition
       @click.away="fecharModalSignUp()"
-      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+      style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; margin: 0;">
     
     <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
       <button @click="fecharModalSignUp()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #6B7280;">&times;</button>
@@ -435,7 +435,7 @@
       x-show="modalResetAberto"
       x-transition
       @click.away="fecharModalReset()"
-      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+      style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; margin: 0;">
     
     <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; position: relative;">
       <button @click="fecharModalReset()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #6B7280;">&times;</button>

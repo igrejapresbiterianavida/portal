@@ -9,9 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:clean": "shx rm -rf dist && shx mkdir -p dist",
-    "build:copy": "shx cp -r assets dist/assets && shx cp -r css dist/css && shx cp -r pagina dist/pagina && shx cp index.html dist/index.html && shx cp manifest.json dist/manifest.json && shx cp browserconfig.xml dist/browserconfig.xml && shx cp -r data dist/data",
-    "build:js": "node build-js.js",
-    "build": "npm-run-all build:clean build:copy build:js",
+    "build:copy": "shx cp -r assets dist/assets && shx cp -r css dist/css && shx cp -r pagina dist/pagina && shx cp index.html dist/index.html && shx cp manifest.json dist/manifest.json && shx cp browserconfig.xml dist/browserconfig.xml && shx cp -r data dist/data && shx mkdir -p dist/js && shx cp js/*.js dist/js/ && shx rm -f dist/js/env-dev.js",
+    "build": "npm-run-all build:clean build:copy",
     "predeploy": "shx rm -rf node_modules/.cache/gh-pages || true",
     "deploy": "npm run build && gh-pages -d dist -b gh-pages"
   },

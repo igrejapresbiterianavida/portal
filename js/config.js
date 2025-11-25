@@ -31,7 +31,12 @@ const CONFIG = {
   
   // IDs que não são sensíveis (mas ainda assim melhor usar env)
   get CANAL_ID() {
-    return this.getEnvVar('CANAL_ID', '');
+    // Prioridade 1: SUPABASE_CONFIG (produção)
+    if (typeof window !== 'undefined' && window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.CANAL_ID) {
+      return window.SUPABASE_CONFIG.CANAL_ID;
+    }
+    // Prioridade 2: ENV (desenvolvimento)
+    return this.getEnvVar('CANAL_ID', 'UCTOsnSoOX31RB6Dr_kh9sHw'); // Default: @ipbvida
   },
   
   get EMAILJS_SERVICE_ID() {

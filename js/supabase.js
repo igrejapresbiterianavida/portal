@@ -9,11 +9,71 @@ class SupabaseClient {
     // URL e Anon Key do Supabase (ambas públicas e seguras)
     this.url = CONFIG?.SUPABASE_URL || window.SUPABASE_CONFIG?.SUPABASE_URL || '';
     this.anonKey = CONFIG?.SUPABASE_ANON_KEY || window.SUPABASE_CONFIG?.SUPABASE_ANON_KEY || '';
-    this.client = null; // Não usamos mais o cliente direto
     
-    console.log('✅ Supabase Client inicializado (usando Edge Functions)');
+    // Cliente Supabase para autenticação (é seguro usar a anon key aqui)
+    // CRUD continua usando Edge Functions, mas auth precisa do cliente direto
+    this.client = null;
+    // Aguardar a biblioteca Supabase estar disponível (pode demorar um pouco)
+    if (this.url && this.anonKey) {
+      this.initAuthClient();
+    }
+    
+    console.log('✅ Supabase Client inicializado (Edge Functions + Auth)');
     console.log(`📍 URL: ${this.url || '❌ Não configurado'}`);
     console.log(`🔑 Anon Key: ${this.anonKey ? '✅ Configurado' : '❌ Não configurado'}`);
+  }
+
+  /**
+   * Inicializar cliente para autenticação
+   * A biblioteca Supabase do CDN pode expor de diferentes formas
+   */
+  initAuthClient() {
+    const tryInit = () => {
+      let supabaseLib = null;
+      
+      // Tentar diferentes formas de acesso à biblioteca Supabase
+      if (typeof window.supabase !== 'undefined') {
+        // Forma 1: window.supabase.createClient (mais comum)
+        if (typeof window.supabase.createClient === 'function') {
+          supabaseLib = window.supabase;
+        }
+        // Forma 2: window.supabase.default.createClient (alguns CDNs)
+        else if (window.supabase.default && typeof window.supabase.default.createClient === 'function') {
+          supabaseLib = window.supabase.default;
+        }
+      }
+      
+      if (supabaseLib && supabaseLib.createClient) {
+        try {
+          this.client = supabaseLib.createClient(this.url, this.anonKey);
+          console.log('✅ Cliente Supabase para autenticação inicializado');
+          // Atualizar referência global
+          window.supabase = this.client;
+          return true;
+        } catch (erro) {
+          console.error('❌ Erro ao criar cliente Supabase:', erro);
+          return false;
+        }
+      }
+      return false;
+    };
+    
+    // Tentar imediatamente
+    if (!tryInit()) {
+      // Se não funcionou, tentar após um delay (a biblioteca pode ainda estar carregando)
+      setTimeout(() => {
+        if (!this.client) {
+          tryInit();
+        }
+      }, 100);
+      
+      // Se ainda não funcionou, tentar após mais tempo
+      setTimeout(() => {
+        if (!this.client) {
+          console.warn('⚠️ Cliente Supabase para autenticação não pôde ser inicializado. Verifique se a biblioteca está carregada.');
+        }
+      }, 1000);
+    }
   }
 
   /**
@@ -269,27 +329,88 @@ class SupabaseClient {
     return usuarios[0] || null;
   }
 
-  // ==================== COMPATIBILIDADE (para código existente) ====================
+  // ==================== AUTENTICAÇÃO (usa cliente direto - seguro) ====================
   
   /**
-   * Métodos de autenticação - ainda precisam do cliente direto
-   * Para autenticação, precisamos usar o cliente com anon key (isso é seguro)
+   * Login com Google usando o cliente Supabase direto
+   * É seguro porque a anon key é pública e protegida por RLS
    */
   async loginComGoogle() {
-    console.warn('⚠️ Autenticação ainda não implementada via Edge Functions');
-    throw new Error('Autenticação precisa ser implementada separadamente');
+    if (!this.client) {
+      throw new Error('Cliente Supabase não inicializado');
+    }
+    
+    try {
+      const { data, error } = await this.client.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/portal/pagina/auth-callback.html`
+        }
+      });
+      
+      if (error) throw error;
+      return { sucesso: true, data };
+    } catch (erro) {
+      console.error('❌ Erro no login Google:', erro);
+      throw erro;
+    }
   }
 
   async verificarSessao() {
-    return null;
+    if (!this.client) {
+      return null;
+    }
+    
+    try {
+      const { data: { session }, error } = await this.client.auth.getSession();
+      if (error) throw error;
+      return session;
+    } catch (erro) {
+      console.error('❌ Erro ao verificar sessão:', erro);
+      return null;
+    }
   }
 
   async logout() {
-    return;
+    if (!this.client) {
+      return;
+    }
+    
+    try {
+      await this.client.auth.signOut();
+    } catch (erro) {
+      console.error('❌ Erro ao fazer logout:', erro);
+    }
   }
 
   async getUsuarioAtual() {
-    return null;
+    if (!this.client) {
+      return null;
+    }
+    
+    try {
+      const { data: { user }, error } = await this.client.auth.getUser();
+      if (error) throw error;
+      return user;
+    } catch (erro) {
+      console.error('❌ Erro ao buscar usuário atual:', erro);
+      return null;
+    }
+  }
+  
+  async getUserFromSession(session) {
+    if (!session || !this.client) {
+      return null;
+    }
+    
+    try {
+      const { data: { user }, error } = await this.client.auth.getUser();
+      if (error) throw error;
+      return user;
+    } catch (erro) {
+      console.error('❌ Erro ao buscar usuário da sessão:', erro);
+      return null;
+    }
   }
 
   /**

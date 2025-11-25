@@ -6,12 +6,14 @@
 
 class SupabaseClient {
   constructor() {
-    // Apenas a URL do Supabase (pública)
+    // URL e Anon Key do Supabase (ambas públicas e seguras)
     this.url = CONFIG?.SUPABASE_URL || window.SUPABASE_CONFIG?.SUPABASE_URL || '';
+    this.anonKey = CONFIG?.SUPABASE_ANON_KEY || window.SUPABASE_CONFIG?.SUPABASE_ANON_KEY || '';
     this.client = null; // Não usamos mais o cliente direto
     
     console.log('✅ Supabase Client inicializado (usando Edge Functions)');
-    console.log(`📍 URL: ${this.url ? 'Configurado' : '❌ Não configurado'}`);
+    console.log(`📍 URL: ${this.url || '❌ Não configurado'}`);
+    console.log(`🔑 Anon Key: ${this.anonKey ? '✅ Configurado' : '❌ Não configurado'}`);
   }
 
   /**
@@ -28,11 +30,19 @@ class SupabaseClient {
     try {
       console.log(`🔍 Chamando Edge Function: ${nomeFunction}`, { url: functionUrl, dados });
       
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      // Adicionar headers de autenticação (necessários para Edge Functions)
+      if (this.anonKey) {
+        headers['Authorization'] = `Bearer ${this.anonKey}`;
+        headers['apikey'] = this.anonKey;
+      }
+      
       const response = await fetch(functionUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: headers,
         body: JSON.stringify(dados)
       });
       

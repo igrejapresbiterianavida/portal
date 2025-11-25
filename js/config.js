@@ -51,11 +51,17 @@ const CONFIG = {
   },
   
   get SUPABASE_URL() {
-    // Apenas a URL (pública) - sem credenciais
     if (typeof window !== 'undefined' && window.SUPABASE_CONFIG) {
       return window.SUPABASE_CONFIG.SUPABASE_URL || '';
     }
     return this.getEnvVar('SUPABASE_URL', '');
+  },
+  
+  get SUPABASE_ANON_KEY() {
+    if (typeof window !== 'undefined' && window.SUPABASE_CONFIG) {
+      return window.SUPABASE_CONFIG.SUPABASE_ANON_KEY || '';
+    }
+    return this.getEnvVar('SUPABASE_ANON_KEY', '');
   },
   
   // Método para buscar variáveis de ambiente (funciona em build)

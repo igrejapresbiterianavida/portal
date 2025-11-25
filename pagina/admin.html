@@ -783,45 +783,80 @@
               </div>
               
               <!-- Campos de Senha -->
-              <div style="margin-top: 25px; padding-top: 25px; border-top: 2px solid var(--cinza-leve);">
-                <h4 style="margin-bottom: 15px; color: var(--verde-escuro);">
-                  <span class="material-icons" style="font-size: 18px; vertical-align: middle;">lock</span>
-                  Senha
-                  <span x-show="!usuarioEditando" style="color: red;">*</span>
+              <div style="margin-top: 25px; padding: 20px; border-top: 3px solid var(--verde-medio); background: linear-gradient(to bottom, #f8f9fa, #ffffff); border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <h4 style="margin-bottom: 15px; color: var(--verde-escuro); display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">
+                  <span class="material-icons" style="font-size: 22px; color: var(--verde-medio);">lock</span>
+                  <span>Gerenciar Senha do Usuário</span>
+                  <span x-show="!usuarioEditando" style="color: red; margin-left: 5px; font-size: 1.2rem;">*</span>
                 </h4>
                 
+                <!-- Mensagem informativa -->
+                <div style="background: #e3f2fd; padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--verde-medio);">
+                  <small style="color: var(--cinza-escuro); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;">
+                    <span class="material-icons" style="font-size: 18px; color: var(--verde-medio); flex-shrink: 0;">info</span>
+                    <span>
+                      <strong x-show="!usuarioEditando" style="display: block; margin-bottom: 4px;">Obrigatório ao criar:</strong>
+                      <span x-show="!usuarioEditando">Defina uma senha para o usuário poder fazer login com email e senha.</span>
+                      <strong x-show="usuarioEditando" style="display: block; margin-bottom: 4px;">Opcional ao editar:</strong>
+                      <span x-show="usuarioEditando">Preencha apenas se desejar alterar a senha do usuário. Deixe em branco para manter a senha atual.</span>
+                    </span>
+                  </small>
+                </div>
+                
                 <div style="margin-top: 15px;">
-                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">
-                    <span x-show="!usuarioEditando">Senha</span>
-                    <span x-show="usuarioEditando">Nova Senha (deixe em branco para não alterar)</span>
-                    <span x-show="!usuarioEditando" style="color: red;">*</span>
+                  <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--cinza-escuro); font-size: 0.95rem;">
+                    <span x-show="!usuarioEditando">Senha *</span>
+                    <span x-show="usuarioEditando">Nova Senha</span>
+                    <span x-show="usuarioEditando" style="color: var(--cinza-medio); font-weight: normal; margin-left: 5px;">(opcional)</span>
                   </label>
                   <input 
                     type="password" 
                     x-model="formulario.senha" 
-                    placeholder="••••••••" 
-                    style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"
+                    :placeholder="usuarioEditando ? 'Deixe em branco para não alterar' : 'Digite a senha (mínimo 6 caracteres)'"
+                    style="width: 100%; padding: 12px; border: 2px solid var(--cinza-leve); border-radius: 8px; font-size: 1rem; transition: all 0.3s; box-sizing: border-box;"
+                    :style="formulario.senha && formulario.senha.length > 0 && formulario.senha.length < 6 ? 'border-color: #dc3545;' : ''"
                     :required="!usuarioEditando"
                     minlength="6"
+                    autocomplete="new-password"
                   >
-                  <small style="color: var(--cinza-medio); display: block; margin-top: 5px;">
-                    Mínimo de 6 caracteres
-                  </small>
+                  <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <small style="color: var(--cinza-medio); display: flex; align-items: center; gap: 4px;">
+                      <span class="material-icons" style="font-size: 16px;">info</span>
+                      Mínimo de 6 caracteres
+                    </small>
+                    <small x-show="formulario.senha && formulario.senha.length > 0 && formulario.senha.length < 6" style="color: #dc3545; display: flex; align-items: center; gap: 4px;">
+                      <span class="material-icons" style="font-size: 16px;">error</span>
+                      Senha muito curta
+                    </small>
+                  </div>
                 </div>
                 
-                <div style="margin-top: 15px;" x-show="formulario.senha">
-                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">
+                <div style="margin-top: 15px;">
+                  <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--cinza-escuro); font-size: 0.95rem;">
                     Confirmar Senha
-                    <span x-show="!usuarioEditando" style="color: red;">*</span>
+                    <span x-show="!usuarioEditando || (formulario.senha && formulario.senha.length > 0)" style="color: red;">*</span>
+                    <span x-show="usuarioEditando && (!formulario.senha || formulario.senha.length === 0)" style="color: var(--cinza-medio); font-weight: normal; margin-left: 5px;">(apenas se alterar senha)</span>
                   </label>
                   <input 
                     type="password" 
                     x-model="formulario.confirmarSenha" 
-                    placeholder="••••••••" 
-                    style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"
-                    :required="formulario.senha && !usuarioEditando"
+                    placeholder="Digite a senha novamente para confirmar"
+                    style="width: 100%; padding: 12px; border: 2px solid var(--cinza-leve); border-radius: 8px; font-size: 1rem; transition: all 0.3s; box-sizing: border-box;"
+                    :style="formulario.confirmarSenha && formulario.senha && formulario.senha !== formulario.confirmarSenha ? 'border-color: #dc3545;' : ''"
+                    :required="(formulario.senha && formulario.senha.length > 0) && (!usuarioEditando || formulario.senha.length > 0)"
                     minlength="6"
+                    autocomplete="new-password"
                   >
+                  <div style="margin-top: 8px;">
+                    <small x-show="formulario.confirmarSenha && formulario.senha && formulario.senha !== formulario.confirmarSenha" style="color: #dc3545; display: flex; align-items: center; gap: 4px;">
+                      <span class="material-icons" style="font-size: 16px;">error</span>
+                      As senhas não coincidem
+                    </small>
+                    <small x-show="formulario.confirmarSenha && formulario.senha && formulario.senha === formulario.confirmarSenha && formulario.senha.length >= 6" style="color: var(--verde-medio); display: flex; align-items: center; gap: 4px;">
+                      <span class="material-icons" style="font-size: 16px;">check_circle</span>
+                      Senhas coincidem
+                    </small>
+                  </div>
                 </div>
               </div>
               

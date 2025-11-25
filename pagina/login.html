@@ -286,7 +286,7 @@
       
       <!-- Link Esqueci minha senha -->
       <div style="text-align: center; margin-top: 15px; margin-bottom: 20px;">
-        <a href="#" @click.prevent="abrirModalReset()" style="color: var(--verde-medio); text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+        <a href="#" @click.prevent="abrirModalReset()" style="color: #2D6A4F; text-decoration: none; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: color 0.3s ease;" onmouseover="this.style.color='#1A4731'" onmouseout="this.style.color='#2D6A4F'">
           Esqueci minha senha
         </a>
       </div>
@@ -314,14 +314,16 @@
       
       <!-- Link Sign Up -->
       <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
-        <p style="color: #6B7280; font-size: 0.9rem; margin-bottom: 10px;">
+        <p style="color: #6B7280; font-size: 0.9rem; margin-bottom: 15px;">
           Não tem uma conta?
         </p>
         <button 
           type="button" 
           @click="abrirModalSignUp()"
-          style="background: transparent; border: 2px solid var(--verde-medio); color: var(--verde-medio); padding: 12px 30px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;"
+          style="background: transparent; border: 2px solid #2D6A4F; color: #2D6A4F; padding: 12px 30px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; min-width: 150px;"
           :disabled="carregando"
+          onmouseover="this.style.backgroundColor='#2D6A4F'; this.style.color='#ffffff'"
+          onmouseout="this.style.backgroundColor='transparent'; this.style.color='#2D6A4F'"
         >
           Criar Conta
         </button>

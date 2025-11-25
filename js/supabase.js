@@ -373,10 +373,27 @@ class SupabaseClient {
     }
     
     try {
+      // Detectar URL correta para redirectTo (produção ou desenvolvimento)
+      let redirectUrl;
+      if (typeof CONFIG !== 'undefined' && CONFIG.getBaseUrl) {
+        redirectUrl = CONFIG.getBaseUrl() + '/portal/pagina/auth-callback.html';
+      } else {
+        // Fallback: detectar produção vs desenvolvimento
+        const isProduction = window.location.hostname.includes('github.io') || 
+                            window.location.hostname.includes('igrejapresbiterianavida');
+        if (isProduction) {
+          redirectUrl = 'https://igrejapresbiterianavida.github.io/portal/pagina/auth-callback.html';
+        } else {
+          redirectUrl = `${window.location.origin}/portal/pagina/auth-callback.html`;
+        }
+      }
+      
+      console.log(`🔗 URL de redirect configurada: ${redirectUrl}`);
+      
       const { data, error } = await this.client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/portal/pagina/auth-callback.html`
+          redirectTo: redirectUrl
         }
       });
       

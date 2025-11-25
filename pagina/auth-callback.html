@@ -90,7 +90,12 @@
         if (error) {
           console.error('❌ Erro no OAuth:', error);
           alert('Erro ao fazer login com Google. Tente novamente.');
-          const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') : '../pagina/login.html';
+          let loginUrl;
+          if (window.CONFIG && window.CONFIG.getBaseUrl) {
+            loginUrl = window.CONFIG.getBaseUrl() + '/portal/pagina/login.html';
+          } else {
+            loginUrl = '../pagina/login.html';
+          }
           window.location.href = loginUrl;
           return;
         }
@@ -113,7 +118,12 @@
           }
           
           alert('Erro na autenticação. Tente novamente.');
-          const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') : '../pagina/login.html';
+          let loginUrl;
+          if (window.CONFIG && window.CONFIG.getBaseUrl) {
+            loginUrl = window.CONFIG.getBaseUrl() + '/portal/pagina/login.html';
+          } else {
+            loginUrl = '../pagina/login.html';
+          }
           window.location.href = loginUrl;
           return;
         }
@@ -147,7 +157,12 @@
       } catch (erro) {
         console.error('❌ Erro ao processar callback:', erro);
         alert('Erro ao processar autenticação. Tente novamente.');
-        const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') : '../pagina/login.html';
+        let loginUrl;
+        if (window.CONFIG && window.CONFIG.getBaseUrl) {
+          loginUrl = window.CONFIG.getBaseUrl() + '/portal/pagina/login.html';
+        } else {
+          loginUrl = '../pagina/login.html';
+        }
         window.location.href = loginUrl;
       }
     }
@@ -195,11 +210,21 @@
         // Redirecionar baseado no tipo de usuário
         // Usar CONFIG.buildPageUrl() para funcionar em dev e produção
         if (usuario && usuario.tipo === 'administracao') {
-          const adminUrl = window.CONFIG ? window.CONFIG.buildPageUrl('admin.html') : '../pagina/admin.html';
+          let adminUrl;
+          if (window.CONFIG && window.CONFIG.getBaseUrl) {
+            adminUrl = window.CONFIG.getBaseUrl() + '/portal/pagina/admin.html';
+          } else {
+            adminUrl = '../pagina/admin.html';
+          }
           window.location.href = adminUrl;
         } else {
-          // Usar CONFIG.buildUrl() para a página inicial
-          const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+          // Usar CONFIG.getBaseUrl() para construir URL completa
+          let homeUrl;
+          if (window.CONFIG && window.CONFIG.getBaseUrl) {
+            homeUrl = window.CONFIG.getBaseUrl() + '/portal/index.html';
+          } else {
+            homeUrl = '../index.html';
+          }
           window.location.href = homeUrl;
         }
       } catch (erro) {

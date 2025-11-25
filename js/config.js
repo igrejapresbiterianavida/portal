@@ -114,6 +114,17 @@ const CONFIG = {
     return this.BASE_PATH + 'pagina/' + page;
   },
   
+  // Obter URL base completa (com protocolo e domínio)
+  getBaseUrl() {
+    // Se está em produção (GitHub Pages)
+    if (window.location.hostname.includes('github.io') || window.location.hostname.includes('igrejapresbiterianavida')) {
+      return 'https://igrejapresbiterianavida.github.io';
+    }
+    
+    // Desenvolvimento local
+    return window.location.origin;
+  },
+  
   // Log do caminho detectado (para debug)
   logBasePath() {
     console.log(`🔗 Caminho base detectado: ${this.BASE_PATH}`);

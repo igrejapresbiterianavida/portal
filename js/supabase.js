@@ -342,8 +342,34 @@ class SupabaseClient {
    * É seguro porque a anon key é pública e protegida por RLS
    */
   async loginComGoogle() {
+    // Garantir que as configurações estão atualizadas
+    if (typeof atualizarConfigSupabase === 'function') {
+      atualizarConfigSupabase();
+    }
+    
+    // Garantir que temos URL e anonKey
+    if (!this.url || !this.anonKey) {
+      // Tentar buscar novamente
+      if (window.SUPABASE_CONFIG) {
+        this.url = window.SUPABASE_CONFIG.SUPABASE_URL || this.url;
+        this.anonKey = window.SUPABASE_CONFIG.SUPABASE_ANON_KEY || this.anonKey;
+      }
+      
+      if (!this.url || !this.anonKey) {
+        throw new Error('Configurações do Supabase não disponíveis. Verifique se config-prod.js foi carregado corretamente.');
+      }
+    }
+    
+    // Se o cliente não foi inicializado, tentar inicializar agora
     if (!this.client) {
-      throw new Error('Cliente Supabase não inicializado');
+      this.initAuthClient();
+      
+      // Aguardar um pouco e tentar novamente
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      if (!this.client) {
+        throw new Error('Cliente Supabase não inicializado. Verifique se a biblioteca Supabase está carregada.');
+      }
     }
     
     try {
@@ -433,10 +459,37 @@ class SupabaseClient {
   }
 }
 
-// Instância global
-// IMPORTANTE: Este arquivo deve ser carregado DEPOIS de config-prod.js
+// Instância global - criar imediatamente
 const supabaseClient = new SupabaseClient();
-
-// Exportar para uso global
 window.supabaseClient = supabaseClient;
-// window.supabase será definido quando o cliente for inicializado em initAuthClient()
+
+// Função para atualizar configurações quando disponíveis
+function atualizarConfigSupabase() {
+  if (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.SUPABASE_URL) {
+    if (supabaseClient.url !== window.SUPABASE_CONFIG.SUPABASE_URL || 
+        supabaseClient.anonKey !== window.SUPABASE_CONFIG.SUPABASE_ANON_KEY) {
+      console.log('🔄 Atualizando configurações do Supabase Client...');
+      supabaseClient.url = window.SUPABASE_CONFIG.SUPABASE_URL;
+      supabaseClient.anonKey = window.SUPABASE_CONFIG.SUPABASE_ANON_KEY;
+      
+      // Tentar inicializar cliente de auth se ainda não foi
+      if (supabaseClient.url && supabaseClient.anonKey && !supabaseClient.client) {
+        supabaseClient.initAuthClient();
+      }
+    }
+  }
+}
+
+// Tentar atualizar após delays para garantir que config-prod.js carregou
+[100, 300, 500, 1000].forEach(delay => {
+  setTimeout(atualizarConfigSupabase, delay);
+});
+
+// Também verificar no DOMContentLoaded
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', atualizarConfigSupabase);
+  } else {
+    setTimeout(atualizarConfigSupabase, 100);
+  }
+}

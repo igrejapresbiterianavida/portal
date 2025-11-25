@@ -1013,4 +1013,115 @@
   transform: rotate(180deg);
 }
 
+/* ==================== MODAL LEGAL (TERMOS E PRIVACIDADE) ==================== */
+.modal-legal {
+  max-width: 800px;
+  max-height: 90vh;
+}
+
+.modal-legal-conteudo {
+  padding: 0;
+  max-height: calc(90vh - 250px);
+  overflow-y: auto;
+}
+
+.legal-secao {
+  margin-bottom: var(--espacamento-xl);
+  padding-bottom: var(--espacamento-lg);
+  border-bottom: 1px solid var(--cinza-leve);
+}
+
+.legal-secao:last-child {
+  border-bottom: none;
+}
+
+.legal-secao h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--verde-escuro);
+  font-size: 1.25rem;
+  font-weight: var(--peso-bold);
+  margin-bottom: var(--espacamento-md);
+}
+
+.legal-secao h3 .material-icons {
+  font-size: 1.5rem;
+  color: var(--verde-medio);
+}
+
+.legal-secao p {
+  color: var(--cinza-escuro);
+  line-height: 1.8;
+  margin-bottom: var(--espacamento-sm);
+}
+
+.legal-secao ul {
+  list-style: none;
+  padding: 0;
+  margin: var(--espacamento-sm) 0;
+}
+
+.legal-secao ul li {
+  padding: var(--espacamento-xs) 0 var(--espacamento-xs) 30px;
+  position: relative;
+  color: var(--cinza-escuro);
+  line-height: 1.7;
+}
+
+.legal-secao ul li:before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--verde-medio);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.legal-secao strong {
+  color: var(--verde-escuro);
+  font-weight: var(--peso-semibold);
+}
+
+.legal-rodape {
+  margin-top: var(--espacamento-xl);
+  padding-top: var(--espacamento-lg);
+  border-top: 2px solid var(--verde-medio);
+  text-align: center;
+  color: var(--cinza-medio);
+  font-size: 0.9rem;
+}
+
+.modal-acoes-legal {
+  margin-top: var(--espacamento-lg);
+  padding-top: var(--espacamento-lg);
+  border-top: 1px solid var(--cinza-leve);
+}
+
+/* ==================== FOOTER LEGAL LINKS ==================== */
+.footer-legal {
+  margin-top: var(--espacamento-md);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footer-legal a {
+  color: var(--cinza-leve);
+  text-decoration: none;
+  transition: var(--transicao-rapida);
+  font-size: 0.875rem;
+}
+
+.footer-legal a:hover {
+  color: var(--branco);
+  text-decoration: underline;
+}
+
+.footer-legal span {
+  color: var(--cinza-medio);
+}
+
 /* Fim componentes.css */

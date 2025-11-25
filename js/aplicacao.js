@@ -1503,3 +1503,23 @@ function baixarTodasMidias(midias) {
   
   alert(`✅ Download de ${midias.length} mídias iniciado!\nOs arquivos serão baixados automaticamente.`);
 }
+
+// ==================== MODAL LEGAL (TERMOS E PRIVACIDADE) ====================
+function modalLegal() {
+  return {
+    modalAberto: false,
+    tipoModal: 'privacidade', // 'privacidade' ou 'termos'
+    
+    abrirModal(tipo) {
+      this.tipoModal = tipo || 'privacidade';
+      this.modalAberto = true;
+      document.body.style.overflow = 'hidden'; // Bloquear scroll
+    },
+    
+    fecharModal() {
+      this.modalAberto = false;
+      document.body.style.overflow = ''; // Liberar scroll
+    }
+  };
+}
+window.modalLegal = modalLegal;

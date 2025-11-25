@@ -313,55 +313,72 @@ window.buscarVideosYouTubeRSS = buscarVideosYouTubeRSS;
 window.buscarDetalhesVideoYouTube = buscarDetalhesVideoYouTube;
 window.verificarLiveYouTube = verificarLiveYouTube;
 
-// Buscar notícias da IPB (via RSS ou scraping)
+// Buscar notícias da IPB (via Edge Function - resolve CORS)
 async function buscarNoticiasIPB() {
   try {
-    // Como não há API oficial, vamos usar dados estruturados
-    // Você pode substituir por um serviço de RSS-to-JSON ou backend próprio
-    const response = await fetch('https://ipb.org.br/feed/rss');
+    // Usar Edge Function do Supabase para evitar CORS
+    if (window.supabaseClient && window.supabaseClient.url) {
+      const functionUrl = `${window.supabaseClient.url}/functions/v1/buscar-noticias-ipb`;
+      
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+          'apikey': window.supabaseClient.anonKey || ''
+        },
+        body: JSON.stringify({})
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        console.log(`✅ ${result.data.length} notícias IPB carregadas via Edge Function`);
+        return result.data;
+      }
+    }
     
-    // Por enquanto, retornar dados mockados estruturados
+    // Fallback: dados mockados se Edge Function não disponível
+    console.warn('⚠️ Edge Function não disponível, usando dados mockados');
     return [
       {
-        id: 1,
+        id: '1',
         titulo: 'Sínodo da Igreja Presbiteriana do Brasil realiza encontro anual',
         descricao: 'Líderes presbiterianos de todo o país se reúnem para discutir o futuro da denominação.',
-        dataPublicacao: '2025-11-01',
+        dataPublicacao: new Date().toISOString().split('T')[0],
         categoria: 'Institucional',
-        link: 'https://ipb.org.br/noticia/sinodo-2025',
-        imagem: 'assets/images/noticia-ipb-1.jpg'
+        link: 'https://ipb.org.br',
+        imagem: 'assets/images/logo-verde.svg'
       },
       {
-        id: 2,
-        titulo: 'Missões IPB anuncia novo campo missionário na África',
-        descricao: 'Igreja envia missionários para iniciar trabalho de evangelização e plantação de igrejas.',
-        dataPublicacao: '2025-10-28',
+        id: '2',
+        titulo: 'Missões IPB anuncia novo campo missionário',
+        descricao: 'Igreja envia missionários para iniciar trabalho de evangelização.',
+        dataPublicacao: new Date().toISOString().split('T')[0],
         categoria: 'Missões',
-        link: 'https://ipb.org.br/noticia/missoes-africa',
-        imagem: 'assets/images/noticia-ipb-2.jpg'
-      },
-      {
-        id: 3,
-        titulo: 'Seminário Teológico IPB abre inscrições para 2026',
-        descricao: 'Instituição oferece cursos de graduação e pós-graduação em teologia reformada.',
-        dataPublicacao: '2025-10-25',
-        categoria: 'Educação',
-        link: 'https://ipb.org.br/noticia/seminario-2026',
-        imagem: 'assets/images/noticia-ipb-3.jpg'
-      },
-      {
-        id: 4,
-        titulo: 'Campanha de arrecadação para construção de templos',
-        descricao: 'IPB lança campanha nacional para auxiliar congregações na construção de novos templos.',
-        dataPublicacao: '2025-10-20',
-        categoria: 'Projetos',
-        link: 'https://ipb.org.br/noticia/campanha-templos',
-        imagem: 'assets/images/noticia-ipb-4.jpg'
+        link: 'https://ipb.org.br',
+        imagem: 'assets/images/logo-verde.svg'
       }
     ];
   } catch (erro) {
-    console.error('Erro ao buscar notícias IPB:', erro);
-    return [];
+    console.error('❌ Erro ao buscar notícias IPB:', erro);
+    
+    // Retornar dados mockados em caso de erro
+    return [
+      {
+        id: '1',
+        titulo: 'Sínodo da Igreja Presbiteriana do Brasil realiza encontro anual',
+        descricao: 'Líderes presbiterianos de todo o país se reúnem para discutir o futuro da denominação.',
+        dataPublicacao: new Date().toISOString().split('T')[0],
+        categoria: 'Institucional',
+        link: 'https://ipb.org.br',
+        imagem: 'assets/images/logo-verde.svg'
+      }
+    ];
   }
 }
 

@@ -7,15 +7,21 @@
 class SupabaseClient {
   constructor() {
     // URL e Anon Key do Supabase (ambas públicas e seguras)
-    this.url = CONFIG?.SUPABASE_URL || window.SUPABASE_CONFIG?.SUPABASE_URL || '';
-    this.anonKey = CONFIG?.SUPABASE_ANON_KEY || window.SUPABASE_CONFIG?.SUPABASE_ANON_KEY || '';
+    // Prioridade: window.SUPABASE_CONFIG > CONFIG > env
+    const config = window.SUPABASE_CONFIG || (typeof CONFIG !== 'undefined' ? CONFIG : null);
+    
+    this.url = (config && config.SUPABASE_URL) || window.SUPABASE_CONFIG?.SUPABASE_URL || '';
+    this.anonKey = (config && config.SUPABASE_ANON_KEY) || window.SUPABASE_CONFIG?.SUPABASE_ANON_KEY || '';
     
     // Cliente Supabase para autenticação (é seguro usar a anon key aqui)
     // CRUD continua usando Edge Functions, mas auth precisa do cliente direto
     this.client = null;
+    
     // Aguardar a biblioteca Supabase estar disponível (pode demorar um pouco)
     if (this.url && this.anonKey) {
       this.initAuthClient();
+    } else {
+      console.warn('⚠️ Supabase não configurado. Verifique se config-prod.js foi carregado antes de supabase.js');
     }
     
     console.log('✅ Supabase Client inicializado (Edge Functions + Auth)');
@@ -428,8 +434,9 @@ class SupabaseClient {
 }
 
 // Instância global
+// IMPORTANTE: Este arquivo deve ser carregado DEPOIS de config-prod.js
 const supabaseClient = new SupabaseClient();
 
 // Exportar para uso global
 window.supabaseClient = supabaseClient;
-window.supabase = null; // Não usamos mais o cliente direto
+// window.supabase será definido quando o cliente for inicializado em initAuthClient()

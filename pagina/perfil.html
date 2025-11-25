@@ -583,7 +583,10 @@
   
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../js/env-dev.js"></script>
+  <!-- Config de produção (carrega primeiro para ter prioridade) -->
+  <script src="../js/config-prod.js"></script>
+  <!-- Config de desenvolvimento (apenas localmente, não vai para produção) -->
+  <script src="../js/env-dev.js" onerror="console.log('⚠️ env-dev.js não encontrado (normal em produção)')"></script>
   <script src="../js/config.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>

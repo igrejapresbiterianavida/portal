@@ -381,7 +381,12 @@
     <!-- Header com Avatar -->
     <div class="perfil-header">
       <div class="avatar-section">
-        <img :src="dados.avatar" :alt="dados.nome" class="avatar-grande">
+        <img 
+          :src="dados.avatar || dados.avatar_url || `https://ui-avatars.com/api/?name=${dados.nome}&background=1A4731&color=fff&size=128`" 
+          :alt="dados.nome" 
+          class="avatar-grande"
+          @error="dados.avatar = `https://ui-avatars.com/api/?name=${dados.nome}&background=1A4731&color=fff&size=128`"
+        >
         <label class="avatar-upload" title="Alterar foto">
           <span class="material-icons" style="font-size: 20px;">camera_alt</span>
           <input type="file" accept="image/*" @change="alterarAvatar($event)">
@@ -577,9 +582,11 @@
   </div>
   
   <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/env-dev.js"></script>
   <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
-  <script src="../js/data-manager.js"></script>
   
   <script>
     function perfilUsuario() {
@@ -592,6 +599,7 @@
           telefone: '',
           tipo: '',
           avatar: '',
+          avatar_url: '',
           status: ''
         },
         senha: {
@@ -602,6 +610,7 @@
         dadosOriginais: null,
         salvando: false,
         alterandoSenha: false,
+        arquivoAvatar: null,
         alerta: {
           mostrar: false,
           tipo: 'info',
@@ -613,28 +622,86 @@
           const tipos = {
             'administracao': 'Administração',
             'lideranca': 'Liderança',
-            'membro': 'Membro'
+            'membro': 'Membro',
+            'visitante': 'Visitante'
           };
           return tipos[this.dados.tipo] || this.dados.tipo;
         },
         
-        init() {
+        async init() {
           // Verificar autenticação
           if (!auth.verificarSessaoAtiva()) {
             console.log('🚫 Usuário não logado - redirecionando');
-            window.location.href = 'login.html?force=true';
+            const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') + '?force=true' : 'login.html?force=true';
+            window.location.href = loginUrl;
             return;
           }
           
-          // Carregar dados do usuário
-          this.carregarDados();
+          // Carregar dados do usuário do Supabase
+          await this.carregarDados();
         },
         
-        carregarDados() {
-          if (auth.usuario) {
-            this.dados = { ...auth.usuario };
-            this.dadosOriginais = { ...auth.usuario };
-            console.log('✅ Dados do perfil carregados:', this.dados.nome);
+        async carregarDados() {
+          try {
+            if (!auth.usuario || !auth.usuario.id) {
+              this.mostrarAlerta('erro', 'Usuário não encontrado. Faça login novamente.', 'error');
+              setTimeout(() => {
+                const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') + '?force=true' : 'login.html?force=true';
+                window.location.href = loginUrl;
+              }, 2000);
+              return;
+            }
+            
+            // Buscar dados atualizados do Supabase
+            if (window.supabaseClient && window.supabaseClient.client) {
+              const usuarioAtualizado = await window.supabaseClient.buscarPorId('usuarios', auth.usuario.id);
+              
+              if (usuarioAtualizado) {
+                // Garantir que avatar_url seja usado corretamente
+                const avatarUrl = usuarioAtualizado.avatar_url || '';
+                this.dados = {
+                  id: usuarioAtualizado.id,
+                  nome: usuarioAtualizado.nome || '',
+                  sobrenome: usuarioAtualizado.sobrenome || '',
+                  email: usuarioAtualizado.email || '',
+                  telefone: usuarioAtualizado.telefone || '',
+                  tipo: usuarioAtualizado.tipo || 'visitante',
+                  avatar: avatarUrl || `https://ui-avatars.com/api/?name=${usuarioAtualizado.nome}&background=1A4731&color=fff&size=128`,
+                  avatar_url: avatarUrl,
+                  status: usuarioAtualizado.status || 'ativo'
+                };
+                
+                console.log('🖼️ Avatar carregado:', {
+                  avatar_url: avatarUrl,
+                  avatar: this.dados.avatar,
+                  temUrl: !!avatarUrl
+                });
+                
+                // Atualizar também no auth
+                auth.usuario = { ...this.dados };
+                
+                this.dadosOriginais = { ...this.dados };
+                console.log('✅ Dados do perfil carregados do Supabase:', this.dados.nome);
+              } else {
+                // Fallback para dados do auth
+                this.dados = { ...auth.usuario };
+                this.dadosOriginais = { ...auth.usuario };
+                console.log('⚠️ Usuário não encontrado no Supabase, usando dados do auth');
+              }
+            } else {
+              // Fallback para dados do auth se Supabase não estiver disponível
+              this.dados = { ...auth.usuario };
+              this.dadosOriginais = { ...auth.usuario };
+              console.log('⚠️ Supabase não disponível, usando dados do auth');
+            }
+          } catch (erro) {
+            console.error('Erro ao carregar dados:', erro);
+            // Fallback para dados do auth
+            if (auth.usuario) {
+              this.dados = { ...auth.usuario };
+              this.dadosOriginais = { ...auth.usuario };
+            }
+            this.mostrarAlerta('erro', 'Erro ao carregar dados do perfil.', 'error');
           }
         },
         
@@ -654,12 +721,14 @@
             return;
           }
           
+          this.arquivoAvatar = file;
+          
           try {
-            // Ler arquivo como base64
+            // Preview local
             const reader = new FileReader();
             reader.onload = (e) => {
               this.dados.avatar = e.target.result;
-              this.mostrarAlerta('sucesso', 'Foto alterada! Não esqueça de salvar.', 'check_circle');
+              this.mostrarAlerta('sucesso', 'Foto selecionada! Não esqueça de salvar o perfil.', 'check_circle');
             };
             reader.readAsDataURL(file);
           } catch (erro) {
@@ -674,23 +743,83 @@
             return;
           }
           
+          if (!this.dados.id) {
+            this.mostrarAlerta('erro', 'ID do usuário não encontrado. Recarregue a página.', 'error');
+            return;
+          }
+          
           this.salvando = true;
           
           try {
-            // Simular salvamento (em produção seria no Supabase)
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Upload do avatar se houver arquivo novo
+            if (this.arquivoAvatar && window.supabaseClient) {
+              try {
+                const avatarUrl = await window.supabaseClient.uploadImagem(
+                  this.arquivoAvatar,
+                  'imagens',
+                  'avatars/'
+                );
+                this.dados.avatar_url = avatarUrl;
+                this.dados.avatar = avatarUrl;
+                this.arquivoAvatar = null;
+              } catch (erro) {
+                console.error('Erro ao fazer upload do avatar:', erro);
+                this.mostrarAlerta('erro', 'Erro ao fazer upload da foto. Os outros dados serão salvos.', 'error');
+              }
+            }
             
-            // Atualizar dados no auth
-            auth.usuario = { ...this.dados };
-            auth.salvarSessao(auth.usuario, auth.token);
-            
-            this.dadosOriginais = { ...this.dados };
-            
-            this.mostrarAlerta('sucesso', 'Perfil atualizado com sucesso!', 'check_circle');
-            console.log('✅ Perfil salvo:', this.dados);
+            // Salvar dados no Supabase
+            if (window.supabaseClient && window.supabaseClient.client) {
+              const dadosParaSalvar = {
+                nome: this.dados.nome,
+                sobrenome: this.dados.sobrenome,
+                telefone: this.dados.telefone || null
+              };
+              
+              // Adicionar avatar_url se foi feito upload
+              if (this.dados.avatar_url) {
+                dadosParaSalvar.avatar_url = this.dados.avatar_url;
+              }
+              
+              await window.supabaseClient.atualizar('usuarios', this.dados.id, dadosParaSalvar);
+              
+              // Atualizar dados no auth
+              auth.usuario = { 
+                ...auth.usuario,
+                nome: this.dados.nome,
+                sobrenome: this.dados.sobrenome,
+                telefone: this.dados.telefone,
+                avatar: this.dados.avatar,
+                avatar_url: this.dados.avatar_url
+              };
+              
+              // Salvar sessão atualizada
+              if (auth.token) {
+                const sessaoNavbar = {
+                  usuario: auth.usuario,
+                  token: auth.token,
+                  expiresAt: auth.sessaoExpiresAt ? auth.sessaoExpiresAt.getTime() : Date.now() + 3600000
+                };
+                localStorage.setItem('ipv_sessao', JSON.stringify(sessaoNavbar));
+                localStorage.setItem('auth_usuario', JSON.stringify(auth.usuario));
+              }
+              
+              this.dadosOriginais = { ...this.dados };
+              
+              this.mostrarAlerta('sucesso', 'Perfil atualizado com sucesso!', 'check_circle');
+              console.log('✅ Perfil salvo no Supabase:', this.dados);
+            } else {
+              // Fallback: apenas atualizar no auth
+              auth.usuario = { ...this.dados };
+              if (auth.token) {
+                auth.salvarSessao(auth.usuario, auth.token);
+              }
+              this.dadosOriginais = { ...this.dados };
+              this.mostrarAlerta('sucesso', 'Perfil atualizado localmente!', 'check_circle');
+            }
           } catch (erro) {
             console.error('Erro ao salvar perfil:', erro);
-            this.mostrarAlerta('erro', 'Erro ao salvar perfil.', 'error');
+            this.mostrarAlerta('erro', 'Erro ao salvar perfil: ' + (erro.message || 'Erro desconhecido'), 'error');
           } finally {
             this.salvando = false;
           }
@@ -717,26 +846,33 @@
             return;
           }
           
-          if (this.senha.atual !== this.dados.senha) {
-            this.mostrarAlerta('erro', 'Senha atual incorreta.', 'error');
-            return;
-          }
-          
           this.alterandoSenha = true;
           
           try {
-            // Simular alteração (em produção seria no Supabase)
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            this.dados.senha = this.senha.nova;
-            auth.usuario.senha = this.senha.nova;
-            auth.salvarSessao(auth.usuario, auth.token);
-            
-            this.limparSenha();
-            this.mostrarAlerta('sucesso', 'Senha alterada com sucesso!', 'check_circle');
+            // Alterar senha no Supabase Auth
+            if (window.supabaseClient && window.supabaseClient.client) {
+              const { data, error } = await window.supabaseClient.client.auth.updateUser({
+                password: this.senha.nova
+              });
+              
+              if (error) {
+                // Se der erro, pode ser que precise reautenticar
+                if (error.message.includes('password') || error.message.includes('reauthenticate')) {
+                  this.mostrarAlerta('erro', 'Para alterar a senha, você precisa fazer login novamente com sua senha atual.', 'error');
+                } else {
+                  throw error;
+                }
+              } else {
+                this.limparSenha();
+                this.mostrarAlerta('sucesso', 'Senha alterada com sucesso!', 'check_circle');
+                console.log('✅ Senha alterada no Supabase');
+              }
+            } else {
+              this.mostrarAlerta('erro', 'Sistema de autenticação não disponível.', 'error');
+            }
           } catch (erro) {
             console.error('Erro ao alterar senha:', erro);
-            this.mostrarAlerta('erro', 'Erro ao alterar senha.', 'error');
+            this.mostrarAlerta('erro', 'Erro ao alterar senha: ' + (erro.message || 'Erro desconhecido'), 'error');
           } finally {
             this.alterandoSenha = false;
           }
@@ -776,17 +912,50 @@
         
         async excluirConta() {
           try {
-            // Simular exclusão (em produção seria no Supabase)
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (!this.dados.id) {
+              this.mostrarAlerta('erro', 'ID do usuário não encontrado.', 'error');
+              return;
+            }
             
-            // Fazer logout e limpar tudo
-            auth.limparSessao();
-            
-            alert('✅ Sua conta foi excluída com sucesso. Você será redirecionado para a página inicial.');
-            window.location.href = '../index.html';
+            // Buscar auth_user_id do usuário
+            if (window.supabaseClient && window.supabaseClient.client) {
+              const usuarioParaDeletar = await window.supabaseClient.buscarPorId('usuarios', this.dados.id);
+              
+              if (usuarioParaDeletar && usuarioParaDeletar.auth_user_id) {
+                // Deletar do auth.users (vai acionar CASCADE e deletar de usuarios também)
+                const { error: rpcError } = await window.supabaseClient.client.rpc('deletar_usuario_auth', { 
+                  p_auth_user_id: usuarioParaDeletar.auth_user_id 
+                });
+                
+                if (rpcError) {
+                  throw rpcError;
+                }
+                
+                // Fazer logout e limpar tudo
+                auth.limparSessao();
+                
+                alert('✅ Sua conta foi excluída com sucesso. Você será redirecionado para a página inicial.');
+                const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+                window.location.href = homeUrl;
+              } else {
+                // Se não tem auth_user_id, deletar apenas de usuarios
+                await window.supabaseClient.deletar('usuarios', this.dados.id);
+                
+                auth.limparSessao();
+                alert('✅ Sua conta foi excluída com sucesso. Você será redirecionado para a página inicial.');
+                const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+                window.location.href = homeUrl;
+              }
+            } else {
+              // Fallback: apenas limpar sessão local
+              auth.limparSessao();
+              alert('⚠️ Sistema de exclusão não disponível. Sessão local limpa.');
+              const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+              window.location.href = homeUrl;
+            }
           } catch (erro) {
             console.error('Erro ao excluir conta:', erro);
-            this.mostrarAlerta('erro', 'Erro ao excluir conta.', 'error');
+            this.mostrarAlerta('erro', 'Erro ao excluir conta: ' + (erro.message || 'Erro desconhecido'), 'error');
           }
         },
         
@@ -816,6 +985,15 @@
         }
       };
     }
+  </script>
+  
+  <!-- Atualizar links dinamicamente para funcionar em dev e produção -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.CONFIG) {
+        window.CONFIG.atualizarLinks();
+      }
+    });
   </script>
   
 </body>

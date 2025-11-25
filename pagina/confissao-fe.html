@@ -76,7 +76,7 @@
         <img src="../assets/images/logo.svg" alt="Logo IPV">
         <span class="navbar-logo-texto">IPV Online</span>
       </div>
-      <a href="../index.html" class="botao botao-outline">← Voltar ao Site</a>
+      <a href="#" class="botao botao-outline" id="link-voltar-topo">← Voltar ao Site</a>
     </div>
   </nav>
   
@@ -194,9 +194,25 @@
     <div class="container">
       <div class="text-center">
         <p>© 2025 Igreja Presbiteriana Vida</p>
-        <a href="../index.html" class="botao botao-outline mt-3">Voltar ao Site</a>
+        <a href="#" class="botao botao-outline mt-3" id="link-voltar-rodape">Voltar ao Site</a>
       </div>
     </div>
   </footer>
+  
+  <!-- Atualizar links dinamicamente para funcionar em dev e produção -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.CONFIG) {
+        const homeUrl = window.CONFIG.buildUrl('index.html');
+        
+        // Atualizar links "Voltar ao Site"
+        const linkVoltarTopo = document.getElementById('link-voltar-topo');
+        const linkVoltarRodape = document.getElementById('link-voltar-rodape');
+        
+        if (linkVoltarTopo) linkVoltarTopo.href = homeUrl;
+        if (linkVoltarRodape) linkVoltarRodape.href = homeUrl;
+      }
+    });
+  </script>
 </body>
 </html>

@@ -81,8 +81,13 @@ class AuthSystem {
     }
   }
 
-  logout() {
+  async logout() {
     console.log('🚪 Realizando logout...');
+    
+    // Logout do Supabase se estiver configurado
+    if (window.supabaseClient) {
+      await window.supabaseClient.logout();
+    }
     
     // Usar função de limpeza
     this.limparSessao();
@@ -95,6 +100,7 @@ class AuthSystem {
   // ==================== VERIFICAÇÕES ====================
   
   verificarSessaoAtiva() {
+    // PRIORIDADE 1: Verificar localStorage primeiro (mais rápido, retorna imediatamente)
     const token = localStorage.getItem('auth_token');
     const usuarioString = localStorage.getItem('auth_usuario');
     const expires = localStorage.getItem('auth_expires');
@@ -119,12 +125,64 @@ class AuthSystem {
         this.token = token;
         this.usuario = JSON.parse(usuarioString);
         this.sessaoExpiresAt = expiresAt;
-        console.log('🔐 Sessão ativa:', this.usuario.nome, '| Tipo:', this.usuario.tipo);
+        console.log('🔐 Sessão ativa (localStorage):', this.usuario.nome, '| Tipo:', this.usuario.tipo);
+        
+        // Verificar Supabase em background para sincronizar
+        if (window.supabaseClient && window.supabaseClient.client) {
+          window.supabaseClient.client.auth.getSession().then(({ data: { session }, error }) => {
+            if (session && !error) {
+              // Sessão Supabase ativa - atualizar se necessário
+              this.verificarSessaoSupabase().then(ativo => {
+                if (ativo && window.authNavbar) {
+                  // Atualizar navbar se existir
+                  const navbar = document.querySelector('[x-data*="authNavbar"]');
+                  if (navbar && navbar._x_dataStack) {
+                    const navbarData = navbar._x_dataStack[0];
+                    if (navbarData) {
+                      navbarData.estaLogado = true;
+                      navbarData.usuario = this.usuario;
+                      navbarData.atualizarSaudacao();
+                    }
+                  }
+                }
+              });
+            }
+          }).catch(erro => {
+            console.log('Supabase session check:', erro);
+          });
+        }
+        
         return true;
       } else {
         console.log('⏰ Sessão expirada - limpando...');
         this.limparSessao();
       }
+    }
+    
+    // PRIORIDADE 2: Se não tem no localStorage, verificar Supabase diretamente
+    if (window.supabaseClient && window.supabaseClient.client) {
+      // Verificar sessão do Supabase de forma assíncrona (mas não bloqueia)
+      window.supabaseClient.client.auth.getSession().then(({ data: { session }, error }) => {
+        if (session && !error) {
+          // Sessão Supabase ativa - buscar perfil e atualizar
+          this.verificarSessaoSupabase().then(ativo => {
+            if (ativo && window.authNavbar) {
+              // Atualizar navbar se existir
+              const navbar = document.querySelector('[x-data*="authNavbar"]');
+              if (navbar && navbar._x_dataStack) {
+                const navbarData = navbar._x_dataStack[0];
+                if (navbarData) {
+                  navbarData.estaLogado = true;
+                  navbarData.usuario = this.usuario;
+                  navbarData.atualizarSaudacao();
+                }
+              }
+            }
+          });
+        }
+      }).catch(erro => {
+        console.log('Supabase session check:', erro);
+      });
     }
     
     console.log('❌ Nenhuma sessão ativa encontrada');
@@ -178,7 +236,11 @@ class AuthSystem {
   }
 
   ehMembro() {
-    return this.usuario && this.usuario.tipo === 'membro';
+    return this.usuario && (this.usuario.tipo === 'membro' || this.usuario.tipo === 'lideranca' || this.usuario.tipo === 'administracao');
+  }
+
+  ehVisitante() {
+    return this.usuario && this.usuario.tipo === 'visitante';
   }
 
   ehLideranca() {
@@ -298,11 +360,111 @@ class AuthSystem {
   }
 
   async loginComGoogle() {
-    // const { data, error } = await supabase.auth.signInWithOAuth({
-    //   provider: 'google'
-    // });
+    try {
+      if (window.supabaseClient) {
+        const resultado = await window.supabaseClient.loginComGoogle();
+        return resultado;
+      } else {
+        throw new Error('Supabase não configurado');
+      }
+    } catch (erro) {
+      console.error('❌ Erro no login Google:', erro);
+      return { sucesso: false, erro: erro.message };
+    }
+  }
+
+  /**
+   * Salvar sessão do Supabase
+   */
+  salvarSessaoSupabase(usuario, session) {
+    this.usuario = {
+      id: usuario.id,
+      email: usuario.email,
+      nome: usuario.nome,
+      sobrenome: usuario.sobrenome || '',
+      tipo: usuario.tipo,
+      status: usuario.status,
+      avatar: usuario.avatar_url || `https://ui-avatars.com/api/?name=${usuario.nome}&background=1A4731&color=fff&size=128`,
+      permissoes: usuario.permissoes || []
+    };
     
-    console.log('🔮 Método preparado para Google OAuth via Supabase');
+    this.token = session.access_token;
+    this.sessaoExpiresAt = new Date(session.expires_at * 1000);
+    
+    // Salvar no localStorage (SÍNCRONO - garante que seja salvo antes de redirecionar)
+    try {
+      localStorage.setItem('auth_token', this.token);
+      localStorage.setItem('auth_usuario', JSON.stringify(this.usuario));
+      localStorage.setItem('auth_expires', this.sessaoExpiresAt.toISOString());
+      
+      // Salvar também no formato para a navbar
+      const sessaoNavbar = {
+        usuario: this.usuario,
+        token: this.token,
+        expiresAt: this.sessaoExpiresAt.getTime()
+      };
+      localStorage.setItem('ipv_sessao', JSON.stringify(sessaoNavbar));
+      
+      // Disparar evento customizado para notificar que a sessão foi salva
+      window.dispatchEvent(new CustomEvent('sessaoSalva', {
+        detail: { usuario: this.usuario }
+      }));
+      
+      console.log('✅ Sessão Supabase salva:', this.usuario.nome);
+    } catch (erro) {
+      console.error('❌ Erro ao salvar sessão no localStorage:', erro);
+      throw erro;
+    }
+  }
+
+  /**
+   * Verificar sessão do Supabase
+   */
+  async verificarSessaoSupabase() {
+    try {
+      if (!window.supabaseClient || !window.supabaseClient.client) {
+        return false;
+      }
+      
+      const { data: { session }, error } = await window.supabaseClient.client.auth.getSession();
+      
+      if (error) {
+        console.error('Erro ao verificar sessão Supabase:', error);
+        return false;
+      }
+      
+      if (session && session.user) {
+        // Buscar perfil do usuário
+        const usuario = await window.supabaseClient.buscarUsuarioPorAuthId(session.user.id);
+        
+        if (usuario) {
+          this.salvarSessaoSupabase(usuario, session);
+          return true;
+        } else {
+          // Se não tem perfil, criar um básico
+          console.log('⚠️ Perfil não encontrado, criando perfil básico...');
+          const novoPerfil = {
+            auth_user_id: session.user.id,
+            email: session.user.email,
+            nome: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'Usuário',
+            sobrenome: session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+            tipo: 'visitante', // Todos começam como visitante
+            status: 'ativo',
+            avatar_url: session.user.user_metadata?.avatar_url || null
+          };
+          
+          const perfilCriado = await window.supabaseClient.criar('usuarios', novoPerfil);
+          if (perfilCriado) {
+            this.salvarSessaoSupabase(perfilCriado, session);
+            return true;
+          }
+        }
+      }
+      return false;
+    } catch (erro) {
+      console.error('❌ Erro ao verificar sessão Supabase:', erro);
+      return false;
+    }
   }
 }
 
@@ -332,6 +494,36 @@ function loginForm() {
       this.erro = '';
       
       try {
+        // Tentar login com Supabase primeiro
+        if (window.supabase && window.supabaseClient) {
+          const { data, error } = await window.supabase.auth.signInWithPassword({
+            email: this.dados.email,
+            password: this.dados.senha
+          });
+
+          if (error) throw error;
+
+          if (data.session) {
+            // Buscar perfil do usuário
+            const usuario = await window.supabaseClient.buscarUsuarioPorAuthId(data.user.id);
+            
+            if (usuario) {
+              auth.salvarSessaoSupabase(usuario, data.session);
+              
+              // Redirecionar baseado no tipo de usuário
+              if (auth.ehAdmin()) {
+                const adminUrl = window.CONFIG ? window.CONFIG.buildPageUrl('admin.html') : 'admin.html';
+                window.location.href = adminUrl;
+              } else {
+                const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+                window.location.href = homeUrl;
+              }
+              return;
+            }
+          }
+        }
+
+        // Fallback: sistema antigo (JSON)
         const resultado = await auth.login(this.dados.email, this.dados.senha);
         
         if (resultado.sucesso) {
@@ -348,9 +540,27 @@ function loginForm() {
           this.erro = resultado.erro;
         }
       } catch (erro) {
-        this.erro = 'Erro inesperado. Tente novamente.';
+        this.erro = erro.message || 'Erro inesperado. Tente novamente.';
         console.error('Erro no login:', erro);
       } finally {
+        this.carregando = false;
+      }
+    },
+
+    async loginComGoogle() {
+      this.carregando = true;
+      this.erro = '';
+      
+      try {
+        const resultado = await auth.loginComGoogle();
+        
+        if (!resultado.sucesso) {
+          this.erro = resultado.erro || 'Erro ao fazer login com Google';
+        }
+        // O redirecionamento será feito automaticamente pelo OAuth
+      } catch (erro) {
+        this.erro = 'Erro ao fazer login com Google. Tente novamente.';
+        console.error('Erro no login Google:', erro);
         this.carregando = false;
       }
     },

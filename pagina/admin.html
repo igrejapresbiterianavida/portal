@@ -26,6 +26,12 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   
   <style>
+    /* ==================== MODAIS CENTRALIZADOS ==================== */
+    /* Garantir que todos os modais fiquem centralizados apenas quando abertos */
+    [x-show*="modalAberto"][x-cloak] {
+      display: none !important;
+    }
+    
     .admin-layout {
       display: flex;
       min-height: 100vh;
@@ -418,11 +424,34 @@
           </a>
         </div>
         
+        <!-- Divisor -->
+        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;"></div>
+        
+        <!-- Pessoas -->
+        <div style="padding: 10px 25px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; color: var(--branco);">
+          Pessoas
+        </div>
+        
         <div class="nav-item">
           <a href="#usuarios" class="nav-link" @click="mudarSecao('usuarios')">
             <span class="material-icons">people</span>
             Usuários
           </a>
+        </div>
+        
+        <div class="nav-item">
+          <a href="#visitantes" class="nav-link" @click="mudarSecao('visitantes')">
+            <span class="material-icons">person_add</span>
+            Visitantes
+          </a>
+        </div>
+        
+        <!-- Divisor -->
+        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;"></div>
+        
+        <!-- Conteúdo -->
+        <div style="padding: 10px 25px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; color: var(--branco);">
+          Conteúdo
         </div>
         
         <div class="nav-item">
@@ -447,16 +476,28 @@
         </div>
         
         <div class="nav-item">
-          <a href="#visitantes" class="nav-link" @click="mudarSecao('visitantes')">
-            <span class="material-icons">person_add</span>
-            Visitantes
+          <a href="#eventos" class="nav-link" @click="mudarSecao('eventos')">
+            <span class="material-icons">calendar_today</span>
+            Eventos
+          </a>
+        </div>
+        
+        <!-- Divisor -->
+        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;"></div>
+        
+        <!-- Configurações -->
+        
+        <div class="nav-item">
+          <a href="#dados-igreja" class="nav-link" @click="mudarSecao('dados-igreja')">
+            <span class="material-icons">church</span>
+            Dados da Igreja
           </a>
         </div>
         
         <div class="nav-item">
-          <a href="#configuracoes" class="nav-link" @click="mudarSecao('configuracoes')">
-            <span class="material-icons">settings</span>
-            Configurações
+          <a href="#redes-sociais" class="nav-link" @click="mudarSecao('redes-sociais')">
+            <span class="material-icons">share</span>
+            Redes Sociais
           </a>
         </div>
       </nav>
@@ -486,7 +527,7 @@
         </div>
         
         <div class="topbar-right">
-          <a href="index.html" class="botao botao-outline" target="_blank">
+          <a href="#" class="botao botao-outline" target="_blank" id="link-ver-site">
             <span class="material-icons">open_in_new</span>
             Ver Site
           </a>
@@ -595,41 +636,1082 @@
               </div>
             </div>
             
-            <div class="dashboard-card" @click="mudarSecao('configuracoes')">
-              <div class="card-header">
-                <div class="card-icon configuracoes">
-                  <span class="material-icons">settings</span>
-                </div>
-                <div class="card-info">
-                  <h3>Configurações</h3>
-                  <p>Configurações gerais</p>
-                </div>
-              </div>
-              <div class="card-stats">
-                <div>
-                  <div class="stat-number">6</div>
-                  <div class="stat-label">Seções</div>
-                </div>
-                <span class="material-icons" style="color: var(--cinza-leve); font-size: 24px;">arrow_forward</span>
-              </div>
-            </div>
-            
           </div>
         </div>
         
-        <!-- Outras seções serão carregadas dinamicamente -->
-        <div x-show="secaoAtiva !== 'dashboard'" x-transition>
-          <div class="card">
-            <h3 x-text="'Gerenciar ' + tituloPagina"></h3>
-            <p>Esta seção está em desenvolvimento. Aqui você poderá:</p>
-            <ul>
-              <li>Visualizar todos os registros</li>
-              <li>Adicionar novos itens</li>
-              <li>Editar registros existentes</li>
-              <li>Excluir itens</li>
-              <li>Exportar dados</li>
-            </ul>
-            <p><strong>Em breve:</strong> Interface completa de CRUD para <span x-text="tituloPagina.toLowerCase()"></span>.</p>
+        <!-- Seções CRUD -->
+        
+        <!-- Usuários -->
+        <div x-show="secaoAtiva === 'usuarios'" x-data="crudUsuarios()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div>
+              <h2>Gerenciar Usuários</h2>
+              <p style="color: var(--cinza-medio); font-size: 0.9rem; margin-top: 5px;">
+                Gerencie os usuários do sistema. Você pode criar novos usuários ou editar os existentes.
+              </p>
+            </div>
+            <button @click="abrirModal()" class="botao botao-primario">
+              <span class="material-icons" style="vertical-align: middle;">add</span>
+              Novo Usuário
+            </button>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando usuários...</p>
+          </div>
+          
+          <div x-show="!carregando" class="card">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                  <th style="padding: 15px; text-align: left;">Nome</th>
+                  <th style="padding: 15px; text-align: left;">Email</th>
+                  <th style="padding: 15px; text-align: center;">Tipo</th>
+                  <th style="padding: 15px; text-align: center;">Status</th>
+                  <th style="padding: 15px; text-align: left;">Criado em</th>
+                  <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="usuario in usuarios" :key="usuario.id">
+                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                    <td style="padding: 15px;">
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <img :src="usuario.avatar_url || `https://ui-avatars.com/api/?name=${usuario.nome}&background=1A4731&color=fff&size=40`" 
+                             :alt="usuario.nome" 
+                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                        <div>
+                          <strong x-text="usuario.nome + ' ' + (usuario.sobrenome || '')"></strong>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="padding: 15px;" x-text="usuario.email"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <select @change="alterarTipo(usuario.id, $event.target.value)" 
+                              :value="usuario.tipo"
+                              style="padding: 5px 10px; border: 1px solid var(--cinza-leve); border-radius: 5px; cursor: pointer;">
+                        <option value="visitante">Visitante</option>
+                        <option value="membro">Membro</option>
+                        <option value="lideranca">Liderança</option>
+                        <option value="administracao">Administração</option>
+                      </select>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                      <select @change="alterarStatus(usuario.id, $event.target.value)" 
+                              :value="usuario.status"
+                              style="padding: 5px 10px; border: 1px solid var(--cinza-leve); border-radius: 5px; cursor: pointer;">
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                        <option value="suspenso">Suspenso</option>
+                      </select>
+                    </td>
+                    <td style="padding: 15px;" x-text="formatarData(usuario.data_criacao)"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <button @click="abrirModal(usuario)" class="botao botao-pequeno" style="margin-right: 5px;" title="Editar">
+                        <span class="material-icons" style="font-size: 16px;">edit</span>
+                      </button>
+                      <button @click="deletar(usuario.id)" 
+                              class="botao botao-pequeno botao-secundario" 
+                              title="Deletar"
+                              x-show="usuario.tipo !== 'administracao' || usuarios.filter(u => u.tipo === 'administracao').length > 1">
+                        <span class="material-icons" style="font-size: 16px;">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                </template>
+                <tr x-show="usuarios.length === 0">
+                  <td colspan="6" style="padding: 40px; text-align: center; color: var(--cinza-medio);">
+                    Nenhum usuário cadastrado
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Modal de Edição/Criação -->
+          <div x-show="modalAberto" 
+               style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" 
+               @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="usuarioEditando ? 'Editar Usuário' : 'Novo Usuário'"></h3>
+              
+              <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome *</label>
+                <input type="text" x-model="formulario.nome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Sobrenome</label>
+                <input type="text" x-model="formulario.sobrenome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email *</label>
+                <input type="email" x-model="formulario.email" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Telefone</label>
+                <input type="tel" x-model="formulario.telefone" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Tipo</label>
+                <select x-model="formulario.tipo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  <template x-for="tipo in tipos" :key="tipo.valor">
+                    <option :value="tipo.valor" x-text="tipo.label"></option>
+                  </template>
+                </select>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Status</label>
+                <select x-model="formulario.status" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  <option value="ativo">Ativo</option>
+                  <option value="inativo">Inativo</option>
+                  <option value="suspenso">Suspenso</option>
+                </select>
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Devocionais -->
+        <div x-show="secaoAtiva === 'devocionais'" x-data="crudDevocionais()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>Gerenciar Devocionais</h2>
+            <button @click="abrirModal()" class="botao botao-primario">
+              <span class="material-icons" style="vertical-align: middle;">add</span>
+              Novo Devocional
+            </button>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando...</p>
+          </div>
+          
+          <div x-show="!carregando" class="card">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                  <th style="padding: 15px; text-align: left;">Título</th>
+                  <th style="padding: 15px; text-align: left;">Data</th>
+                  <th style="padding: 15px; text-align: center;">Status</th>
+                  <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="devocional in devocionais" :key="devocional.id">
+                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                    <td style="padding: 15px;"><strong x-text="devocional.titulo || 'Sem título'"></strong></td>
+                    <td style="padding: 15px;" x-text="devocional.data_publicacao"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <span x-show="devocional.ativo" style="color: green;">Ativo</span>
+                      <span x-show="!devocional.ativo" style="color: red;">Inativo</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                      <button @click="abrirModal(devocional)" class="botao botao-pequeno">Editar</button>
+                      <button @click="deletar(devocional.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Modal Devocional -->
+          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="devocionalEditando ? 'Editar Devocional' : 'Novo Devocional'"></h3>
+              
+              <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Título</label>
+                <input type="text" x-model="formulario.titulo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Texto *</label>
+                <textarea x-model="formulario.texto" rows="8" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required></textarea>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Imagem</label>
+                <input type="file" @change="selecionarImagem($event)" accept="image/*" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                <img x-show="previewImagem" :src="previewImagem" style="max-width: 200px; margin-top: 10px; border-radius: 5px;">
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Publicação</label>
+                  <input type="date" x-model="formulario.data_publicacao" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                <div>
+                  <label style="display: flex; align-items: center; gap: 10px; margin-top: 30px;">
+                    <input type="checkbox" x-model="formulario.ativo">
+                    <span>Ativo</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Vídeos -->
+        <div x-show="secaoAtiva === 'videos'" x-data="crudVideos()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>Gerenciar Vídeos</h2>
+            <button @click="abrirModal()" class="botao botao-primario">
+              <span class="material-icons" style="vertical-align: middle;">add</span>
+              Novo Vídeo
+            </button>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando...</p>
+          </div>
+          
+          <div x-show="!carregando" class="card">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                  <th style="padding: 15px; text-align: left;">Título</th>
+                  <th style="padding: 15px; text-align: left;">ID YouTube</th>
+                  <th style="padding: 15px; text-align: center;">Destaque</th>
+                  <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="video in videos" :key="video.id">
+                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                    <td style="padding: 15px;"><strong x-text="video.titulo"></strong></td>
+                    <td style="padding: 15px;" x-text="video.video_id"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <span x-show="video.destaque" style="color: green;">★</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                      <button @click="abrirModal(video)" class="botao botao-pequeno">Editar</button>
+                      <button @click="deletar(video.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Modal Vídeo -->
+          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="videoEditando ? 'Editar Vídeo' : 'Novo Vídeo'"></h3>
+              
+              <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">URL do YouTube *</label>
+                <input type="url" x-model="formulario.url" placeholder="https://www.youtube.com/watch?v=..." style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                <button @click="preencherDoYouTube()" class="botao botao-pequeno" style="margin-top: 5px;">Preencher do YouTube</button>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">ID do Vídeo *</label>
+                <input type="text" x-model="formulario.video_id" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Título *</label>
+                <input type="text" x-model="formulario.titulo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Descrição</label>
+                <textarea x-model="formulario.descricao" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Publicação</label>
+                <input type="date" x-model="formulario.data_publicacao" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                  <input type="checkbox" x-model="formulario.destaque">
+                  <span>Marcar como destaque</span>
+                </label>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ordem</label>
+                <input type="number" x-model="formulario.ordem" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Programação -->
+        <div x-show="secaoAtiva === 'programacao'" x-data="crudProgramacao()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>Gerenciar Programação</h2>
+            <button @click="abrirModal()" class="botao botao-primario">
+              <span class="material-icons" style="vertical-align: middle;">add</span>
+              Novo Programa
+            </button>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando...</p>
+          </div>
+          
+          <div x-show="!carregando" class="card">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                  <th style="padding: 15px; text-align: left;">Título</th>
+                  <th style="padding: 15px; text-align: left;">Data/Horário</th>
+                  <th style="padding: 15px; text-align: center;">Status</th>
+                  <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="programa in programas" :key="programa.id">
+                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                    <td style="padding: 15px;"><strong x-text="programa.titulo"></strong></td>
+                    <td style="padding: 15px;" x-text="`${programa.dia}/${programa.mes}/${programa.ano} - ${programa.horario}`"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <span x-show="programa.ativo" style="color: green;">Ativo</span>
+                      <span x-show="!programa.ativo" style="color: red;">Inativo</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                      <button @click="abrirModal(programa)" class="botao botao-pequeno">Editar</button>
+                      <button @click="deletar(programa.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Modal Programação -->
+          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="programaEditando ? 'Editar Programa' : 'Novo Programa'"></h3>
+              
+              <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Título *</label>
+                <input type="text" x-model="formulario.titulo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Descrição</label>
+                <textarea x-model="formulario.descricao" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Dia *</label>
+                  <input type="number" x-model="formulario.dia" min="1" max="31" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Mês *</label>
+                  <select x-model="formulario.mes" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                    <template x-for="mes in meses" :key="mes">
+                      <option :value="mes" x-text="mes"></option>
+                    </template>
+                  </select>
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ano *</label>
+                  <input type="number" x-model="formulario.ano" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Horário *</label>
+                  <input type="text" x-model="formulario.horario" placeholder="Ex: 19:00" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Local *</label>
+                  <input type="text" x-model="formulario.local" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Imagem</label>
+                <input type="file" @change="selecionarImagem($event)" accept="image/*" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                <img x-show="previewImagem" :src="previewImagem" style="max-width: 200px; margin-top: 10px; border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                  <input type="checkbox" x-model="formulario.ativo">
+                  <span>Ativo</span>
+                </label>
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Visitantes -->
+        <div x-show="secaoAtiva === 'visitantes'" x-data="crudVisitantes()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>Gerenciar Visitantes</h2>
+            <button @click="abrirModal()" class="botao botao-primario">
+              <span class="material-icons" style="vertical-align: middle;">add</span>
+              Novo Visitante
+            </button>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando...</p>
+          </div>
+          
+          <div x-show="!carregando" class="card">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                  <th style="padding: 15px; text-align: left;">Nome</th>
+                  <th style="padding: 15px; text-align: left;">Contato</th>
+                  <th style="padding: 15px; text-align: left;">Data Visita</th>
+                  <th style="padding: 15px; text-align: center;">Status</th>
+                  <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="visitante in visitantes" :key="visitante.id">
+                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                    <td style="padding: 15px;"><strong x-text="visitante.nome"></strong></td>
+                    <td style="padding: 15px;" x-text="visitante.email || visitante.telefone"></td>
+                    <td style="padding: 15px;" x-text="formatarData(visitante.data_visita)"></td>
+                    <td style="padding: 15px; text-align: center;" x-text="visitante.status"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <button @click="abrirModal(visitante)" class="botao botao-pequeno">Editar</button>
+                      <button @click="deletar(visitante.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Modal Visitante -->
+          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="visitanteEditando ? 'Editar Visitante' : 'Novo Visitante'"></h3>
+              
+              <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome *</label>
+                <input type="text" x-model="formulario.nome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Telefone</label>
+                <input type="tel" x-model="formulario.telefone" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email</label>
+                <input type="email" x-model="formulario.email" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data da Visita *</label>
+                <input type="date" x-model="formulario.data_visita" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Mensagem</label>
+                <textarea x-model="formulario.mensagem" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Status</label>
+                <select x-model="formulario.status" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  <option value="confirmado">Confirmado</option>
+                  <option value="cancelado">Cancelado</option>
+                  <option value="visitou">Visitou</option>
+                </select>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Observações</label>
+                <textarea x-model="formulario.observacoes" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Eventos -->
+        <div x-show="secaoAtiva === 'eventos'" x-data="crudEventos()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>Gerenciar Eventos</h2>
+            <button @click="abrirModal()" class="botao botao-primario">
+              <span class="material-icons" style="vertical-align: middle;">add</span>
+              Novo Evento
+            </button>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando...</p>
+          </div>
+          
+          <div x-show="!carregando" class="card">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                  <th style="padding: 15px; text-align: left;">Título</th>
+                  <th style="padding: 15px; text-align: left;">Data/Horário</th>
+                  <th style="padding: 15px; text-align: center;">Inscrição</th>
+                  <th style="padding: 15px; text-align: center;">Status</th>
+                  <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="evento in eventos" :key="evento.id">
+                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                    <td style="padding: 15px;"><strong x-text="evento.titulo"></strong></td>
+                    <td style="padding: 15px;" x-text="`${formatarData(evento.data)} ${evento.horario || ''}`"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <span x-show="evento.inscricao_aberta" style="color: green;">Aberta</span>
+                      <span x-show="!evento.inscricao_aberta" style="color: gray;">Fechada</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                      <span x-show="evento.ativo" style="color: green;">Ativo</span>
+                      <span x-show="!evento.ativo" style="color: red;">Inativo</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                      <button @click="abrirModal(evento)" class="botao botao-pequeno">Editar</button>
+                      <button @click="deletar(evento.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Modal Evento -->
+          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="eventoEditando ? 'Editar Evento' : 'Novo Evento'"></h3>
+              
+              <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Título *</label>
+                <input type="text" x-model="formulario.titulo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Descrição</label>
+                <textarea x-model="formulario.descricao" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data *</label>
+                  <input type="date" x-model="formulario.data" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Horário</label>
+                  <input type="text" x-model="formulario.horario" placeholder="Ex: 19:00" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Local</label>
+                <input type="text" x-model="formulario.local" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Imagem</label>
+                <input type="file" @change="selecionarImagem($event)" accept="image/*" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                <img x-show="previewImagem" :src="previewImagem" style="max-width: 200px; margin-top: 10px; border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                  <input type="checkbox" x-model="formulario.inscricao_aberta">
+                  <span>Inscrição aberta</span>
+                </label>
+              </div>
+              
+              <div style="margin-top: 15px;" x-show="formulario.inscricao_aberta">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Link de Inscrição</label>
+                <input type="url" x-model="formulario.link_inscricao" placeholder="https://..." style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                  <input type="checkbox" x-model="formulario.ativo">
+                  <span>Ativo</span>
+                </label>
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Dados da Igreja e Bancários -->
+        <div x-show="secaoAtiva === 'dados-igreja'" x-data="crudDadosIgreja()" x-init="init()" x-transition>
+          <div style="margin-bottom: 30px;">
+            <h2>Dados da Igreja e Bancários</h2>
+            <p style="color: var(--cinza-medio); font-size: 0.9rem; margin-top: 5px;">
+              Gerencie as informações da igreja e dados bancários para contribuições
+            </p>
+          </div>
+          
+          <!-- Abas -->
+          <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--cinza-leve);">
+            <button @click="abaAtiva = 'igreja'" 
+                    :style="`padding: 12px 20px; border: none; background: ${abaAtiva === 'igreja' ? 'var(--verde-medio)' : 'transparent'}; color: ${abaAtiva === 'igreja' ? 'white' : 'var(--cinza-escuro)'}; cursor: pointer; border-radius: 8px 8px 0 0; font-weight: ${abaAtiva === 'igreja' ? 'bold' : 'normal'};`">
+              Dados da Igreja
+            </button>
+            <button @click="abaAtiva = 'bancarios'" 
+                    :style="`padding: 12px 20px; border: none; background: ${abaAtiva === 'bancarios' ? 'var(--verde-medio)' : 'transparent'}; color: ${abaAtiva === 'bancarios' ? 'white' : 'var(--cinza-escuro)'}; cursor: pointer; border-radius: 8px 8px 0 0; font-weight: ${abaAtiva === 'bancarios' ? 'bold' : 'normal'};`">
+              Dados Bancários
+            </button>
+          </div>
+          
+          <!-- Aba: Dados da Igreja -->
+          <div x-show="abaAtiva === 'igreja'" class="card" style="padding: 30px;">
+            <div x-show="carregando" class="text-center" style="padding: 40px;">
+              <div class="spinner" style="margin: 0 auto;"></div>
+              <p>Carregando...</p>
+            </div>
+            
+            <div x-show="!carregando">
+              <form @submit.prevent="salvarIgreja()">
+                <h3 style="margin-bottom: 20px; color: var(--verde-escuro);">Informações Gerais</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome da Igreja *</label>
+                    <input type="text" x-model="formularioIgreja.nome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome Abreviado</label>
+                    <input type="text" x-model="formularioIgreja.nome_abreviado" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Denominação</label>
+                    <input type="text" x-model="formularioIgreja.denominacao" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ano de Fundação</label>
+                    <input type="text" x-model="formularioIgreja.fundacao" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px 0; color: var(--verde-escuro);">Endereço</h3>
+                
+                <div style="margin-bottom: 15px;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Logradouro *</label>
+                  <input type="text" x-model="formularioIgreja.logradouro" placeholder="Ex: Av. Antonio Carlos do Amaral" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Número</label>
+                    <input type="text" x-model="formularioIgreja.numero" placeholder="Ex: 123 ou Sem número" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Complemento</label>
+                    <input type="text" x-model="formularioIgreja.complemento" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Bairro</label>
+                    <input type="text" x-model="formularioIgreja.bairro" placeholder="Ex: Res. Cosmos" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Cidade</label>
+                    <input type="text" x-model="formularioIgreja.cidade" placeholder="Ex: Campinas" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Estado</label>
+                    <input type="text" x-model="formularioIgreja.estado" placeholder="Ex: SP" maxlength="2" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">CEP</label>
+                    <input type="text" x-model="formularioIgreja.cep" placeholder="00000-000" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px 0; color: var(--verde-escuro);">Contato</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Telefone</label>
+                    <input type="text" x-model="formularioIgreja.telefone" placeholder="(19) 99999-9999" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">WhatsApp</label>
+                    <input type="text" x-model="formularioIgreja.whatsapp" placeholder="5519999999999" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email</label>
+                    <input type="email" x-model="formularioIgreja.email" placeholder="contato@igreja.com" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email Secretaria</label>
+                    <input type="email" x-model="formularioIgreja.email_secretaria" placeholder="secretaria@igreja.com" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px 0; color: var(--verde-escuro);">Horários</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Culto Sexta-feira</label>
+                    <input type="text" x-model="formularioIgreja.culto_sexta_horario" placeholder="Ex: 20h00" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Culto Domingo</label>
+                    <input type="text" x-model="formularioIgreja.culto_domingo_horario" placeholder="Ex: 10h00" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Secretaria - Dias</label>
+                    <input type="text" x-model="formularioIgreja.secretaria_dias" placeholder="Ex: Segunda a Sexta" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Secretaria - Horário</label>
+                    <input type="text" x-model="formularioIgreja.secretaria_horario" placeholder="Ex: 9h00 às 17h00" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px 0; color: var(--verde-escuro);">Liderança</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome do Pastor</label>
+                    <input type="text" x-model="formularioIgreja.pastor_nome" placeholder="Ex: Rev. Enéias Mendes" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Título</label>
+                    <input type="text" x-model="formularioIgreja.pastor_titulo" placeholder="Ex: Pastor Titular" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Instagram</label>
+                    <input type="text" x-model="formularioIgreja.pastor_instagram" placeholder="@pr.eneiasmendes" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email do Pastor</label>
+                    <input type="email" x-model="formularioIgreja.pastor_email" placeholder="pastor@igreja.com" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;">
+                  <button type="submit" class="botao botao-primario" :disabled="carregando">
+                    <span x-show="!carregando">Salvar Dados da Igreja</span>
+                    <span x-show="carregando">Salvando...</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Aba: Dados Bancários -->
+          <div x-show="abaAtiva === 'bancarios'">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h3>Dados Bancários para Contribuições</h3>
+              <button @click="abrirModalBancario()" class="botao botao-primario">
+                <span class="material-icons" style="vertical-align: middle;">add</span>
+                Novo Dado Bancário
+              </button>
+            </div>
+            
+            <div x-show="carregando" class="text-center" style="padding: 40px;">
+              <div class="spinner" style="margin: 0 auto;"></div>
+              <p>Carregando...</p>
+            </div>
+            
+            <div x-show="!carregando" class="card">
+              <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                    <th style="padding: 15px; text-align: left;">Favorecido</th>
+                    <th style="padding: 15px; text-align: left;">Banco</th>
+                    <th style="padding: 15px; text-align: left;">PIX</th>
+                    <th style="padding: 15px; text-align: center;">Status</th>
+                    <th style="padding: 15px; text-align: center;">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="dado in dadosBancarios" :key="dado.id">
+                    <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                      <td style="padding: 15px;"><strong x-text="dado.favorecido"></strong></td>
+                      <td style="padding: 15px;" x-text="`${dado.banco_nome || ''} - Ag: ${dado.agencia || ''} / Conta: ${dado.conta || ''}`"></td>
+                      <td style="padding: 15px;" x-text="dado.pix_chave || '-'"></td>
+                      <td style="padding: 15px; text-align: center;">
+                        <span x-show="dado.ativo" style="color: green;">Ativo</span>
+                        <span x-show="!dado.ativo" style="color: red;">Inativo</span>
+                      </td>
+                      <td style="padding: 15px; text-align: center;">
+                        <button @click="abrirModalBancario(dado)" class="botao botao-pequeno">Editar</button>
+                        <button @click="deletarBancario(dado.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                      </td>
+                    </tr>
+                  </template>
+                  <tr x-show="dadosBancarios.length === 0">
+                    <td colspan="5" style="padding: 40px; text-align: center; color: var(--cinza-medio);">
+                      Nenhum dado bancário cadastrado
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Modal Dados Bancários -->
+            <div x-show="modalAberto && abaAtiva === 'bancarios'" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
+              <div style="background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+                <h3 x-text="formularioBancario.id ? 'Editar Dado Bancário' : 'Novo Dado Bancário'"></h3>
+                
+                <div style="margin-top: 20px;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Favorecido *</label>
+                  <input type="text" x-model="formularioBancario.favorecido" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">CNPJ</label>
+                  <input type="text" x-model="formularioBancario.cnpj" placeholder="00.000.000/0000-00" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome do Banco</label>
+                    <input type="text" x-model="formularioBancario.banco_nome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Código do Banco</label>
+                    <input type="text" x-model="formularioBancario.banco_codigo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Agência</label>
+                    <input type="text" x-model="formularioBancario.agencia" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Conta</label>
+                    <input type="text" x-model="formularioBancario.conta" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Tipo PIX</label>
+                    <select x-model="formularioBancario.pix_tipo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                      <option value="">Selecione</option>
+                      <option value="cpf">CPF</option>
+                      <option value="cnpj">CNPJ</option>
+                      <option value="email">Email</option>
+                      <option value="telefone">Telefone</option>
+                      <option value="chave_aleatoria">Chave Aleatória</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Chave PIX</label>
+                    <input type="text" x-model="formularioBancario.pix_chave" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">QR Code (Imagem)</label>
+                  <input type="file" @change="selecionarQRCode($event)" accept="image/*" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  <img x-show="previewQRCode" :src="previewQRCode" style="max-width: 200px; margin-top: 10px; border-radius: 5px;">
+                </div>
+                
+                <div style="margin-top: 15px;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Instruções do QR Code</label>
+                  <textarea x-model="formularioBancario.qrcode_instrucoes" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Mensagem de Informações</label>
+                  <textarea x-model="formularioBancario.informacoes_mensagem" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                  <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" x-model="formularioBancario.ativo">
+                    <span>Ativo</span>
+                  </label>
+                </div>
+                
+                <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                  <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                  <button @click="salvarBancario()" class="botao botao-primario" :disabled="carregando">
+                    <span x-show="!carregando">Salvar</span>
+                    <span x-show="carregando">Salvando...</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Redes Sociais -->
+        <div x-show="secaoAtiva === 'redes-sociais'" x-data="crudRedesSociais()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>Redes Sociais</h2>
+            <button @click="abrirModal()" class="botao botao-primario">
+              <span class="material-icons" style="vertical-align: middle;">add</span>
+              Nova Rede Social
+            </button>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando...</p>
+          </div>
+          
+          <div x-show="!carregando" class="card">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                  <th style="padding: 15px; text-align: left;">Nome</th>
+                  <th style="padding: 15px; text-align: left;">URL</th>
+                  <th style="padding: 15px; text-align: center;">Status</th>
+                  <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="rede in redes" :key="rede.id">
+                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                    <td style="padding: 15px;"><strong x-text="rede.nome"></strong></td>
+                    <td style="padding: 15px;"><a :href="rede.url" target="_blank" x-text="rede.url"></a></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <span x-show="rede.ativo" style="color: green;">Ativo</span>
+                      <span x-show="!rede.ativo" style="color: red;">Inativo</span>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                      <button @click="abrirModal(rede)" class="botao botao-pequeno">Editar</button>
+                      <button @click="deletar(rede.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Modal Redes Sociais -->
+          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="redeEditando ? 'Editar Rede Social' : 'Nova Rede Social'"></h3>
+              
+              <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome *</label>
+                <input type="text" x-model="formulario.nome" placeholder="Ex: YouTube, Instagram" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Usuário/Handle</label>
+                <input type="text" x-model="formulario.usuario" placeholder="Ex: @ipbvida" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">URL *</label>
+                <input type="url" x-model="formulario.url" placeholder="https://..." style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ícone (Bootstrap Icons)</label>
+                <input type="text" x-model="formulario.icone" placeholder="Ex: bi-youtube, bi-instagram" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                <small style="color: var(--cinza-medio);">Classes do Bootstrap Icons (bi-*)</small>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Cor</label>
+                <input type="color" x-model="formulario.cor" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Descrição</label>
+                <textarea x-model="formulario.descricao" rows="2" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ordem</label>
+                <input type="number" x-model="formulario.ordem" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                  <input type="checkbox" x-model="formulario.ativo">
+                  <span>Ativo</span>
+                </label>
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -640,9 +1722,15 @@
   </div>
   
   <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/env-dev.js"></script>
   <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/data-manager.js"></script>
+  <script src="../js/admin-crud.js"></script>
+  <script src="../js/admin-crud-usuarios.js"></script>
+  <script src="../js/youtube-sync.js"></script>
   
   <!-- Proteção Inicial - Executar ANTES do Alpine.js -->
   <script>
@@ -678,7 +1766,8 @@
         if (!auth.ehAdmin()) {
           console.log('🚫 Usuário não é admin:', auth.usuario ? auth.usuario.tipo : 'nenhum');
           alert('🚫 Acesso negado! Esta área é restrita para administradores.');
-          window.location.href = '../index.html';
+          const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+          window.location.href = homeUrl;
           return;
         }
         
@@ -708,7 +1797,10 @@
             devocionais: 'Devocionais',
             videos: 'Vídeos',
             programacao: 'Programação',
+            eventos: 'Eventos',
             visitantes: 'Visitantes',
+            'dados-igreja': 'Dados da Igreja',
+            'redes-sociais': 'Redes Sociais',
             configuracoes: 'Configurações'
           };
           return titulos[this.secaoAtiva] || 'Dashboard';
@@ -721,7 +1813,8 @@
           // Verificar se o usuário está logado
           if (!auth.verificarSessaoAtiva()) {
             console.log('🚫 Usuário não logado - redirecionando para login');
-            window.location.href = 'login.html?force=true';
+            const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') + '?force=true' : 'login.html?force=true';
+            window.location.href = loginUrl;
             return;
           }
           
@@ -729,7 +1822,8 @@
           if (!auth.ehAdmin()) {
             console.log('🚫 Usuário não é admin - redirecionando para home');
             alert('⚠️ Acesso negado! Área restrita para administradores.');
-            window.location.href = '../index.html';
+            const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+            window.location.href = homeUrl;
             return;
           }
           
@@ -751,24 +1845,52 @@
         
         async carregarEstatisticas() {
           try {
-            // Carregar dados para estatísticas
-            const [usuarios, devocionais, videos, programacao, visitantes] = await Promise.all([
-              fetch('../data/usuarios.json').then(r => r.json()),
-              dataManager.carregarDevocionais(),
-              dataManager.carregarVideos(),
-              dataManager.carregarProgramacao(),
-              fetch('../data/visitantes.json').then(r => r.json())
-            ]);
-            
-            this.stats = {
-              usuarios: usuarios.usuarios?.length || 0,
-              devocionais: Object.keys(devocionais || {}).length,
-              videos: videos?.videos?.length || 0,
-              eventos: programacao?.eventos?.length || 0,
-              visitantes: visitantes?.visitantes?.length || 0
-            };
+            // Carregar dados para estatísticas do Supabase
+            if (window.supabaseClient && window.supabaseClient.client) {
+              const [usuarios, devocionais, videos, programacao, eventos, visitantes] = await Promise.all([
+                window.supabaseClient.listar('usuarios').catch(() => []),
+                window.supabaseClient.listar('devocionais').catch(() => []),
+                window.supabaseClient.listar('videos').catch(() => []),
+                window.supabaseClient.listar('programacao').catch(() => []),
+                window.supabaseClient.listar('eventos').catch(() => []),
+                window.supabaseClient.listar('visitantes').catch(() => [])
+              ]);
+              
+              this.stats = {
+                usuarios: Array.isArray(usuarios) ? usuarios.length : 0,
+                devocionais: Array.isArray(devocionais) ? devocionais.length : 0,
+                videos: Array.isArray(videos) ? videos.length : 0,
+                eventos: Array.isArray(eventos) ? eventos.length : 0,
+                visitantes: Array.isArray(visitantes) ? visitantes.length : 0
+              };
+            } else {
+              // Fallback para JSONs (temporário)
+              const [usuarios, devocionais, videos, programacao, visitantes] = await Promise.all([
+                fetch('../data/usuarios.json').then(r => r.json()).catch(() => ({ usuarios: [] })),
+                dataManager.carregarDevocionais().catch(() => ({})),
+                dataManager.carregarVideos().catch(() => ({ videos: [] })),
+                dataManager.carregarProgramacao().catch(() => ({ eventos: [] })),
+                fetch('../data/visitantes.json').then(r => r.json()).catch(() => ({ visitantes: [] }))
+              ]);
+              
+              this.stats = {
+                usuarios: usuarios.usuarios?.length || 0,
+                devocionais: Object.keys(devocionais || {}).length,
+                videos: videos?.videos?.length || 0,
+                eventos: programacao?.eventos?.length || 0,
+                visitantes: visitantes?.visitantes?.length || 0
+              };
+            }
           } catch (erro) {
             console.error('Erro ao carregar estatísticas:', erro);
+            // Valores padrão em caso de erro
+            this.stats = {
+              usuarios: 0,
+              devocionais: 0,
+              videos: 0,
+              eventos: 0,
+              visitantes: 0
+            };
           }
         },
         
@@ -800,6 +1922,21 @@
         }
       };
     }
+  </script>
+  
+  <!-- Atualizar links dinamicamente para funcionar em dev e produção -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.CONFIG) {
+        window.CONFIG.atualizarLinks();
+        
+        // Atualizar link "Ver Site" especificamente
+        const linkVerSite = document.getElementById('link-ver-site');
+        if (linkVerSite) {
+          linkVerSite.href = window.CONFIG.buildUrl('index.html');
+        }
+      }
+    });
   </script>
   
 </body>

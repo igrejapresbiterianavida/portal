@@ -2,71 +2,301 @@
 // API-INTEGRACAO.JS - Integrações Externas
 // ============================================
 
-// Buscar vídeos do canal
-async function buscarVideosYouTube(maxResults = 6) {
+// Buscar vídeos do canal via RSS Feed (SEM API KEY - Alternativa)
+async function buscarVideosYouTubeRSS(canalId) {
   try {
-    const apiKey = CONFIG.YOUTUBE_API_KEY;
-    const canalId = CONFIG.CANAL_ID;
-    
-    if (!apiKey || !canalId) {
-      console.warn('⚠️ Credenciais do YouTube não configuradas');
+    if (!canalId) {
+      console.warn('⚠️ Canal ID não fornecido');
       return [];
     }
     
-    const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${canalId}&part=snippet,id&order=date&maxResults=${maxResults}&type=video`
-    );
+    // YouTube RSS Feed - Público, não precisa de API key
+    // Formato: https://www.youtube.com/feeds/videos.xml?channel_id=CHANNEL_ID
+    // Usar proxy CORS para evitar bloqueio
+    const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${canalId}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+    
+    console.log('📡 Buscando vídeos via RSS Feed do YouTube...');
+    console.log('🔗 URL:', rssUrl);
+    
+    // Fazer requisição ao RSS via proxy CORS
+    const response = await fetch(proxyUrl);
     
     if (!response.ok) {
-      throw new Error('Erro na API do YouTube');
+      console.error('❌ Erro ao buscar RSS:', response.status);
+      return [];
     }
     
+    // Se usar proxy, extrair o conteúdo
     const data = await response.json();
+    const xmlText = data.contents || await response.text();
     
-    return data.items.map(item => ({
-      id: item.id.videoId,
-      titulo: item.snippet.title,
-      descricao: item.snippet.description.substring(0, 100) + '...',
-      thumbnail: item.snippet.thumbnails.medium.url,
-      url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-      dataPublicacao: item.snippet.publishedAt
-    }));
+    // Parsear XML
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+    
+    // Verificar se há erros no parsing
+    const parseError = xmlDoc.querySelector('parsererror');
+    if (parseError) {
+      console.error('❌ Erro ao parsear XML:', parseError.textContent);
+      return [];
+    }
+    
+    // Extrair vídeos do RSS
+    const entries = xmlDoc.querySelectorAll('entry');
+    const videos = [];
+    
+    entries.forEach((entry, index) => {
+      try {
+        // Extrair dados do RSS
+        const videoId = entry.querySelector('yt\\:videoId, videoId')?.textContent || 
+                       entry.querySelector('id')?.textContent?.split(':').pop() || '';
+        
+        const titulo = entry.querySelector('title')?.textContent || '';
+        const descricao = entry.querySelector('media\\:description, description')?.textContent || '';
+        const thumbnail = entry.querySelector('media\\:thumbnail, thumbnail')?.getAttribute('url') || 
+                         `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+        const published = entry.querySelector('published')?.textContent || '';
+        const author = entry.querySelector('author name')?.textContent || '';
+        
+        // Extrair duração se disponível (pode não estar no RSS)
+        const duration = entry.querySelector('yt\\:duration, duration')?.getAttribute('seconds') || null;
+        
+        if (videoId && titulo) {
+          videos.push({
+            id: videoId,
+            video_id: videoId,
+            titulo: titulo.trim(),
+            descricao: descricao.trim().substring(0, 200) + (descricao.trim().length > 200 ? '...' : ''),
+            thumbnail: thumbnail,
+            thumbnail_url: thumbnail,
+            url: `https://www.youtube.com/watch?v=${videoId}`,
+            dataPublicacao: published,
+            data_publicacao: published,
+            duracao: duration ? formatarDuracao(duration) : null,
+            visualizacoes: 0, // RSS não fornece visualizações
+            origem: 'youtube-rss',
+            autor: author
+          });
+        }
+      } catch (erro) {
+        console.warn(`⚠️ Erro ao processar vídeo ${index}:`, erro);
+      }
+    });
+    
+    console.log(`✅ ${videos.length} vídeos encontrados via RSS Feed`);
+    return videos;
+    
   } catch (erro) {
-    console.error('Erro ao buscar vídeos:', erro);
+    console.error('❌ Erro ao buscar vídeos via RSS:', erro);
     return [];
   }
 }
 
-// Verificar se há transmissão ao vivo
-async function verificarLiveYouTube() {
+// Formatar duração de segundos para HH:MM:SS ou MM:SS
+function formatarDuracao(segundos) {
+  if (!segundos) return null;
+  
+  const totalSegundos = parseInt(segundos);
+  const horas = Math.floor(totalSegundos / 3600);
+  const minutos = Math.floor((totalSegundos % 3600) / 60);
+  const segs = totalSegundos % 60;
+  
+  if (horas > 0) {
+    return `${horas}:${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+  } else {
+    return `${minutos}:${segs.toString().padStart(2, '0')}`;
+  }
+}
+
+// Buscar detalhes adicionais do vídeo via oEmbed (título, thumbnail, etc)
+async function buscarDetalhesVideoYouTube(videoId) {
   try {
-    const apiKey = CONFIG.YOUTUBE_API_KEY;
-    const canalId = CONFIG.CANAL_ID;
+    // YouTube oEmbed API - Público, não precisa de API key
+    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
     
-    if (!apiKey || !canalId) {
-      console.warn('⚠️ Credenciais do YouTube não configuradas');
-      return { aoVivo: false };
-    }
-    
-    const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${canalId}&part=snippet&eventType=live&type=video`
-    );
+    const response = await fetch(oembedUrl);
     
     if (!response.ok) {
-      throw new Error('Erro ao verificar live');
+      return null;
     }
     
     const data = await response.json();
     
-    if (data.items && data.items.length > 0) {
-      const live = data.items[0];
-      return {
-        aoVivo: true,
-        videoId: live.id.videoId,
-        titulo: live.snippet.title,
-        thumbnail: live.snippet.thumbnails.medium.url,
-        url: `https://www.youtube.com/watch?v=${live.id.videoId}`
-      };
+    return {
+      titulo: data.title || '',
+      thumbnail: data.thumbnail_url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+      autor: data.author_name || '',
+      altura: data.height || 360,
+      largura: data.width || 480
+    };
+  } catch (erro) {
+    console.warn(`⚠️ Erro ao buscar detalhes do vídeo ${videoId}:`, erro);
+    return null;
+  }
+}
+
+// Buscar TODOS os vídeos do canal (via RSS Feed - SEM API KEY)
+async function buscarTodosVideosYouTube() {
+  try {
+    const canalId = CONFIG.CANAL_ID;
+    
+    if (!canalId) {
+      console.warn('⚠️ Canal ID não configurado');
+      return [];
+    }
+    
+    console.log('🔍 Buscando vídeos do canal YouTube via RSS Feed (sem API key)...');
+    
+    // Usar RSS Feed do YouTube (público, não precisa de API key)
+    const videos = await buscarVideosYouTubeRSS(canalId);
+    
+    if (videos.length > 0) {
+      console.log(`✅ ${videos.length} vídeos carregados via RSS Feed`);
+      
+      // Opcional: Buscar detalhes adicionais via oEmbed para os primeiros vídeos
+      // (limitado para não fazer muitas requisições)
+      const videosComDetalhes = await Promise.all(
+        videos.slice(0, 10).map(async (video) => {
+          try {
+            const detalhes = await buscarDetalhesVideoYouTube(video.video_id);
+            if (detalhes) {
+              return {
+                ...video,
+                titulo: detalhes.titulo || video.titulo,
+                thumbnail: detalhes.thumbnail || video.thumbnail
+              };
+            }
+            return video;
+          } catch (erro) {
+            return video;
+          }
+        })
+      );
+      
+      // Combinar vídeos com detalhes + vídeos sem detalhes
+      const todosVideos = [
+        ...videosComDetalhes,
+        ...videos.slice(10)
+      ];
+      
+      return todosVideos;
+    }
+    
+    return [];
+    
+  } catch (erro) {
+    console.error('❌ Erro ao buscar vídeos do YouTube:', erro);
+    return [];
+  }
+}
+
+// Buscar vídeos do canal (versão limitada - usando RSS Feed)
+async function buscarVideosYouTube(maxResults = 6) {
+  try {
+    const canalId = CONFIG.CANAL_ID;
+    
+    if (!canalId) {
+      console.warn('⚠️ Canal ID não configurado');
+      return [];
+    }
+    
+    // Usar RSS Feed e limitar resultados
+    const videos = await buscarVideosYouTubeRSS(canalId);
+    return videos.slice(0, maxResults);
+  } catch (erro) {
+    console.error('❌ Erro ao buscar vídeos do YouTube:', erro);
+    return [];
+  }
+}
+
+// Verificar se há transmissão ao vivo (via RSS Feed)
+async function verificarLiveYouTube() {
+  try {
+    const canalId = CONFIG.CANAL_ID;
+    
+    if (!canalId) {
+      return { aoVivo: false };
+    }
+    
+    console.log('🔍 Verificando se há transmissão ao vivo...');
+    
+    // Buscar vídeos recentes via RSS (apenas os 5 mais recentes)
+    const videos = await buscarVideosYouTubeRSS(canalId);
+    
+    if (!videos || videos.length === 0) {
+      return { aoVivo: false };
+    }
+    
+    // Pegar o vídeo mais recente
+    const videoMaisRecente = videos[0];
+    
+    if (!videoMaisRecente || !videoMaisRecente.video_id) {
+      return { aoVivo: false };
+    }
+    
+    // Verificar se é uma live usando oEmbed (YouTube indica se é live)
+    try {
+      const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoMaisRecente.video_id}&format=json`;
+      const response = await fetch(oembedUrl);
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Verificar se o título ou descrição indica que é live
+        // YouTube geralmente adiciona indicadores de live no título
+        const titulo = data.title || videoMaisRecente.titulo || '';
+        const isLive = titulo.toLowerCase().includes('ao vivo') || 
+                      titulo.toLowerCase().includes('live') ||
+                      titulo.toLowerCase().includes('🔴') ||
+                      titulo.toLowerCase().includes('streaming');
+        
+        // Verificar também se foi publicado há menos de 2 horas (pode ser live recente)
+        const dataPublicacao = new Date(videoMaisRecente.dataPublicacao || videoMaisRecente.data_publicacao);
+        const agora = new Date();
+        const diferencaHoras = (agora - dataPublicacao) / (1000 * 60 * 60);
+        
+        // Se foi publicado há menos de 2 horas e tem indicadores de live
+        if (isLive || (diferencaHoras < 2 && titulo.toLowerCase().includes('culto'))) {
+          console.log('🔴 Live detectado!', videoMaisRecente.titulo);
+          return {
+            aoVivo: true,
+            videoId: videoMaisRecente.video_id,
+            titulo: videoMaisRecente.titulo,
+            thumbnail: videoMaisRecente.thumbnail || videoMaisRecente.thumbnail_url,
+            url: videoMaisRecente.url || `https://www.youtube.com/watch?v=${videoMaisRecente.video_id}`,
+            embedUrl: `https://www.youtube.com/embed/${videoMaisRecente.video_id}?autoplay=1`
+          };
+        }
+      }
+    } catch (erro) {
+      console.warn('⚠️ Erro ao verificar live via oEmbed:', erro);
+    }
+    
+    // Fallback: verificar se o vídeo mais recente foi publicado há menos de 30 minutos
+    // (pode indicar que está ao vivo agora)
+    const dataPublicacao = new Date(videoMaisRecente.dataPublicacao || videoMaisRecente.data_publicacao);
+    const agora = new Date();
+    const diferencaMinutos = (agora - dataPublicacao) / (1000 * 60);
+    
+    if (diferencaMinutos < 30) {
+      // Verificar se o título tem indicadores de live
+      const titulo = videoMaisRecente.titulo || '';
+      if (titulo.toLowerCase().includes('ao vivo') || 
+          titulo.toLowerCase().includes('live') ||
+          titulo.toLowerCase().includes('🔴') ||
+          titulo.toLowerCase().includes('streaming') ||
+          titulo.toLowerCase().includes('culto')) {
+        console.log('🔴 Live detectado (vídeo recente)!', videoMaisRecente.titulo);
+        return {
+          aoVivo: true,
+          videoId: videoMaisRecente.video_id,
+          titulo: videoMaisRecente.titulo,
+          thumbnail: videoMaisRecente.thumbnail || videoMaisRecente.thumbnail_url,
+          url: videoMaisRecente.url || `https://www.youtube.com/watch?v=${videoMaisRecente.video_id}`,
+          embedUrl: `https://www.youtube.com/embed/${videoMaisRecente.video_id}?autoplay=1`
+        };
+      }
     }
     
     return { aoVivo: false };
@@ -75,6 +305,13 @@ async function verificarLiveYouTube() {
     return { aoVivo: false };
   }
 }
+
+// Exportar para uso global
+window.buscarVideosYouTube = buscarVideosYouTube;
+window.buscarTodosVideosYouTube = buscarTodosVideosYouTube;
+window.buscarVideosYouTubeRSS = buscarVideosYouTubeRSS;
+window.buscarDetalhesVideoYouTube = buscarDetalhesVideoYouTube;
+window.verificarLiveYouTube = verificarLiveYouTube;
 
 // Buscar notícias da IPB (via RSS ou scraping)
 async function buscarNoticiasIPB() {

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autenticando... | IPV</title>
+  <link rel="stylesheet" href="../css/globais.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--cinza-muito-claro);
+    }
+    .loading-container {
+      text-align: center;
+      padding: 40px;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--cinza-leve);
+      border-top-color: var(--verde-medio);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <h2>Autenticando...</h2>
+    <p>Aguarde enquanto processamos seu login.</p>
+  </div>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/env-dev.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+
+  <script>
+    // Processar callback do Google OAuth
+    async function processarCallback() {
+      try {
+        // Verificar se já há sessão (access_token no hash)
+        const hash = window.location.hash.substring(1);
+        const hashParams = new URLSearchParams(hash);
+        const accessToken = hashParams.get('access_token');
+        
+        // Se já tem access_token, a sessão já foi criada
+        if (accessToken) {
+          console.log('✅ Access token encontrado no hash, verificando sessão...');
+          
+          // Verificar sessão atual
+          if (!window.supabaseClient || !window.supabaseClient.client) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            if (window.supabaseClient) {
+              window.supabaseClient.reinicializar();
+            }
+          }
+          
+          if (window.supabaseClient && window.supabaseClient.client) {
+            const { data: { session }, error } = await window.supabaseClient.client.auth.getSession();
+            
+            if (error) throw error;
+            
+            if (session) {
+              console.log('✅ Sessão encontrada!');
+              await processarSessao(session);
+              return;
+            }
+          }
+        }
+        
+        // Tentar buscar código OAuth na query string
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const error = urlParams.get('error');
+
+        if (error) {
+          console.error('❌ Erro no OAuth:', error);
+          alert('Erro ao fazer login com Google. Tente novamente.');
+          const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') : '../pagina/login.html';
+          window.location.href = loginUrl;
+          return;
+        }
+
+        if (!code) {
+          console.error('❌ Código OAuth não encontrado na query string');
+          // Tentar aguardar um pouco mais (às vezes o Supabase processa o hash)
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          const hash2 = window.location.hash.substring(1);
+          const hashParams2 = new URLSearchParams(hash2);
+          const accessToken2 = hashParams2.get('access_token');
+          
+          if (accessToken2 && window.supabaseClient && window.supabaseClient.client) {
+            const { data: { session }, error } = await window.supabaseClient.client.auth.getSession();
+            if (session) {
+              await processarSessao(session);
+              return;
+            }
+          }
+          
+          alert('Erro na autenticação. Tente novamente.');
+          const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') : '../pagina/login.html';
+          window.location.href = loginUrl;
+          return;
+        }
+
+        // Trocar código por sessão
+        // Aguardar um pouco para garantir que tudo está carregado
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (!window.supabaseClient || !window.supabaseClient.client) {
+          console.error('❌ Supabase não inicializado. Tentando reinicializar...');
+          if (window.supabaseClient) {
+            window.supabaseClient.reinicializar();
+          }
+          
+          if (!window.supabaseClient || !window.supabaseClient.client) {
+            throw new Error('Supabase não configurado. Verifique js/env-dev.js');
+          }
+        }
+        
+        const { data, error: authError } = await window.supabaseClient.client.auth.exchangeCodeForSession(code);
+
+        if (authError) {
+          throw authError;
+        }
+
+        if (data.session) {
+          await processarSessao(data.session);
+        } else {
+          throw new Error('Sessão não criada');
+        }
+      } catch (erro) {
+        console.error('❌ Erro ao processar callback:', erro);
+        alert('Erro ao processar autenticação. Tente novamente.');
+        const loginUrl = window.CONFIG ? window.CONFIG.buildPageUrl('login.html') : '../pagina/login.html';
+        window.location.href = loginUrl;
+      }
+    }
+
+    // Processar sessão após autenticação
+    async function processarSessao(session) {
+      try {
+        console.log('✅ Login com Google realizado com sucesso!');
+        
+        // Buscar perfil do usuário
+        const usuario = await buscarPerfilUsuario(session.user.id);
+        
+        if (!usuario) {
+          throw new Error('Perfil do usuário não encontrado');
+        }
+        
+        // Salvar sessão no sistema de auth ANTES de redirecionar
+        if (window.auth) {
+          window.auth.salvarSessaoSupabase(usuario, session);
+          
+          // AGUARDAR que o localStorage seja atualizado (síncrono, mas garantir)
+          await new Promise(resolve => {
+            // Verificar se foi salvo corretamente
+            const checkInterval = setInterval(() => {
+              const saved = localStorage.getItem('auth_usuario');
+              if (saved) {
+                clearInterval(checkInterval);
+                resolve();
+              }
+            }, 50);
+            
+            // Timeout de segurança
+            setTimeout(() => {
+              clearInterval(checkInterval);
+              resolve();
+            }, 1000);
+          });
+        }
+
+        // Aguardar um pouco mais para garantir que tudo foi processado
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        console.log('✅ Sessão salva, redirecionando...');
+        
+        // Redirecionar baseado no tipo de usuário
+        // Usar CONFIG.buildPageUrl() para funcionar em dev e produção
+        if (usuario && usuario.tipo === 'administracao') {
+          const adminUrl = window.CONFIG ? window.CONFIG.buildPageUrl('admin.html') : '../pagina/admin.html';
+          window.location.href = adminUrl;
+        } else {
+          // Usar CONFIG.buildUrl() para a página inicial
+          const homeUrl = window.CONFIG ? window.CONFIG.buildUrl('index.html') : '../index.html';
+          window.location.href = homeUrl;
+        }
+      } catch (erro) {
+        console.error('❌ Erro ao processar sessão:', erro);
+        throw erro;
+      }
+    }
+
+    // Buscar perfil do usuário no banco
+    async function buscarPerfilUsuario(authUserId) {
+      try {
+        if (!window.supabaseClient || !window.supabaseClient.client) {
+          throw new Error('Supabase não inicializado');
+        }
+        
+        const { data, error } = await window.supabaseClient.client
+          .from('usuarios')
+          .select('*')
+          .eq('auth_user_id', authUserId)
+          .single();
+
+        if (error) throw error;
+
+        // Se não existe perfil, criar um básico
+        if (!data) {
+          const { data: userData } = await window.supabaseClient.client.auth.getUser();
+          const novoPerfil = {
+            auth_user_id: authUserId,
+            email: userData.user.email,
+            nome: userData.user.user_metadata?.full_name?.split(' ')[0] || 'Usuário',
+            sobrenome: userData.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+            tipo: 'visitante', // Todos começam como visitante, admin altera depois
+            status: 'ativo',
+            avatar_url: userData.user.user_metadata?.avatar_url || null
+          };
+
+          const { data: perfilCriado } = await window.supabaseClient.client
+            .from('usuarios')
+            .insert(novoPerfil)
+            .select()
+            .single();
+
+          return perfilCriado;
+        }
+
+        return data;
+      } catch (erro) {
+        console.error('❌ Erro ao buscar perfil:', erro);
+        return null;
+      }
+    }
+
+    // Executar quando a página carregar
+    document.addEventListener('DOMContentLoaded', () => {
+      processarCallback();
+    });
+  </script>
+</body>
+</html>
+

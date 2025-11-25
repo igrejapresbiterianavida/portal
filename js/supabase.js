@@ -373,30 +373,41 @@ class SupabaseClient {
     }
     
     try {
-      // FORÇAR URL de produção se estiver em produção
-      const isProduction = window.location.hostname.includes('github.io') || 
-                          window.location.hostname.includes('igrejapresbiterianavida');
+      // FORÇAR URL de produção - NUNCA usar localhost se estiver em produção
+      const hostname = window.location.hostname.toLowerCase();
+      const isProduction = hostname.includes('github.io') || 
+                          hostname.includes('igrejapresbiterianavida') ||
+                          hostname === 'igrejapresbiterianavida.github.io';
       
       let redirectUrl;
       if (isProduction) {
         // SEMPRE usar URL de produção quando em produção
         redirectUrl = 'https://igrejapresbiterianavida.github.io/portal/pagina/auth-callback.html';
         console.log('🌐 PRODUÇÃO DETECTADA - Forçando URL de produção:', redirectUrl);
-      } else {
+        console.log('⚠️ IMPORTANTE: Certifique-se de configurar esta URL no painel do Supabase!');
+      } else if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.')) {
         // Desenvolvimento local
         redirectUrl = `${window.location.origin}/portal/pagina/auth-callback.html`;
         console.log('💻 DESENVOLVIMENTO LOCAL - Usando URL local:', redirectUrl);
+      } else {
+        // Para qualquer outro ambiente, usar produção
+        redirectUrl = 'https://igrejapresbiterianavida.github.io/portal/pagina/auth-callback.html';
+        console.log('⚠️ Ambiente desconhecido - Usando URL de produção:', redirectUrl);
       }
       
       console.log(`🔗 URL de redirect configurada: ${redirectUrl}`);
-      console.log(`📍 Hostname atual: ${window.location.hostname}`);
+      console.log(`📍 Hostname atual: ${hostname}`);
       console.log(`📍 Origin atual: ${window.location.origin}`);
       
       const { data, error } = await this.client.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
-          skipBrowserRedirect: false
+          skipBrowserRedirect: false,
+          queryParams: {
+            // Forçar redirectTo na query string também
+            redirect_to: redirectUrl
+          }
         }
       });
       

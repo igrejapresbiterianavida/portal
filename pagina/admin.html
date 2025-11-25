@@ -711,6 +711,14 @@
                       <button @click="abrirModal(usuario)" class="botao botao-pequeno" style="margin-right: 5px;" title="Editar">
                         <span class="material-icons" style="font-size: 16px;">edit</span>
                       </button>
+                      <button @click="resetarSenha(usuario)" 
+                              class="botao botao-pequeno" 
+                              style="background: var(--laranja); color: white; margin-right: 5px;"
+                              title="Resetar Senha"
+                              :disabled="resetandoSenha"
+                              x-show="usuario.auth_user_id">
+                        <span class="material-icons" style="font-size: 16px;">lock_reset</span>
+                      </button>
                       <button @click="deletar(usuario.id)" 
                               class="botao botao-pequeno botao-secundario" 
                               title="Deletar"
@@ -772,6 +780,49 @@
                   <option value="inativo">Inativo</option>
                   <option value="suspenso">Suspenso</option>
                 </select>
+              </div>
+              
+              <!-- Campos de Senha -->
+              <div style="margin-top: 25px; padding-top: 25px; border-top: 2px solid var(--cinza-leve);">
+                <h4 style="margin-bottom: 15px; color: var(--verde-escuro);">
+                  <span class="material-icons" style="font-size: 18px; vertical-align: middle;">lock</span>
+                  Senha
+                  <span x-show="!usuarioEditando" style="color: red;">*</span>
+                </h4>
+                
+                <div style="margin-top: 15px;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">
+                    <span x-show="!usuarioEditando">Senha</span>
+                    <span x-show="usuarioEditando">Nova Senha (deixe em branco para não alterar)</span>
+                    <span x-show="!usuarioEditando" style="color: red;">*</span>
+                  </label>
+                  <input 
+                    type="password" 
+                    x-model="formulario.senha" 
+                    placeholder="••••••••" 
+                    style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"
+                    :required="!usuarioEditando"
+                    minlength="6"
+                  >
+                  <small style="color: var(--cinza-medio); display: block; margin-top: 5px;">
+                    Mínimo de 6 caracteres
+                  </small>
+                </div>
+                
+                <div style="margin-top: 15px;" x-show="formulario.senha">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">
+                    Confirmar Senha
+                    <span x-show="!usuarioEditando" style="color: red;">*</span>
+                  </label>
+                  <input 
+                    type="password" 
+                    x-model="formulario.confirmarSenha" 
+                    placeholder="••••••••" 
+                    style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"
+                    :required="formulario.senha && !usuarioEditando"
+                    minlength="6"
+                  >
+                </div>
               </div>
               
               <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">

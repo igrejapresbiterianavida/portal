@@ -51,27 +51,35 @@ const CONFIG = {
   },
   
   get SUPABASE_URL() {
+    // Apenas a URL (pública) - sem credenciais
+    if (typeof window !== 'undefined' && window.SUPABASE_CONFIG) {
+      return window.SUPABASE_CONFIG.SUPABASE_URL || '';
+    }
     return this.getEnvVar('SUPABASE_URL', '');
-  },
-  
-  get SUPABASE_ANON_KEY() {
-    return this.getEnvVar('SUPABASE_ANON_KEY', '');
   },
   
   // Método para buscar variáveis de ambiente (funciona em build)
   getEnvVar(name, defaultValue = '') {
-    // Em produção, essas variáveis devem ser injetadas no build
+    // Prioridade 1: Produção (GitHub Pages) - usar SUPABASE_CONFIG
+    if (typeof window !== 'undefined' && window.SUPABASE_CONFIG) {
+      const configValue = window.SUPABASE_CONFIG[name];
+      if (configValue) return configValue;
+    }
+    
+    // Prioridade 2: Process env (build time)
     if (typeof process !== 'undefined' && process.env) {
       return process.env[name] || defaultValue;
     }
     
-    // Para desenvolvimento local, pode usar um objeto global
+    // Prioridade 3: Desenvolvimento local (window.ENV)
     if (typeof window !== 'undefined' && window.ENV) {
       return window.ENV[name] || defaultValue;
     }
     
-    // Fallback para desenvolvimento
-    console.warn(`Variável de ambiente ${name} não encontrada`);
+    // Fallback
+    if (defaultValue === '') {
+      console.warn(`⚠️ Variável de ambiente ${name} não encontrada`);
+    }
     return defaultValue;
   },
   

@@ -198,15 +198,10 @@ function devocionalDiario() {
     async carregar() {
       try {
         // Carregar do Supabase
-        if (window.supabaseClient && window.supabaseClient.client) {
-          const devocionais = await window.supabaseClient.listar('devocionais', {
-            filtro: { campo: 'ativo', operador: 'eq', valor: true },
-            ordem: { campo: 'data_publicacao', ascendente: false },
-            limite: 1
-          });
+        if (window.supabaseClient) {
+          const devocional = await window.supabaseClient.getDevocionalAtivo();
           
-          if (devocionais && devocionais.length > 0) {
-            const devocional = devocionais[0];
+          if (devocional) {
             const imagemUrl = devocional.imagem_url || '';
             // Adicionar timestamp para forçar atualização da imagem (evita cache)
             const imagemComCache = imagemUrl ? (imagemUrl.includes('?') ? imagemUrl : imagemUrl + '?t=' + Date.now()) : 'assets/images/corrida.jpg?t=' + Date.now();
@@ -332,7 +327,7 @@ function videosYoutube() {
         }
         
         // 2. Carregar vídeos do Supabase (cadastrados manualmente) - como complemento
-        if (window.supabaseClient && window.supabaseClient.client) {
+        if (window.supabaseClient) {
           try {
             const videosSupabase = await window.supabaseClient.listar('videos', {
               ordem: { campo: 'data_publicacao', ascendente: false },
@@ -458,7 +453,7 @@ function videosYoutube() {
     async carregarProgramacao() {
       try {
         // Carregar do Supabase
-        if (window.supabaseClient && window.supabaseClient.client) {
+        if (window.supabaseClient) {
           const programacao = await window.supabaseClient.listar('programacao', {
             ordem: { campo: 'dia', ascendente: true }
           });
@@ -537,7 +532,7 @@ function eventosIgreja() {
     async carregarEventos() {
       try {
         // Carregar do Supabase
-        if (window.supabaseClient && window.supabaseClient.client) {
+        if (window.supabaseClient) {
           const eventos = await window.supabaseClient.listar('eventos', {
             filtro: { campo: 'ativo', operador: 'eq', valor: true },
             ordem: { campo: 'data', ascendente: true },
@@ -704,7 +699,7 @@ function contribuicoesIgreja() {
     async init() {
       try {
         // Carregar dados bancários do Supabase
-        if (window.supabaseClient && window.supabaseClient.client) {
+        if (window.supabaseClient) {
           const dadosBancarios = await window.supabaseClient.listar('dados_bancarios', {
             filtro: { campo: 'ativo', operador: 'eq', valor: true }
           });
@@ -784,11 +779,10 @@ function localizacaoIgreja() {
     async init() {
       try {
         // Carregar dados da igreja do Supabase
-        if (window.supabaseClient && window.supabaseClient.client) {
-          const dadosIgreja = await window.supabaseClient.listar('dados_igreja');
+        if (window.supabaseClient) {
+          const dado = await window.supabaseClient.getDadosIgreja();
           
-          if (dadosIgreja && dadosIgreja.length > 0) {
-            const dado = dadosIgreja[0]; // Deve ter apenas 1 registro
+          if (dado) {
             this.dados = {
               endereco: {
                 logradouro: dado.logradouro || '',
@@ -949,7 +943,7 @@ function modalVisitante() {
         };
         
         // Salvar no Supabase
-        if (window.supabaseClient && window.supabaseClient.client) {
+        if (window.supabaseClient) {
           const visitanteSalvo = await window.supabaseClient.criar('visitantes', dadosVisitante);
           
           if (visitanteSalvo) {

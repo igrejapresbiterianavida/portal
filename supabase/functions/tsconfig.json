@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "types": [],
+    "typeRoots": ["_shared"]
+  },
+  "include": ["**/*.ts", "_shared/**/*.d.ts"],
+  "exclude": ["node_modules"]
+}
+

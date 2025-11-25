@@ -15,8 +15,10 @@ if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true });
 }
 
-// Listar todos os arquivos .js
-const files = fs.readdirSync(sourceDir).filter(file => file.endsWith('.js'));
+// Listar todos os arquivos .js (excluindo config-prod.js que não deve ser ofuscado)
+const files = fs.readdirSync(sourceDir).filter(file => 
+  file.endsWith('.js') && file !== 'config-prod.js'
+);
 
 console.log(`🔐 Ofuscando ${files.length} arquivos JavaScript...\n`);
 

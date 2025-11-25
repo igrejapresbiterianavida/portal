@@ -1183,6 +1183,9 @@
   
   <!-- JavaScript -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Config de produção (carrega primeiro para ter prioridade) -->
+  <script src="js/config-prod.js"></script>
+  <!-- Config de desenvolvimento (será sobrescrito em produção) -->
   <script src="js/env-dev.js"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase.js"></script>

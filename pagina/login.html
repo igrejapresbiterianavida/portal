@@ -237,7 +237,7 @@
   </a>
   
   <!-- Container de Login -->
-  <div class="login-container" x-data="window.loginForm ? window.loginForm() : {}" x-init="console.log('Alpine inicializado:', typeof window.loginForm)">
+  <div class="login-container" x-data="loginForm()" x-init="console.log('Alpine inicializado:', typeof window.loginForm, 'modalSignUpAberto:', modalSignUpAberto, 'modalResetAberto:', modalResetAberto)">
     
     <!-- Título -->
     <h1 class="login-title">Sign In</h1>
@@ -331,15 +331,12 @@
       
     </div>
     
-  </div>
-  
-  <!-- ==================== MODAL SIGN UP ==================== -->
-  <div 
-    x-show="modalSignUpAberto" 
-    @click.away="fecharModalSignUp()"
-    x-transition
-    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;"
-    x-cloak>
+    <!-- ==================== MODAL SIGN UP ==================== -->
+    <div 
+      x-show="modalSignUpAberto"
+      x-transition
+      @click.away="fecharModalSignUp()"
+      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
     
     <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
       <button @click="fecharModalSignUp()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #6B7280;">&times;</button>
@@ -431,15 +428,14 @@
         </button>
       </form>
     </div>
-  </div>
-  
-  <!-- ==================== MODAL RESET SENHA ==================== -->
-  <div 
-    x-show="modalResetAberto" 
-    @click.away="fecharModalReset()"
-    x-transition
-    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;"
-    x-cloak>
+    </div>
+    
+    <!-- ==================== MODAL RESET SENHA ==================== -->
+    <div 
+      x-show="modalResetAberto"
+      x-transition
+      @click.away="fecharModalReset()"
+      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
     
     <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; position: relative;">
       <button @click="fecharModalReset()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #6B7280;">&times;</button>
@@ -478,6 +474,7 @@
           </button>
         </form>
       </div>
+    </div>
     </div>
   </div>
   

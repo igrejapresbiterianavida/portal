@@ -373,27 +373,30 @@ class SupabaseClient {
     }
     
     try {
-      // Detectar URL correta para redirectTo (produção ou desenvolvimento)
+      // FORÇAR URL de produção se estiver em produção
+      const isProduction = window.location.hostname.includes('github.io') || 
+                          window.location.hostname.includes('igrejapresbiterianavida');
+      
       let redirectUrl;
-      if (typeof CONFIG !== 'undefined' && CONFIG.getBaseUrl) {
-        redirectUrl = CONFIG.getBaseUrl() + '/portal/pagina/auth-callback.html';
+      if (isProduction) {
+        // SEMPRE usar URL de produção quando em produção
+        redirectUrl = 'https://igrejapresbiterianavida.github.io/portal/pagina/auth-callback.html';
+        console.log('🌐 PRODUÇÃO DETECTADA - Forçando URL de produção:', redirectUrl);
       } else {
-        // Fallback: detectar produção vs desenvolvimento
-        const isProduction = window.location.hostname.includes('github.io') || 
-                            window.location.hostname.includes('igrejapresbiterianavida');
-        if (isProduction) {
-          redirectUrl = 'https://igrejapresbiterianavida.github.io/portal/pagina/auth-callback.html';
-        } else {
-          redirectUrl = `${window.location.origin}/portal/pagina/auth-callback.html`;
-        }
+        // Desenvolvimento local
+        redirectUrl = `${window.location.origin}/portal/pagina/auth-callback.html`;
+        console.log('💻 DESENVOLVIMENTO LOCAL - Usando URL local:', redirectUrl);
       }
       
       console.log(`🔗 URL de redirect configurada: ${redirectUrl}`);
+      console.log(`📍 Hostname atual: ${window.location.hostname}`);
+      console.log(`📍 Origin atual: ${window.location.origin}`);
       
       const { data, error } = await this.client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: false
         }
       });
       

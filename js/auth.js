@@ -484,6 +484,196 @@ function loginForm() {
     carregando: false,
     erro: '',
     
+    // Sign Up
+    modalSignUpAberto: false,
+    dadosSignUp: {
+      nome: '',
+      sobrenome: '',
+      email: '',
+      telefone: '',
+      senha: '',
+      confirmarSenha: ''
+    },
+    carregandoSignUp: false,
+    erroSignUp: '',
+    sucessoSignUp: '',
+    
+    // Reset Senha
+    modalResetAberto: false,
+    dadosReset: {
+      email: ''
+    },
+    carregandoReset: false,
+    erroReset: '',
+    sucessoReset: '',
+    
+    abrirModalSignUp() {
+      this.modalSignUpAberto = true;
+      this.erroSignUp = '';
+      this.sucessoSignUp = '';
+      this.dadosSignUp = {
+        nome: '',
+        sobrenome: '',
+        email: '',
+        telefone: '',
+        senha: '',
+        confirmarSenha: ''
+      };
+    },
+    
+    fecharModalSignUp() {
+      this.modalSignUpAberto = false;
+      this.erroSignUp = '';
+      this.sucessoSignUp = '';
+    },
+    
+    abrirModalReset() {
+      this.modalResetAberto = true;
+      this.erroReset = '';
+      this.sucessoReset = '';
+      this.dadosReset = { email: '' };
+    },
+    
+    fecharModalReset() {
+      this.modalResetAberto = false;
+      this.erroReset = '';
+      this.sucessoReset = '';
+    },
+    
+    async enviarSignUp() {
+      // Validações
+      if (!this.dadosSignUp.nome || !this.dadosSignUp.email || !this.dadosSignUp.senha) {
+        this.erroSignUp = 'Preencha todos os campos obrigatórios';
+        return;
+      }
+      
+      if (this.dadosSignUp.senha !== this.dadosSignUp.confirmarSenha) {
+        this.erroSignUp = 'As senhas não coincidem';
+        return;
+      }
+      
+      if (this.dadosSignUp.senha.length < 6) {
+        this.erroSignUp = 'A senha deve ter pelo menos 6 caracteres';
+        return;
+      }
+      
+      this.carregandoSignUp = true;
+      this.erroSignUp = '';
+      this.sucessoSignUp = '';
+      
+      try {
+        // Chamar Edge Function para criar usuário
+        if (!window.supabaseClient || !window.supabaseClient.url) {
+          throw new Error('Sistema de autenticação não disponível');
+        }
+        
+        const functionUrl = `${window.supabaseClient.url}/functions/v1/criar-usuario-com-senha`;
+        
+        const response = await fetch(functionUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+            'apikey': window.supabaseClient.anonKey || ''
+          },
+          body: JSON.stringify({
+            nome: this.dadosSignUp.nome,
+            sobrenome: this.dadosSignUp.sobrenome || '',
+            email: this.dadosSignUp.email.toLowerCase(),
+            senha: this.dadosSignUp.senha,
+            telefone: this.dadosSignUp.telefone || '',
+            tipo: 'visitante'
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erro ao criar conta');
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          this.sucessoSignUp = 'Conta criada com sucesso! Verifique seu email para confirmar sua senha.';
+          
+          // Limpar formulário
+          this.dadosSignUp = {
+            nome: '',
+            sobrenome: '',
+            email: '',
+            telefone: '',
+            senha: '',
+            confirmarSenha: ''
+          };
+          
+          // Fechar modal após 3 segundos
+          setTimeout(() => {
+            this.fecharModalSignUp();
+          }, 3000);
+        } else {
+          throw new Error(result.error || 'Erro ao criar conta');
+        }
+      } catch (erro) {
+        this.erroSignUp = erro.message || 'Erro ao criar conta. Tente novamente.';
+        console.error('Erro no signup:', erro);
+      } finally {
+        this.carregandoSignUp = false;
+      }
+    },
+    
+    async enviarReset() {
+      if (!this.dadosReset.email) {
+        this.erroReset = 'Digite seu email';
+        return;
+      }
+      
+      this.carregandoReset = true;
+      this.erroReset = '';
+      this.sucessoReset = '';
+      
+      try {
+        // Chamar Edge Function para resetar senha
+        if (!window.supabaseClient || !window.supabaseClient.url) {
+          throw new Error('Sistema de autenticação não disponível');
+        }
+        
+        const functionUrl = `${window.supabaseClient.url}/functions/v1/resetar-senha`;
+        
+        const response = await fetch(functionUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+            'apikey': window.supabaseClient.anonKey || ''
+          },
+          body: JSON.stringify({
+            email: this.dadosReset.email.toLowerCase()
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erro ao solicitar reset de senha');
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          this.sucessoReset = result.message || 'Instruções para resetar sua senha foram enviadas para seu email.';
+          
+          // Limpar formulário
+          this.dadosReset = { email: '' };
+        } else {
+          throw new Error(result.error || 'Erro ao solicitar reset de senha');
+        }
+      } catch (erro) {
+        this.erroReset = erro.message || 'Erro ao solicitar reset de senha. Tente novamente.';
+        console.error('Erro no reset:', erro);
+      } finally {
+        this.carregandoReset = false;
+      }
+    },
+    
     async enviar() {
       if (!this.dados.email || !this.dados.senha) {
         this.erro = 'Preencha email e senha';

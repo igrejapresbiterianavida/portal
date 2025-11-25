@@ -141,17 +141,35 @@ function crudUsuarios() {
               return;
             }
             
-            // Atualizar senha no Supabase Auth
-            if (window.supabaseClient && window.supabaseClient.client && this.usuarioEditando.auth_user_id) {
-              // Usar admin API para atualizar senha de outro usuário
-              // Isso precisa ser feito via Edge Function com SERVICE_ROLE_KEY
+            // Atualizar senha no Supabase Auth usando Edge Function (que envia email)
+            if (window.supabaseClient && this.usuarioEditando.auth_user_id) {
               try {
-                await window.supabaseClient.chamarEdgeFunction('atualizar-senha-usuario', {
-                  auth_user_id: this.usuarioEditando.auth_user_id,
-                  nova_senha: this.formulario.senha
+                const functionUrl = `${window.supabaseClient.url}/functions/v1/atualizar-senha-usuario`;
+                
+                const response = await fetch(functionUrl, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+                    'apikey': window.supabaseClient.anonKey || ''
+                  },
+                  body: JSON.stringify({
+                    auth_user_id: this.usuarioEditando.auth_user_id,
+                    nova_senha: this.formulario.senha
+                  })
                 });
+                
+                if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(errorData.error || 'Erro ao atualizar senha');
+                }
+                
+                const result = await response.json();
+                if (result.success) {
+                  alert('Senha atualizada! Um email foi enviado ao usuário com a nova senha.');
+                }
               } catch (erro) {
-                console.warn('Erro ao atualizar senha (pode não ter Edge Function):', erro);
+                console.warn('Erro ao atualizar senha:', erro);
                 alert('Aviso: Dados atualizados, mas não foi possível atualizar a senha. O usuário pode precisar resetá-la pelo perfil.');
               }
             }
@@ -160,67 +178,45 @@ function crudUsuarios() {
           await window.supabaseClient.atualizar('usuarios', this.usuarioEditando.id, dadosParaAtualizar);
           alert('Usuário atualizado com sucesso!');
         } else {
-          // Criar novo usuário
-          // Verificar se já existe um usuário com este email
-          const usuariosExistentes = await window.supabaseClient.listar('usuarios');
-          const emailExistente = usuariosExistentes.find(u => u.email.toLowerCase() === this.formulario.email.toLowerCase());
-          
-          if (emailExistente) {
-            alert('Já existe um usuário com este email');
+          // Criar novo usuário usando Edge Function (que cria auth + perfil + envia email)
+          try {
+            const functionUrl = `${window.supabaseClient.url}/functions/v1/criar-usuario-com-senha`;
+            
+            const response = await fetch(functionUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+                'apikey': window.supabaseClient.anonKey || ''
+              },
+              body: JSON.stringify({
+                nome: this.formulario.nome,
+                sobrenome: this.formulario.sobrenome || '',
+                email: this.formulario.email.toLowerCase(),
+                senha: this.formulario.senha,
+                telefone: this.formulario.telefone || '',
+                tipo: this.formulario.tipo || 'visitante'
+              })
+            });
+            
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || 'Erro ao criar usuário');
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+              alert('Usuário criado com sucesso! Um email foi enviado com a senha para o usuário.');
+            } else {
+              throw new Error(result.error || 'Erro ao criar usuário');
+            }
+          } catch (erro) {
+            console.error('Erro ao criar usuário:', erro);
+            alert('Erro ao criar usuário: ' + erro.message);
             this.carregando = false;
             return;
           }
-
-          // Criar usuário no Supabase Auth primeiro
-          let authUserId = null;
-          if (window.supabaseClient && window.supabaseClient.client && this.formulario.senha) {
-            try {
-              const { data: authData, error: authError } = await window.supabaseClient.client.auth.admin.createUser({
-                email: this.formulario.email.toLowerCase(),
-                password: this.formulario.senha,
-                email_confirm: true // Confirmar email automaticamente
-              });
-              
-              if (authError) {
-                throw authError;
-              }
-              
-              if (authData && authData.user) {
-                authUserId = authData.user.id;
-              }
-            } catch (authErro) {
-              console.error('Erro ao criar usuário no Auth:', authErro);
-              // Tentar usar Edge Function se cliente admin não funcionar
-              try {
-                const result = await window.supabaseClient.chamarEdgeFunction('criar-usuario-auth', {
-                  email: this.formulario.email.toLowerCase(),
-                  senha: this.formulario.senha,
-                  nome: this.formulario.nome,
-                  sobrenome: this.formulario.sobrenome || ''
-                });
-                authUserId = result?.auth_user_id || null;
-              } catch (edgeErro) {
-                console.error('Erro ao criar usuário via Edge Function:', edgeErro);
-                alert('Erro ao criar usuário no sistema de autenticação. Verifique se as Edge Functions estão configuradas.');
-                this.carregando = false;
-                return;
-              }
-            }
-          }
-
-          // Criar registro na tabela usuarios
-          const novoUsuario = {
-            nome: this.formulario.nome,
-            sobrenome: this.formulario.sobrenome || '',
-            email: this.formulario.email.toLowerCase(),
-            telefone: this.formulario.telefone || '',
-            tipo: this.formulario.tipo || 'visitante',
-            status: this.formulario.status || 'ativo',
-            auth_user_id: authUserId
-          };
-
-          await window.supabaseClient.criar('usuarios', novoUsuario);
-          alert('Usuário criado com sucesso! O usuário pode fazer login com email e senha.');
         }
 
         this.fecharModal();
@@ -234,41 +230,43 @@ function crudUsuarios() {
     },
     
     async resetarSenha(usuario) {
-      const novaSenha = prompt(`Digite a nova senha para ${usuario.nome}:\n\n(A senha deve ter pelo menos 6 caracteres)`);
-      
-      if (!novaSenha) {
-        return; // Usuário cancelou
-      }
-      
-      if (novaSenha.length < 6) {
-        alert('A senha deve ter pelo menos 6 caracteres');
+      if (!usuario.auth_user_id) {
+        alert('Este usuário não possui um ID de autenticação para resetar a senha.');
         return;
       }
+      if (!confirm(`Tem certeza que deseja enviar um email de reset de senha para ${usuario.email}?`)) return;
       
-      if (!confirm(`Tem certeza que deseja redefinir a senha de ${usuario.nome}?\n\nA nova senha será: ${novaSenha.substring(0, 3)}***`)) {
-        return;
-      }
-      
-      this.resetandoSenha = true;
-      
+      this.carregando = true;
       try {
-        if (!usuario.auth_user_id) {
-          alert('Este usuário não tem conta de autenticação. É necessário criar uma senha pelo formulário de edição.');
-          return;
-        }
+        // Usar Edge Function para resetar senha (que envia email com OTP/link)
+        const functionUrl = `${window.supabaseClient.url}/functions/v1/resetar-senha`;
         
-        // Resetar senha via Edge Function
-        await window.supabaseClient.chamarEdgeFunction('atualizar-senha-usuario', {
-          auth_user_id: usuario.auth_user_id,
-          nova_senha: novaSenha
+        const response = await fetch(functionUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+            'apikey': window.supabaseClient.anonKey || ''
+          },
+          body: JSON.stringify({
+            email: usuario.email
+          })
         });
         
-        alert(`Senha redefinida com sucesso para ${usuario.nome}!\n\nNova senha: ${novaSenha}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erro ao solicitar reset de senha');
+        }
+        
+        const result = await response.json();
+        if (result.success) {
+          alert('Email de reset de senha enviado com sucesso para ' + usuario.email);
+        }
       } catch (erro) {
         console.error('Erro ao resetar senha:', erro);
         alert('Erro ao resetar senha: ' + (erro.message || 'Erro desconhecido'));
       } finally {
-        this.resetandoSenha = false;
+        this.carregando = false;
       }
     },
 

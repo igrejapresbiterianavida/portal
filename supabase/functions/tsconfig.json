@@ -5,13 +5,24 @@
     "lib": ["ESNext", "DOM"],
     "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "types": [],
-    "typeRoots": ["_shared"]
+    "typeRoots": ["./_shared"],
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowJs": false
   },
-  "include": ["**/*.ts", "_shared/**/*.d.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "_shared/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".temp"
+  ]
 }
-

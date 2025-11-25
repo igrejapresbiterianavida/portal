@@ -284,6 +284,13 @@
         
       </form>
       
+      <!-- Link Esqueci minha senha -->
+      <div style="text-align: center; margin-top: 15px; margin-bottom: 20px;">
+        <a href="#" @click.prevent="abrirModalReset()" style="color: var(--verde-medio); text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+          Esqueci minha senha
+        </a>
+      </div>
+      
       <!-- Divisor -->
       <div class="divider">Or login with</div>
 
@@ -305,8 +312,171 @@
         </button>
       </div>
       
+      <!-- Link Sign Up -->
+      <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB;">
+        <p style="color: #6B7280; font-size: 0.9rem; margin-bottom: 10px;">
+          Não tem uma conta?
+        </p>
+        <button 
+          type="button" 
+          @click="abrirModalSignUp()"
+          style="background: transparent; border: 2px solid var(--verde-medio); color: var(--verde-medio); padding: 12px 30px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;"
+          :disabled="carregando"
+        >
+          Criar Conta
+        </button>
+      </div>
+      
     </div>
     
+  </div>
+  
+  <!-- ==================== MODAL SIGN UP ==================== -->
+  <div 
+    x-show="modalSignUpAberto" 
+    @click.away="fecharModalSignUp()"
+    x-transition
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;"
+    x-cloak>
+    
+    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
+      <button @click="fecharModalSignUp()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #6B7280;">&times;</button>
+      
+      <h2 style="color: #1A4731; margin-bottom: 25px; text-align: center;">Criar Conta</h2>
+      
+      <div x-show="erroSignUp" style="background: #FEE2E2; color: #DC2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+        <span x-text="erroSignUp"></span>
+      </div>
+      
+      <div x-show="sucessoSignUp" style="background: #D1FAE5; color: #065F46; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+        <span x-text="sucessoSignUp"></span>
+      </div>
+      
+      <form @submit.prevent="enviarSignUp()">
+        <div style="margin-bottom: 20px;">
+          <input 
+            type="text" 
+            x-model="dadosSignUp.nome"
+            placeholder="Nome *" 
+            style="width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; box-sizing: border-box;"
+            required
+            :disabled="carregandoSignUp"
+          >
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <input 
+            type="text" 
+            x-model="dadosSignUp.sobrenome"
+            placeholder="Sobrenome" 
+            style="width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; box-sizing: border-box;"
+            :disabled="carregandoSignUp"
+          >
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <input 
+            type="email" 
+            x-model="dadosSignUp.email"
+            placeholder="Email *" 
+            style="width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; box-sizing: border-box;"
+            required
+            :disabled="carregandoSignUp"
+          >
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <input 
+            type="tel" 
+            x-model="dadosSignUp.telefone"
+            placeholder="Telefone (opcional)" 
+            style="width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; box-sizing: border-box;"
+            :disabled="carregandoSignUp"
+          >
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <input 
+            type="password" 
+            x-model="dadosSignUp.senha"
+            placeholder="Senha (mínimo 6 caracteres) *" 
+            style="width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; box-sizing: border-box;"
+            required
+            minlength="6"
+            :disabled="carregandoSignUp"
+          >
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+          <input 
+            type="password" 
+            x-model="dadosSignUp.confirmarSenha"
+            placeholder="Confirmar Senha *" 
+            style="width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; box-sizing: border-box;"
+            required
+            minlength="6"
+            :disabled="carregandoSignUp"
+          >
+        </div>
+        
+        <button 
+          type="submit" 
+          class="btn-signin" 
+          :disabled="carregandoSignUp"
+          style="margin-top: 10px;">
+          <span x-show="!carregandoSignUp">CRIAR CONTA</span>
+          <span x-show="carregandoSignUp">CRIANDO...</span>
+        </button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- ==================== MODAL RESET SENHA ==================== -->
+  <div 
+    x-show="modalResetAberto" 
+    @click.away="fecharModalReset()"
+    x-transition
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;"
+    x-cloak>
+    
+    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; position: relative;">
+      <button @click="fecharModalReset()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #6B7280;">&times;</button>
+      
+      <h2 style="color: #1A4731; margin-bottom: 25px; text-align: center;">Recuperar Senha</h2>
+      
+      <div x-show="erroReset" style="background: #FEE2E2; color: #DC2626; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+        <span x-text="erroReset"></span>
+      </div>
+      
+      <div x-show="sucessoReset" style="background: #D1FAE5; color: #065F46; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+        <p x-text="sucessoReset"></p>
+        <p style="margin-top: 10px; font-size: 0.85rem;">Verifique seu email para receber as instruções.</p>
+      </div>
+      
+      <div x-show="!sucessoReset">
+        <form @submit.prevent="enviarReset()">
+          <div style="margin-bottom: 20px;">
+            <input 
+              type="email" 
+              x-model="dadosReset.email"
+              placeholder="Digite seu email cadastrado *" 
+              style="width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; box-sizing: border-box;"
+              required
+              :disabled="carregandoReset"
+            >
+          </div>
+          
+          <button 
+            type="submit" 
+            class="btn-signin" 
+            :disabled="carregandoReset"
+            style="margin-top: 10px;">
+            <span x-show="!carregandoReset">ENVIAR INSTRUÇÕES</span>
+            <span x-show="carregandoReset">ENVIANDO...</span>
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
   
   <!-- Scripts -->

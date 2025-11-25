@@ -248,17 +248,17 @@
 
         if (error) throw error;
 
-        // Se não existe perfil, criar um básico
+        // Se não existe perfil, criar um básico e gerar/enviar senha
         if (!data) {
           const { data: userData } = await window.supabaseClient.client.auth.getUser();
           const novoPerfil = {
             auth_user_id: authUserId,
             email: userData.user.email,
-            nome: userData.user.user_metadata?.full_name?.split(' ')[0] || 'Usuário',
-            sobrenome: userData.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+            nome: userData.user.user_metadata?.full_name?.split(' ')[0] || userData.user.user_metadata?.name?.split(' ')[0] || 'Usuário',
+            sobrenome: userData.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || userData.user.user_metadata?.name?.split(' ').slice(1).join(' ') || '',
             tipo: 'visitante', // Todos começam como visitante, admin altera depois
             status: 'ativo',
-            avatar_url: userData.user.user_metadata?.avatar_url || null
+            avatar_url: userData.user.user_metadata?.avatar_url || userData.user.user_metadata?.picture || null
           };
 
           const { data: perfilCriado } = await window.supabaseClient.client
@@ -266,6 +266,51 @@
             .insert(novoPerfil)
             .select()
             .single();
+
+          // Gerar senha aleatória e enviar por email
+          // A senha será gerada pela Edge Function que será chamada
+          try {
+            // Gerar senha aleatória de 12 caracteres
+            const senhaGerada = Math.random().toString(36).slice(-12) + Math.random().toString(36).toUpperCase().slice(-4);
+            
+            // Atualizar senha do usuário usando Edge Function
+            const functionUrl = `${window.supabaseClient.url}/functions/v1/atualizar-senha-usuario`;
+            
+            await fetch(functionUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+                'apikey': window.supabaseClient.anonKey || ''
+              },
+              body: JSON.stringify({
+                auth_user_id: authUserId,
+                nova_senha: senhaGerada
+              })
+            });
+            
+            // Enviar email com a senha gerada
+            const emailFunctionUrl = `${window.supabaseClient.url}/functions/v1/enviar-email-senha`;
+            await fetch(emailFunctionUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${window.supabaseClient.anonKey || ''}`,
+                'apikey': window.supabaseClient.anonKey || ''
+              },
+              body: JSON.stringify({
+                email: userData.user.email,
+                nome: novoPerfil.nome,
+                senha: senhaGerada,
+                tipo: 'google_login'
+              })
+            });
+            
+            console.log('✅ Senha gerada e email enviado para novo usuário Google');
+          } catch (erro) {
+            console.warn('⚠️ Erro ao gerar/enviar senha para novo usuário Google (usuário foi criado):', erro);
+            // Não falhar se o email não for enviado
+          }
 
           return perfilCriado;
         }

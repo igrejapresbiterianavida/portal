@@ -2,7 +2,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -102,8 +102,9 @@ serve(async (req) => {
         status: 200,
       },
     )
-  } catch (error) {
-    console.error('Erro ao buscar notícias IPB:', error)
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+    console.error('Erro ao buscar notícias IPB:', errorMessage)
     
     // Retornar dados mockados em caso de erro (fallback)
     const noticiasMock = [

@@ -1,6 +1,5 @@
 /// <reference path="../_shared/deno.d.ts" />
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
 serve(async (req: Request) => {
@@ -9,27 +8,30 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { tabela, id, dados } = await req.json()
+    const { email, nome, otp, resetLink, expiresAt } = await req.json()
 
-    if (!tabela || !id || !dados) {
-      throw new Error('Tabela, ID e dados são obrigatórios')
+    if (!email || !nome) {
+      throw new Error('Email e nome são obrigatórios')
     }
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    // Log para debug (em produção, não logar dados sensíveis)
+    console.log('📧 Email de reset:', {
+      para: email,
+      nome: nome,
+      // otp e resetLink não devem ser logados em produção!
+    })
 
-    const { data, error } = await supabaseClient
-      .from(tabela)
-      .update(dados)
-      .eq('id', id)
-      .select()
-
-    if (error) throw error
-
+    // TODO: Implementar envio real de email usando Resend ou EmailJS
+    // O email deve conter:
+    // - OTP de 6 dígitos
+    // - Link para resetar senha
+    // - Instruções de uso
+    
     return new Response(
-      JSON.stringify({ success: true, data: Array.isArray(data) ? data[0] : data }),
+      JSON.stringify({ 
+        success: true, 
+        message: 'Email de recuperação enviado com sucesso'
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

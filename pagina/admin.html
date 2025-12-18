@@ -13,10 +13,11 @@
   
   <!-- CSS -->
   <link rel="stylesheet" href="../css/globais.css">
-  <link rel="stylesheet" href="../css/componentes.css">
-  <link rel="stylesheet" href="../css/animacoes.css">
-  <link rel="stylesheet" href="../css/mobile.css">
-  <link rel="stylesheet" href="../css/desktop.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/admin-mobile.css">
+  <link rel="stylesheet" href="../css/admin-modals.css">
+  <link rel="stylesheet" href="../css/admin-tables.css">
+  <link rel="stylesheet" href="../css/ux-ui-fixes.css">
   
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
@@ -485,6 +486,28 @@
         <!-- Divisor -->
         <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;"></div>
         
+        <!-- Catecúmenos -->
+        <div style="padding: 10px 25px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; color: var(--branco);">
+          Catecúmenos
+        </div>
+        
+        <div class="nav-item">
+          <a href="#catecumenos" class="nav-link" @click="mudarSecao('catecumenos')">
+            <span class="material-icons">school</span>
+            Inscrições
+          </a>
+        </div>
+        
+        <div class="nav-item">
+          <a href="#turmas-catecumenos" class="nav-link" @click="mudarSecao('turmas-catecumenos')">
+            <span class="material-icons">groups</span>
+            Turmas
+          </a>
+        </div>
+        
+        <!-- Divisor -->
+        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;"></div>
+        
         <!-- Configurações -->
         
         <div class="nav-item">
@@ -631,6 +654,29 @@
                 <div>
                   <div class="stat-number" x-text="stats.visitantes"></div>
                   <div class="stat-label">Cadastros</div>
+                </div>
+                <span class="material-icons" style="color: var(--cinza-leve); font-size: 24px;">arrow_forward</span>
+              </div>
+            </div>
+            
+            <div class="dashboard-card" @click="mudarSecao('catecumenos')" style="border-left: 4px solid #9c27b0;">
+              <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);">
+                  <span class="material-icons">school</span>
+                </div>
+                <div class="card-info">
+                  <h3>Catecúmenos</h3>
+                  <p>Turmas e inscrições</p>
+                </div>
+              </div>
+              <div class="card-stats">
+                <div>
+                  <div class="stat-number" x-text="stats.turmas || 0"></div>
+                  <div class="stat-label">Turmas</div>
+                </div>
+                <div>
+                  <div class="stat-number" x-text="stats.inscricoes || 0"></div>
+                  <div class="stat-label">Inscrições</div>
                 </div>
                 <span class="material-icons" style="color: var(--cinza-leve); font-size: 24px;">arrow_forward</span>
               </div>
@@ -800,72 +846,187 @@
             <p>Carregando...</p>
           </div>
           
-          <div x-show="!carregando" class="card">
-            <table style="width: 100%; border-collapse: collapse;">
+          <!-- Listagem Moderna -->
+          <div x-show="!carregando" class="crud-table-container">
+            <table class="crud-table">
               <thead>
-                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
-                  <th style="padding: 15px; text-align: left;">Título</th>
-                  <th style="padding: 15px; text-align: left;">Data</th>
-                  <th style="padding: 15px; text-align: center;">Status</th>
-                  <th style="padding: 15px; text-align: center;">Ações</th>
+                <tr>
+                  <th style="width: 80px;">Imagem</th>
+                  <th>Título</th>
+                  <th style="width: 120px;">Data</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="width: 130px;">Visibilidade</th>
+                  <th style="width: 200px;">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 <template x-for="devocional in devocionais" :key="devocional.id">
-                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
-                    <td style="padding: 15px;"><strong x-text="devocional.titulo || 'Sem título'"></strong></td>
-                    <td style="padding: 15px;" x-text="devocional.data_publicacao"></td>
-                    <td style="padding: 15px; text-align: center;">
-                      <span x-show="devocional.ativo" style="color: green;">Ativo</span>
-                      <span x-show="!devocional.ativo" style="color: red;">Inativo</span>
+                  <tr>
+                    <td>
+                      <div class="table-thumbnail">
+                        <img :src="devocional.imagem || '../assets/images/default-devocional.jpg'" 
+                             :alt="devocional.titulo"
+                             onerror="this.src='../assets/images/default-devocional.jpg'">
+                      </div>
                     </td>
-                    <td style="padding: 15px; text-align: center;">
-                      <button @click="abrirModal(devocional)" class="botao botao-pequeno">Editar</button>
-                      <button @click="deletar(devocional.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    <td>
+                      <div class="table-title" x-text="devocional.titulo || 'Sem título'"></div>
+                    </td>
+                    <td x-text="devocional.data_publicacao"></td>
+                    <td>
+                      <span class="badge" :class="devocional.ativo ? 'badge-success' : 'badge-danger'">
+                        <span x-text="devocional.ativo ? 'Ativo' : 'Inativo'"></span>
+                      </span>
+                    </td>
+                    <td>
+                      <span x-show="!devocional.nivel_acesso || devocional.nivel_acesso.includes('visitante')" 
+                            class="badge badge-public">🌐 Público</span>
+                      <span x-show="devocional.nivel_acesso && !devocional.nivel_acesso.includes('visitante') && devocional.nivel_acesso.includes('membro')" 
+                            class="badge badge-members">👥 Membros</span>
+                      <span x-show="devocional.nivel_acesso && !devocional.nivel_acesso.includes('membro') && devocional.nivel_acesso.includes('lideranca')" 
+                            class="badge badge-leadership">👔 Liderança</span>
+                    </td>
+                    <td>
+                      <div class="table-actions">
+                        <button @click="abrirModal(devocional)" class="btn-action btn-edit">
+                          <span class="material-icons">edit</span>
+                        </button>
+                        <button @click="deletar(devocional.id)" class="btn-action btn-delete">
+                          <span class="material-icons">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </template>
               </tbody>
             </table>
+            
+            <!-- Mobile Cards -->
+            <div class="crud-mobile-cards">
+              <template x-for="devocional in devocionais" :key="devocional.id">
+                <div class="mobile-card">
+                  <div class="mobile-card-image">
+                    <img :src="devocional.imagem || '../assets/images/default-devocional.jpg'" 
+                         :alt="devocional.titulo"
+                         onerror="this.src='../assets/images/default-devocional.jpg'">
+                    <span class="badge" :class="devocional.ativo ? 'badge-success' : 'badge-danger'" 
+                          x-text="devocional.ativo ? 'Ativo' : 'Inativo'"></span>
+                  </div>
+                  <div class="mobile-card-content">
+                    <h4 x-text="devocional.titulo || 'Sem título'"></h4>
+                    <div class="mobile-card-meta">
+                      <span>📅 <span x-text="devocional.data_publicacao"></span></span>
+                    </div>
+                    <div class="mobile-card-badges">
+                      <span x-show="!devocional.nivel_acesso || devocional.nivel_acesso.includes('visitante')" 
+                            class="badge badge-public">🌐 Público</span>
+                      <span x-show="devocional.nivel_acesso && !devocional.nivel_acesso.includes('visitante') && devocional.nivel_acesso.includes('membro')" 
+                            class="badge badge-members">👥 Membros</span>
+                      <span x-show="devocional.nivel_acesso && !devocional.nivel_acesso.includes('membro') && devocional.nivel_acesso.includes('lideranca')" 
+                            class="badge badge-leadership">👔 Liderança</span>
+                    </div>
+                    <div class="mobile-card-actions">
+                      <button @click="abrirModal(devocional)" class="btn-action btn-edit">
+                        <span class="material-icons">edit</span> Editar
+                      </button>
+                      <button @click="deletar(devocional.id)" class="btn-action btn-delete">
+                        <span class="material-icons">delete</span> Deletar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
           
-          <!-- Modal Devocional -->
-          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
-            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
-              <h3 x-text="devocionalEditando ? 'Editar Devocional' : 'Novo Devocional'"></h3>
-              
-              <div style="margin-top: 20px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Título</label>
-                <input type="text" x-model="formulario.titulo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+          <!-- Modal Devocional Moderno -->
+          <div x-show="modalAberto" class="modal-overlay" @click.self="fecharModal()">
+            <div class="modal-container">
+              <div class="modal-header">
+                <h3 x-text="devocionalEditando ? 'Editar Devocional' : 'Novo Devocional'"></h3>
+                <button @click="fecharModal()" class="modal-close">
+                  <span class="material-icons">close</span>
+                </button>
               </div>
               
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Texto *</label>
-                <textarea x-model="formulario.texto" rows="8" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required></textarea>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Imagem</label>
-                <input type="file" @change="selecionarImagem($event)" accept="image/*" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-                <img x-show="previewImagem" :src="previewImagem" style="max-width: 200px; margin-top: 10px; border-radius: 5px;">
-              </div>
-              
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                <div>
-                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Publicação</label>
-                  <input type="date" x-model="formulario.data_publicacao" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              <div class="modal-body">
+                <div class="form-grid-2">
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Título *</label>
+                    <input type="text" x-model="formulario.titulo" class="form-input" placeholder="Digite o título do devocional" required>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Texto do Devocional *</label>
+                    <textarea x-model="formulario.texto" rows="6" class="form-textarea" placeholder="Digite o texto completo do devocional" required></textarea>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">image</span>
+                      Imagem de Capa
+                    </label>
+                    <div class="image-upload-container">
+                      <input type="file" @change="selecionarImagem($event)" accept="image/*" class="form-input" id="file-devocional">
+                      <div x-show="previewImagem" class="image-preview">
+                        <img :src="previewImagem" alt="Preview">
+                        <button type="button" @click="previewImagem = ''; formulario.imagem = ''" class="btn-remove-image">
+                          <span class="material-icons">close</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Data de Publicação</label>
+                    <input type="date" x-model="formulario.data_publicacao" class="form-input">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <label class="form-checkbox">
+                      <input type="checkbox" x-model="formulario.ativo">
+                      <span class="checkbox-label">Devocional Ativo</span>
+                    </label>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">visibility</span>
+                      Quem pode ver?
+                    </label>
+                    <div class="access-level-chips">
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['visitante', 'membro', 'lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': !formulario.nivel_acesso || formulario.nivel_acesso.includes('visitante')}">
+                        🌐 Todos (Público)
+                      </button>
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['membro', 'lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': formulario.nivel_acesso && !formulario.nivel_acesso.includes('visitante') && formulario.nivel_acesso.includes('membro')}">
+                        👥 Apenas Membros
+                      </button>
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': formulario.nivel_acesso && !formulario.nivel_acesso.includes('membro') && formulario.nivel_acesso.includes('lideranca')}">
+                        👔 Apenas Liderança
+                      </button>
+                    </div>
+                    <small class="form-hint">Visitantes não logados só verão itens marcados como "Público"</small>
+                  </div>
                 </div>
-                <div>
-                  <label style="display: flex; align-items: center; gap: 10px; margin-top: 30px;">
-                    <input type="checkbox" x-model="formulario.ativo">
-                    <span>Ativo</span>
-                  </label>
-                </div>
               </div>
               
-              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
-                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
-                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+              <div class="modal-footer">
+                <button @click="fecharModal()" class="btn-secondary" :disabled="carregando">
+                  <span class="material-icons">close</span>
+                  Cancelar
+                </button>
+                <button @click="salvar()" class="btn-primary" :disabled="carregando">
+                  <span x-show="!carregando" class="material-icons">save</span>
                   <span x-show="!carregando">Salvar</span>
                   <span x-show="carregando">Salvando...</span>
                 </button>
@@ -889,80 +1050,189 @@
             <p>Carregando...</p>
           </div>
           
-          <div x-show="!carregando" class="card">
-            <table style="width: 100%; border-collapse: collapse;">
+          <!-- Listagem Moderna -->
+          <div x-show="!carregando" class="crud-table-container">
+            <table class="crud-table">
               <thead>
-                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
-                  <th style="padding: 15px; text-align: left;">Título</th>
-                  <th style="padding: 15px; text-align: left;">ID YouTube</th>
-                  <th style="padding: 15px; text-align: center;">Destaque</th>
-                  <th style="padding: 15px; text-align: center;">Ações</th>
+                <tr>
+                  <th style="width: 120px;">Thumbnail</th>
+                  <th>Título</th>
+                  <th style="width: 120px;">ID</th>
+                  <th style="width: 100px;">Destaque</th>
+                  <th style="width: 130px;">Visibilidade</th>
+                  <th style="width: 200px;">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 <template x-for="video in videos" :key="video.id">
-                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
-                    <td style="padding: 15px;"><strong x-text="video.titulo"></strong></td>
-                    <td style="padding: 15px;" x-text="video.video_id"></td>
-                    <td style="padding: 15px; text-align: center;">
-                      <span x-show="video.destaque" style="color: green;">★</span>
+                  <tr>
+                    <td>
+                      <div class="table-thumbnail">
+                        <img :src="`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`" 
+                             :alt="video.titulo">
+                      </div>
                     </td>
-                    <td style="padding: 15px; text-align: center;">
-                      <button @click="abrirModal(video)" class="botao botao-pequeno">Editar</button>
-                      <button @click="deletar(video.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    <td>
+                      <div class="table-title" x-text="video.titulo"></div>
+                    </td>
+                    <td x-text="video.video_id"></td>
+                    <td>
+                      <span x-show="video.destaque" class="badge badge-warning">★ Destaque</span>
+                      <span x-show="!video.destaque" class="badge badge-light">-</span>
+                    </td>
+                    <td>
+                      <span x-show="!video.nivel_acesso || video.nivel_acesso.includes('visitante')" 
+                            class="badge badge-public">🌐 Público</span>
+                      <span x-show="video.nivel_acesso && !video.nivel_acesso.includes('visitante') && video.nivel_acesso.includes('membro')" 
+                            class="badge badge-members">👥 Membros</span>
+                      <span x-show="video.nivel_acesso && !video.nivel_acesso.includes('membro') && video.nivel_acesso.includes('lideranca')" 
+                            class="badge badge-leadership">👔 Liderança</span>
+                    </td>
+                    <td>
+                      <div class="table-actions">
+                        <button @click="abrirModal(video)" class="btn-action btn-edit">
+                          <span class="material-icons">edit</span>
+                        </button>
+                        <button @click="deletar(video.id)" class="btn-action btn-delete">
+                          <span class="material-icons">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </template>
               </tbody>
             </table>
+            
+            <!-- Mobile Cards -->
+            <div class="crud-mobile-cards">
+              <template x-for="video in videos" :key="video.id">
+                <div class="mobile-card">
+                  <div class="mobile-card-image">
+                    <img :src="`https://img.youtube.com/vi/${video.video_id}/mqdefault.jpg`" 
+                         :alt="video.titulo">
+                    <span x-show="video.destaque" class="badge badge-warning">★ Destaque</span>
+                  </div>
+                  <div class="mobile-card-content">
+                    <h4 x-text="video.titulo"></h4>
+                    <div class="mobile-card-meta">
+                      <span>🎬 <span x-text="video.video_id"></span></span>
+                    </div>
+                    <div class="mobile-card-badges">
+                      <span x-show="!video.nivel_acesso || video.nivel_acesso.includes('visitante')" 
+                            class="badge badge-public">🌐 Público</span>
+                      <span x-show="video.nivel_acesso && !video.nivel_acesso.includes('visitante') && video.nivel_acesso.includes('membro')" 
+                            class="badge badge-members">👥 Membros</span>
+                      <span x-show="video.nivel_acesso && !video.nivel_acesso.includes('membro') && video.nivel_acesso.includes('lideranca')" 
+                            class="badge badge-leadership">👔 Liderança</span>
+                    </div>
+                    <div class="mobile-card-actions">
+                      <button @click="abrirModal(video)" class="btn-action btn-edit">
+                        <span class="material-icons">edit</span> Editar
+                      </button>
+                      <button @click="deletar(video.id)" class="btn-action btn-delete">
+                        <span class="material-icons">delete</span> Deletar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
           
-          <!-- Modal Vídeo -->
-          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
-            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
-              <h3 x-text="videoEditando ? 'Editar Vídeo' : 'Novo Vídeo'"></h3>
-              
-              <div style="margin-top: 20px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">URL do YouTube *</label>
-                <input type="url" x-model="formulario.url" placeholder="https://www.youtube.com/watch?v=..." style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-                <button @click="preencherDoYouTube()" class="botao botao-pequeno" style="margin-top: 5px;">Preencher do YouTube</button>
+          <!-- Modal Vídeo Moderno -->
+          <div x-show="modalAberto" class="modal-overlay" @click.self="fecharModal()">
+            <div class="modal-container">
+              <div class="modal-header">
+                <h3 x-text="videoEditando ? 'Editar Vídeo' : 'Novo Vídeo'"></h3>
+                <button @click="fecharModal()" class="modal-close">
+                  <span class="material-icons">close</span>
+                </button>
               </div>
               
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">ID do Vídeo *</label>
-                <input type="text" x-model="formulario.video_id" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              <div class="modal-body">
+                <div class="form-grid-2">
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">link</span>
+                      URL do YouTube *
+                    </label>
+                    <input type="url" x-model="formulario.url" placeholder="https://www.youtube.com/watch?v=..." class="form-input" required>
+                    <button type="button" @click="preencherDoYouTube()" class="btn-secondary" style="margin-top: 8px; width: auto;">
+                      <span class="material-icons">cloud_download</span>
+                      Buscar Dados do YouTube
+                    </button>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">ID do Vídeo *</label>
+                    <input type="text" x-model="formulario.video_id" class="form-input" placeholder="Ex: dQw4w9WgXcQ" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Ordem de Exibição</label>
+                    <input type="number" x-model="formulario.ordem" class="form-input" placeholder="0">
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Título *</label>
+                    <input type="text" x-model="formulario.titulo" class="form-input" placeholder="Digite o título do vídeo" required>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Descrição</label>
+                    <textarea x-model="formulario.descricao" rows="3" class="form-textarea" placeholder="Digite uma descrição breve"></textarea>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Data de Publicação</label>
+                    <input type="date" x-model="formulario.data_publicacao" class="form-input">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">Opções</label>
+                    <label class="form-checkbox">
+                      <input type="checkbox" x-model="formulario.destaque">
+                      <span class="checkbox-label">⭐ Marcar como destaque</span>
+                    </label>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">visibility</span>
+                      Quem pode ver?
+                    </label>
+                    <div class="access-level-chips">
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['visitante', 'membro', 'lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': !formulario.nivel_acesso || formulario.nivel_acesso.includes('visitante')}">
+                        🌐 Todos (Público)
+                      </button>
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['membro', 'lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': formulario.nivel_acesso && !formulario.nivel_acesso.includes('visitante') && formulario.nivel_acesso.includes('membro')}">
+                        👥 Apenas Membros
+                      </button>
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': formulario.nivel_acesso && !formulario.nivel_acesso.includes('membro') && formulario.nivel_acesso.includes('lideranca')}">
+                        👔 Apenas Liderança
+                      </button>
+                    </div>
+                    <small class="form-hint">Visitantes não logados só verão itens marcados como "Público"</small>
+                  </div>
+                </div>
               </div>
               
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Título *</label>
-                <input type="text" x-model="formulario.titulo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Descrição</label>
-                <textarea x-model="formulario.descricao" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Publicação</label>
-                <input type="date" x-model="formulario.data_publicacao" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: flex; align-items: center; gap: 10px;">
-                  <input type="checkbox" x-model="formulario.destaque">
-                  <span>Marcar como destaque</span>
-                </label>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ordem</label>
-                <input type="number" x-model="formulario.ordem" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-              </div>
-              
-              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
-                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
-                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+              <div class="modal-footer">
+                <button @click="fecharModal()" class="btn-secondary" :disabled="carregando">
+                  <span class="material-icons">close</span>
+                  Cancelar
+                </button>
+                <button @click="salvar()" class="btn-primary" :disabled="carregando">
+                  <span x-show="!carregando" class="material-icons">save</span>
                   <span x-show="!carregando">Salvar</span>
                   <span x-show="carregando">Salvando...</span>
                 </button>
@@ -986,96 +1256,216 @@
             <p>Carregando...</p>
           </div>
           
-          <div x-show="!carregando" class="card">
-            <table style="width: 100%; border-collapse: collapse;">
+          <!-- Listagem Moderna -->
+          <div x-show="!carregando" class="crud-table-container">
+            <table class="crud-table">
               <thead>
-                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
-                  <th style="padding: 15px; text-align: left;">Título</th>
-                  <th style="padding: 15px; text-align: left;">Data/Horário</th>
-                  <th style="padding: 15px; text-align: center;">Status</th>
-                  <th style="padding: 15px; text-align: center;">Ações</th>
+                <tr>
+                  <th style="width: 80px;">Imagem</th>
+                  <th>Título</th>
+                  <th style="width: 150px;">Data/Horário</th>
+                  <th style="width: 130px;">Visibilidade</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="width: 200px;">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 <template x-for="programa in programas" :key="programa.id">
-                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
-                    <td style="padding: 15px;"><strong x-text="programa.titulo"></strong></td>
-                    <td style="padding: 15px;" x-text="`${programa.dia}/${programa.mes}/${programa.ano} - ${programa.horario}`"></td>
-                    <td style="padding: 15px; text-align: center;">
-                      <span x-show="programa.ativo" style="color: green;">Ativo</span>
-                      <span x-show="!programa.ativo" style="color: red;">Inativo</span>
+                  <tr>
+                    <td>
+                      <div class="table-thumbnail">
+                        <img :src="programa.imagem || '../assets/images/default-programa.jpg'" 
+                             :alt="programa.titulo"
+                             onerror="this.src='../assets/images/default-programa.jpg'">
+                      </div>
                     </td>
-                    <td style="padding: 15px; text-align: center;">
-                      <button @click="abrirModal(programa)" class="botao botao-pequeno">Editar</button>
-                      <button @click="deletar(programa.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                    <td>
+                      <div class="table-title" x-text="programa.titulo"></div>
+                    </td>
+                    <td x-text="`${programa.dia}/${programa.mes}/${programa.ano} ${programa.horario}`"></td>
+                    <td>
+                      <span x-show="!programa.nivel_acesso || programa.nivel_acesso.includes('visitante')" 
+                            class="badge badge-public">🌐 Público</span>
+                      <span x-show="programa.nivel_acesso && !programa.nivel_acesso.includes('visitante') && programa.nivel_acesso.includes('membro')" 
+                            class="badge badge-members">👥 Membros</span>
+                      <span x-show="programa.nivel_acesso && !programa.nivel_acesso.includes('membro') && programa.nivel_acesso.includes('lideranca')" 
+                            class="badge badge-leadership">👔 Liderança</span>
+                    </td>
+                    <td>
+                      <span class="badge" :class="programa.ativo ? 'badge-success' : 'badge-danger'">
+                        <span x-text="programa.ativo ? 'Ativo' : 'Inativo'"></span>
+                      </span>
+                    </td>
+                    <td>
+                      <div class="table-actions">
+                        <button @click="abrirModal(programa)" class="btn-action btn-edit">
+                          <span class="material-icons">edit</span>
+                        </button>
+                        <button @click="deletar(programa.id)" class="btn-action btn-delete">
+                          <span class="material-icons">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </template>
               </tbody>
             </table>
+            
+            <!-- Mobile Cards -->
+            <div class="crud-mobile-cards">
+              <template x-for="programa in programas" :key="programa.id">
+                <div class="mobile-card">
+                  <div class="mobile-card-image">
+                    <img :src="programa.imagem || '../assets/images/default-programa.jpg'" 
+                         :alt="programa.titulo"
+                         onerror="this.src='../assets/images/default-programa.jpg'">
+                    <span class="badge" :class="programa.ativo ? 'badge-success' : 'badge-danger'" 
+                          x-text="programa.ativo ? 'Ativo' : 'Inativo'"></span>
+                  </div>
+                  <div class="mobile-card-content">
+                    <h4 x-text="programa.titulo"></h4>
+                    <div class="mobile-card-meta">
+                      <span>📅 <span x-text="`${programa.dia}/${programa.mes}/${programa.ano}`"></span></span>
+                      <span>🕐 <span x-text="programa.horario"></span></span>
+                    </div>
+                    <div class="mobile-card-badges">
+                      <span x-show="!programa.nivel_acesso || programa.nivel_acesso.includes('visitante')" 
+                            class="badge badge-public">🌐 Público</span>
+                      <span x-show="programa.nivel_acesso && !programa.nivel_acesso.includes('visitante') && programa.nivel_acesso.includes('membro')" 
+                            class="badge badge-members">👥 Membros</span>
+                      <span x-show="programa.nivel_acesso && !programa.nivel_acesso.includes('membro') && programa.nivel_acesso.includes('lideranca')" 
+                            class="badge badge-leadership">👔 Liderança</span>
+                    </div>
+                    <div class="mobile-card-actions">
+                      <button @click="abrirModal(programa)" class="btn-action btn-edit">
+                        <span class="material-icons">edit</span> Editar
+                      </button>
+                      <button @click="deletar(programa.id)" class="btn-action btn-delete">
+                        <span class="material-icons">delete</span> Deletar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
           
-          <!-- Modal Programação -->
-          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
-            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
-              <h3 x-text="programaEditando ? 'Editar Programa' : 'Novo Programa'"></h3>
-              
-              <div style="margin-top: 20px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Título *</label>
-                <input type="text" x-model="formulario.titulo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+          <!-- Modal Programação PROFISSIONAL -->
+          <div x-show="modalAberto" class="modal-crud-overlay" @click.self="fecharModal()">
+            <div class="modal-crud-container">
+              <div class="modal-crud-header">
+                <h3 x-text="programaEditando ? 'Editar Programa' : 'Novo Programa'"></h3>
+                <button @click="fecharModal()" class="modal-close">
+                  <span class="material-icons">close</span>
+                </button>
               </div>
               
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Descrição</label>
-                <textarea x-model="formulario.descricao" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
-              </div>
-              
-              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px;">
-                <div>
-                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Dia *</label>
-                  <input type="number" x-model="formulario.dia" min="1" max="31" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              <div class="modal-crud-body">
+                <div class="form-grid-2">
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons">title</span>
+                      Título do Programa *
+                    </label>
+                    <input type="text" x-model="formulario.titulo" class="form-input" placeholder="Ex: Culto de Domingo" required>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons">description</span>
+                      Descrição <small style="font-weight: normal; color: #64748b;">(máx. 200 caracteres)</small>
+                    </label>
+                    <textarea x-model="formulario.descricao" maxlength="200" rows="3" class="form-textarea" placeholder="Breve descrição do programa..."></textarea>
+                    <small class="form-hint" x-text="(formulario.descricao?.length || 0) + '/200'"></small>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">
+                      <span class="material-icons">event</span>
+                      Data *
+                    </label>
+                    <input type="date" x-model="formulario.data_completa" class="form-input" 
+                           @change="
+                             if(formulario.data_completa) {
+                               const d = new Date(formulario.data_completa + 'T00:00:00');
+                               formulario.dia = d.getDate();
+                               formulario.mes = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'][d.getMonth()];
+                               formulario.ano = d.getFullYear();
+                             }
+                           " required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">
+                      <span class="material-icons">schedule</span>
+                      Horário *
+                    </label>
+                    <input type="time" x-model="formulario.horario" class="form-input" required>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons">location_on</span>
+                      Local *
+                    </label>
+                    <input type="text" x-model="formulario.local" class="form-input" placeholder="Ex: Templo Principal" required>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons">image</span>
+                      Imagem de Capa
+                    </label>
+                    <input type="file" @change="selecionarImagem($event)" accept="image/*" class="form-input">
+                    <div x-show="previewImagem" class="image-preview mt-2">
+                      <img :src="previewImagem" style="max-width: 200px; border-radius: 8px;">
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-checkbox">
+                      <input type="checkbox" x-model="formulario.ativo">
+                      <span class="checkbox-label">Programa Ativo</span>
+                    </label>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons">visibility</span>
+                      Quem pode ver?
+                    </label>
+                    <div class="access-level-chips">
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['visitante', 'membro', 'lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': !formulario.nivel_acesso || formulario.nivel_acesso.includes('visitante')}">
+                        🌐 Todos (Público)
+                      </button>
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['membro', 'lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': formulario.nivel_acesso && !formulario.nivel_acesso.includes('visitante') && formulario.nivel_acesso.includes('membro')}">
+                        👥 Apenas Membros
+                      </button>
+                      <button type="button" 
+                        @click="formulario.nivel_acesso = ['lideranca', 'administracao']" 
+                        class="access-chip"
+                        :class="{'active': formulario.nivel_acesso && !formulario.nivel_acesso.includes('membro') && formulario.nivel_acesso.includes('lideranca')}">
+                        👔 Liderança
+                      </button>
+                    </div>
+                    <small style="display: block; margin-top: 8px; color: #666;">Visitantes não logados só verão itens marcados como "Público"</small>
+                  </div>
                 </div>
-                <div>
-                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Mês *</label>
-                  <select x-model="formulario.mes" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-                    <template x-for="mes in meses" :key="mes">
-                      <option :value="mes" x-text="mes"></option>
-                    </template>
-                  </select>
-                </div>
-                <div>
-                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Ano *</label>
-                  <input type="number" x-model="formulario.ano" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-                </div>
               </div>
               
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                <div>
-                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Horário *</label>
-                  <input type="text" x-model="formulario.horario" placeholder="Ex: 19:00" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-                </div>
-                <div>
-                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Local *</label>
-                  <input type="text" x-model="formulario.local" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-                </div>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Imagem</label>
-                <input type="file" @change="selecionarImagem($event)" accept="image/*" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-                <img x-show="previewImagem" :src="previewImagem" style="max-width: 200px; margin-top: 10px; border-radius: 5px;">
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: flex; align-items: center; gap: 10px;">
-                  <input type="checkbox" x-model="formulario.ativo">
-                  <span>Ativo</span>
-                </label>
-              </div>
-              
-              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
-                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
-                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+              <div class="modal-crud-footer">
+                <button @click="fecharModal()" class="btn-secondary" :disabled="carregando">
+                  <span class="material-icons">close</span>
+                  Cancelar
+                </button>
+                <button @click="salvar()" class="btn-primary" :disabled="carregando">
+                  <span x-show="!carregando" class="material-icons">save</span>
                   <span x-show="!carregando">Salvar</span>
                   <span x-show="carregando">Salvando...</span>
                 </button>
@@ -1099,81 +1489,149 @@
             <p>Carregando...</p>
           </div>
           
-          <div x-show="!carregando" class="card">
-            <table style="width: 100%; border-collapse: collapse;">
+          <!-- Listagem Moderna Visitantes -->
+          <div x-show="!carregando" class="crud-table-container">
+            <table class="crud-table">
               <thead>
-                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
-                  <th style="padding: 15px; text-align: left;">Nome</th>
-                  <th style="padding: 15px; text-align: left;">Contato</th>
-                  <th style="padding: 15px; text-align: left;">Data Visita</th>
-                  <th style="padding: 15px; text-align: center;">Status</th>
-                  <th style="padding: 15px; text-align: center;">Ações</th>
+                <tr>
+                  <th style="width: 60px;">Avatar</th>
+                  <th>Nome</th>
+                  <th>Contato</th>
+                  <th style="width: 140px;">Data Visita</th>
+                  <th style="width: 120px;">Status</th>
+                  <th style="width: 140px;">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 <template x-for="visitante in visitantes" :key="visitante.id">
-                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
-                    <td style="padding: 15px;"><strong x-text="visitante.nome"></strong></td>
-                    <td style="padding: 15px;" x-text="visitante.email || visitante.telefone"></td>
-                    <td style="padding: 15px;" x-text="formatarData(visitante.data_visita)"></td>
-                    <td style="padding: 15px; text-align: center;" x-text="visitante.status"></td>
-                    <td style="padding: 15px; text-align: center;">
-                      <button @click="abrirModal(visitante)" class="botao botao-pequeno">Editar</button>
-                      <button @click="deletar(visitante.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                  <tr>
+                    <td>
+                      <div class="table-thumbnail">
+                        <img :src="visitante.avatar || '../assets/images/default-user.jpg'" alt="Visitante" onerror="this.src='../assets/images/default-user.jpg'">
+                      </div>
+                    </td>
+                    <td>
+                      <div class="table-title" x-text="visitante.nome || 'Visitante'"></div>
+                      <div class="table-subtitle" x-text="visitante.email || visitante.telefone || 'Sem contato'"></div>
+                    </td>
+                    <td x-text="visitante.email || visitante.telefone || '-'"></td>
+                    <td x-text="formatarData(visitante.data_visita)"></td>
+                    <td>
+                      <span class="badge" :class="visitante.status === 'confirmado' ? 'badge-success' : (visitante.status === 'cancelado' ? 'badge-danger' : 'badge-info')" x-text="visitante.status || '-'"></span>
+                    </td>
+                    <td>
+                      <div class="table-actions">
+                        <button @click="abrirModal(visitante)" class="btn-action btn-edit"><span class="material-icons">edit</span></button>
+                        <button @click="deletar(visitante.id)" class="btn-action btn-delete"><span class="material-icons">delete</span></button>
+                      </div>
                     </td>
                   </tr>
                 </template>
               </tbody>
             </table>
+
+            <!-- Mobile cards -->
+            <div class="crud-mobile-cards">
+              <template x-for="visitante in visitantes" :key="visitante.id">
+                <div class="mobile-card">
+                  <div class="mobile-card-image">
+                    <img :src="visitante.avatar || '../assets/images/default-user.jpg'" alt="Visitante" onerror="this.src='../assets/images/default-user.jpg'">
+                  </div>
+                  <div class="mobile-card-content">
+                    <h4 x-text="visitante.nome || 'Visitante'"></h4>
+                    <div class="mobile-card-meta">
+                      <span>📧 <span x-text="visitante.email || '-'"></span></span>
+                      <span>📞 <span x-text="visitante.telefone || '-'"></span></span>
+                    </div>
+                    <div class="mobile-card-meta">
+                      <span>📅 <span x-text="formatarData(visitante.data_visita)"></span></span>
+                      <span class="badge" :class="visitante.status === 'confirmado' ? 'badge-success' : (visitante.status === 'cancelado' ? 'badge-danger' : 'badge-info')" x-text="visitante.status || '-'"></span>
+                    </div>
+                    <div class="mobile-card-actions">
+                      <button @click="abrirModal(visitante)" class="btn-action btn-edit"><span class="material-icons">edit</span> Editar</button>
+                      <button @click="deletar(visitante.id)" class="btn-action btn-delete"><span class="material-icons">delete</span> Deletar</button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
           
-          <!-- Modal Visitante -->
-          <div x-show="modalAberto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" @click.self="fecharModal()">
-            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
-              <h3 x-text="visitanteEditando ? 'Editar Visitante' : 'Novo Visitante'"></h3>
-              
-              <div style="margin-top: 20px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome *</label>
-                <input type="text" x-model="formulario.nome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+          <!-- Modal Visitante MODERNO -->
+          <div x-show="modalAberto" class="modal-crud-overlay" @click.self="fecharModal()">
+            <div class="modal-crud-container">
+              <div class="modal-crud-header">
+                <h3 x-text="visitanteEditando ? 'Editar Visitante' : 'Novo Visitante'"></h3>
+                <button @click="fecharModal()" class="modal-close">
+                  <span class="material-icons">close</span>
+                </button>
               </div>
               
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Telefone</label>
-                <input type="tel" x-model="formulario.telefone" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+              <div class="modal-crud-body">
+                <div class="form-grid-2">
+                  <div class="form-group form-group-full">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">person</span>
+                      Nome Completo *
+                    </label>
+                    <input type="text" x-model="formulario.nome" class="form-input" placeholder="Digite o nome completo" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">phone</span>
+                      Telefone
+                    </label>
+                    <input type="tel" x-model="formulario.telefone" class="form-input" placeholder="(00) 00000-0000">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">email</span>
+                      E-mail
+                    </label>
+                    <input type="email" x-model="formulario.email" class="form-input" placeholder="exemplo@email.com">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">event</span>
+                      Data da Visita *
+                    </label>
+                    <input type="date" x-model="formulario.data_visita" class="form-input" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label">
+                      <span class="material-icons" style="vertical-align: middle; font-size: 18px;">check_circle</span>
+                      Status
+                    </label>
+                    <select x-model="formulario.status" class="form-select">
+                      <option value="confirmado">Confirmado</option>
+                      <option value="cancelado">Cancelado</option>
+                      <option value="visitou">Visitou</option>
+                    </select>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Mensagem do Visitante</label>
+                    <textarea x-model="formulario.mensagem" rows="3" class="form-textarea" placeholder="Mensagem deixada pelo visitante..."></textarea>
+                  </div>
+                  
+                  <div class="form-group form-group-full">
+                    <label class="form-label">Observações Internas</label>
+                    <textarea x-model="formulario.observacoes" rows="3" class="form-textarea" placeholder="Observações internas sobre o visitante..."></textarea>
+                  </div>
+                </div>
               </div>
               
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email</label>
-                <input type="email" x-model="formulario.email" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data da Visita *</label>
-                <input type="date" x-model="formulario.data_visita" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Mensagem</label>
-                <textarea x-model="formulario.mensagem" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Status</label>
-                <select x-model="formulario.status" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-                  <option value="confirmado">Confirmado</option>
-                  <option value="cancelado">Cancelado</option>
-                  <option value="visitou">Visitou</option>
-                </select>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Observações</label>
-                <textarea x-model="formulario.observacoes" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
-              </div>
-              
-              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
-                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
-                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+              <div class="modal-crud-footer">
+                <button @click="fecharModal()" class="btn-secondary" :disabled="carregando">
+                  <span class="material-icons">close</span>
+                  Cancelar
+                </button>
+                <button @click="salvar()" class="btn-primary" :disabled="carregando">
+                  <span x-show="!carregando" class="material-icons">save</span>
                   <span x-show="!carregando">Salvar</span>
                   <span x-show="carregando">Salvando...</span>
                 </button>
@@ -1203,6 +1661,7 @@
                 <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
                   <th style="padding: 15px; text-align: left;">Título</th>
                   <th style="padding: 15px; text-align: left;">Data/Horário</th>
+                  <th style="padding: 15px; text-align: center;">Visibilidade</th>
                   <th style="padding: 15px; text-align: center;">Inscrição</th>
                   <th style="padding: 15px; text-align: center;">Status</th>
                   <th style="padding: 15px; text-align: center;">Ações</th>
@@ -1213,6 +1672,20 @@
                   <tr style="border-bottom: 1px solid var(--cinza-leve);">
                     <td style="padding: 15px;"><strong x-text="evento.titulo"></strong></td>
                     <td style="padding: 15px;" x-text="`${formatarData(evento.data)} ${evento.horario || ''}`"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <span x-show="!evento.nivel_acesso || evento.nivel_acesso.includes('visitante')" 
+                            style="background: #4CAF50; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;">
+                        🌐 Público
+                      </span>
+                      <span x-show="evento.nivel_acesso && !evento.nivel_acesso.includes('visitante') && evento.nivel_acesso.includes('membro')" 
+                            style="background: #2196F3; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;">
+                        👥 Membros
+                      </span>
+                      <span x-show="evento.nivel_acesso && !evento.nivel_acesso.includes('membro') && evento.nivel_acesso.includes('lideranca')" 
+                            style="background: #FF9800; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;">
+                        👔 Liderança
+                      </span>
+                    </td>
                     <td style="padding: 15px; text-align: center;">
                       <span x-show="evento.inscricao_aberta" style="color: green;">Aberta</span>
                       <span x-show="!evento.inscricao_aberta" style="color: gray;">Fechada</span>
@@ -1285,6 +1758,35 @@
                   <input type="checkbox" x-model="formulario.ativo">
                   <span>Ativo</span>
                 </label>
+              </div>
+              
+              <!-- Nível de Acesso -->
+              <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold;">
+                  <span class="material-icons" style="vertical-align: middle; font-size: 18px;">visibility</span>
+                  Quem pode ver?
+                </label>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['visitante', 'membro', 'lideranca', 'administracao']" 
+                    style="padding: 8px 16px; border-radius: 20px; border: 2px solid #ddd; background: white; cursor: pointer; transition: all 0.2s;"
+                    :style="(!formulario.nivel_acesso || formulario.nivel_acesso.includes('visitante')) ? 'background: var(--verde-medio); color: white; border-color: var(--verde-medio);' : ''">
+                    🌐 Todos (Público)
+                  </button>
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['membro', 'lideranca', 'administracao']" 
+                    style="padding: 8px 16px; border-radius: 20px; border: 2px solid #ddd; background: white; cursor: pointer; transition: all 0.2s;"
+                    :style="(formulario.nivel_acesso && !formulario.nivel_acesso.includes('visitante') && formulario.nivel_acesso.includes('membro')) ? 'background: #2196F3; color: white; border-color: #2196F3;' : ''">
+                    👥 Apenas Membros
+                  </button>
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['lideranca', 'administracao']" 
+                    style="padding: 8px 16px; border-radius: 20px; border: 2px solid #ddd; background: white; cursor: pointer; transition: all 0.2s;"
+                    :style="(formulario.nivel_acesso && !formulario.nivel_acesso.includes('membro') && formulario.nivel_acesso.includes('lideranca')) ? 'background: #FF9800; color: white; border-color: #FF9800;' : ''">
+                    👔 Liderança
+                  </button>
+                </div>
+                <small style="display: block; margin-top: 8px; color: #666;">Visitantes não logados só verão itens marcados como "Público"</small>
               </div>
               
               <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
@@ -1633,6 +2135,7 @@
                 <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
                   <th style="padding: 15px; text-align: left;">Nome</th>
                   <th style="padding: 15px; text-align: left;">URL</th>
+                  <th style="padding: 15px; text-align: center;">Visibilidade</th>
                   <th style="padding: 15px; text-align: center;">Status</th>
                   <th style="padding: 15px; text-align: center;">Ações</th>
                 </tr>
@@ -1642,6 +2145,20 @@
                   <tr style="border-bottom: 1px solid var(--cinza-leve);">
                     <td style="padding: 15px;"><strong x-text="rede.nome"></strong></td>
                     <td style="padding: 15px;"><a :href="rede.url" target="_blank" x-text="rede.url"></a></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <span x-show="!rede.nivel_acesso || rede.nivel_acesso.includes('visitante')" 
+                            style="background: #4CAF50; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;">
+                        🌐 Público
+                      </span>
+                      <span x-show="rede.nivel_acesso && !rede.nivel_acesso.includes('visitante') && rede.nivel_acesso.includes('membro')" 
+                            style="background: #2196F3; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;">
+                        👥 Membros
+                      </span>
+                      <span x-show="rede.nivel_acesso && !rede.nivel_acesso.includes('membro') && rede.nivel_acesso.includes('lideranca')" 
+                            style="background: #FF9800; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;">
+                        👔 Liderança
+                      </span>
+                    </td>
                     <td style="padding: 15px; text-align: center;">
                       <span x-show="rede.ativo" style="color: green;">Ativo</span>
                       <span x-show="!rede.ativo" style="color: red;">Inativo</span>
@@ -1704,6 +2221,622 @@
                 </label>
               </div>
               
+              <!-- Nível de Acesso -->
+              <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold;">
+                  <span class="material-icons" style="vertical-align: middle; font-size: 18px;">visibility</span>
+                  Quem pode ver?
+                </label>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['visitante', 'membro', 'lideranca', 'administracao']" 
+                    style="padding: 8px 16px; border-radius: 20px; border: 2px solid #ddd; background: white; cursor: pointer; transition: all 0.2s;"
+                    :style="(!formulario.nivel_acesso || formulario.nivel_acesso.includes('visitante')) ? 'background: var(--verde-medio); color: white; border-color: var(--verde-medio);' : ''">
+                    🌐 Todos (Público)
+                  </button>
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['membro', 'lideranca', 'administracao']" 
+                    style="padding: 8px 16px; border-radius: 20px; border: 2px solid #ddd; background: white; cursor: pointer; transition: all 0.2s;"
+                    :style="(formulario.nivel_acesso && !formulario.nivel_acesso.includes('visitante') && formulario.nivel_acesso.includes('membro')) ? 'background: #2196F3; color: white; border-color: #2196F3;' : ''">
+                    👥 Apenas Membros
+                  </button>
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['lideranca', 'administracao']" 
+                    style="padding: 8px 16px; border-radius: 20px; border: 2px solid #ddd; background: white; cursor: pointer; transition: all 0.2s;"
+                    :style="(formulario.nivel_acesso && !formulario.nivel_acesso.includes('membro') && formulario.nivel_acesso.includes('lideranca')) ? 'background: #FF9800; color: white; border-color: #FF9800;' : ''">
+                    👔 Liderança
+                  </button>
+                </div>
+                <small style="display: block; margin-top: 8px; color: #666;">Visitantes não logados só verão itens marcados como "Público"</small>
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ==================== CATECÚMENOS ==================== -->
+        <div x-show="secaoAtiva === 'catecumenos'" x-data="crudCatecumenos()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+            <div>
+              <h2 style="margin: 0;">Gerenciar Catecúmenos</h2>
+              <p style="color: var(--cinza-medio); font-size: 0.9rem; margin-top: 5px;">
+                Gerencie as inscrições para classes de catecúmenos
+              </p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button @click="exportarCSV()" class="botao botao-secundario">
+                <span class="material-icons" style="vertical-align: middle; font-size: 18px;">download</span>
+                Exportar CSV
+              </button>
+              <button @click="abrirModal()" class="botao botao-primario">
+                <span class="material-icons" style="vertical-align: middle;">add</span>
+                Novo Catecúmeno
+              </button>
+            </div>
+          </div>
+          
+          <!-- Filtros -->
+          <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+              <input type="text" x-model="busca" placeholder="Buscar por nome, email ou telefone..." 
+                     style="width: 100%; padding: 10px 15px; border: 1px solid var(--cinza-leve); border-radius: 8px;">
+            </div>
+            <select x-model="filtroStatus" style="padding: 10px 15px; border: 1px solid var(--cinza-leve); border-radius: 8px; min-width: 150px;">
+              <option value="todos">Todos os status</option>
+              <option value="pendente">Pendente</option>
+              <option value="aprovado">Aprovado</option>
+              <option value="em_andamento">Em Andamento</option>
+              <option value="concluido">Concluído</option>
+              <option value="desistente">Desistente</option>
+            </select>
+            <select x-model="filtroTurma" style="padding: 10px 15px; border: 1px solid var(--cinza-leve); border-radius: 8px; min-width: 150px;">
+              <option value="todas">Todas as turmas</option>
+              <option value="sem_turma">Sem turma</option>
+              <template x-for="turma in turmas" :key="turma.id">
+                <option :value="turma.id" x-text="turma.nome"></option>
+              </template>
+            </select>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando...</p>
+          </div>
+          
+          <div x-show="!carregando" class="card">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--cinza-muito-claro); border-bottom: 2px solid var(--cinza-leve);">
+                  <th style="padding: 15px; text-align: left;">Nome</th>
+                  <th style="padding: 15px; text-align: left;">Contato</th>
+                  <th style="padding: 15px; text-align: left;">Turma</th>
+                  <th style="padding: 15px; text-align: center;">Status</th>
+                  <th style="padding: 15px; text-align: left;">Inscrição</th>
+                  <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="catecumeno in catecumenosFiltrados" :key="catecumeno.id">
+                  <tr style="border-bottom: 1px solid var(--cinza-leve);">
+                    <td style="padding: 15px;">
+                      <strong x-text="catecumeno.nome"></strong>
+                      <div x-show="catecumeno.ja_batizado" style="font-size: 0.75rem; color: var(--verde-escuro);">
+                        <span class="material-icons" style="font-size: 14px; vertical-align: middle;">check_circle</span>
+                        Batizado
+                      </div>
+                    </td>
+                    <td style="padding: 15px;">
+                      <div x-text="catecumeno.telefone"></div>
+                      <div x-text="catecumeno.email" style="font-size: 0.85rem; color: var(--cinza-medio);"></div>
+                    </td>
+                    <td style="padding: 15px;">
+                      <select @change="atribuirTurma(catecumeno, $event.target.value)" 
+                              :value="catecumeno.turma_id || ''"
+                              style="padding: 5px 10px; border: 1px solid var(--cinza-leve); border-radius: 5px; font-size: 0.85rem;">
+                        <option value="">Sem turma</option>
+                        <template x-for="turma in turmas" :key="turma.id">
+                          <option :value="turma.id" x-text="turma.nome"></option>
+                        </template>
+                      </select>
+                    </td>
+                    <td style="padding: 15px; text-align: center;">
+                      <select @change="atualizarStatus(catecumeno, $event.target.value)" 
+                              :value="catecumeno.status"
+                              :style="`padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer; ${
+                                catecumeno.status === 'pendente' ? 'background: #fff3cd; color: #856404;' :
+                                catecumeno.status === 'aprovado' ? 'background: #d1ecf1; color: #0c5460;' :
+                                catecumeno.status === 'em_andamento' ? 'background: #e8f5e9; color: #1A4731;' :
+                                catecumeno.status === 'concluido' ? 'background: #d4edda; color: #155724;' :
+                                'background: #f8d7da; color: #721c24;'
+                              }`">
+                        <option value="pendente">Pendente</option>
+                        <option value="aprovado">Aprovado</option>
+                        <option value="em_andamento">Em Andamento</option>
+                        <option value="concluido">Concluído</option>
+                        <option value="desistente">Desistente</option>
+                      </select>
+                    </td>
+                    <td style="padding: 15px; font-size: 0.85rem;" x-text="formatarDataHora(catecumeno.created_at)"></td>
+                    <td style="padding: 15px; text-align: center;">
+                      <button @click="verDetalhes(catecumeno)" class="botao botao-pequeno" title="Ver detalhes" style="margin-right: 5px;">
+                        <span class="material-icons" style="font-size: 16px;">visibility</span>
+                      </button>
+                      <button @click="abrirModal(catecumeno)" class="botao botao-pequeno" title="Editar" style="margin-right: 5px;">
+                        <span class="material-icons" style="font-size: 16px;">edit</span>
+                      </button>
+                      <button @click="deletar(catecumeno.id)" class="botao botao-pequeno botao-secundario" title="Deletar">
+                        <span class="material-icons" style="font-size: 16px;">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                </template>
+                <tr x-show="catecumenosFiltrados.length === 0">
+                  <td colspan="6" style="padding: 40px; text-align: center; color: var(--cinza-medio);">
+                    <span class="material-icons" style="font-size: 48px; opacity: 0.5;">school</span>
+                    <p>Nenhum catecúmeno encontrado</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Modal de Edição/Criação Catecúmeno -->
+          <div x-show="modalAberto" 
+               style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" 
+               @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="catecumenoEditando ? 'Editar Catecúmeno' : 'Novo Catecúmeno'"></h3>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+                <div style="grid-column: span 2;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome Completo *</label>
+                  <input type="text" x-model="formulario.nome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Telefone *</label>
+                  <input type="tel" x-model="formulario.telefone" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email</label>
+                  <input type="email" x-model="formulario.email" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Nascimento</label>
+                  <input type="date" x-model="formulario.data_nascimento" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Estado Civil</label>
+                  <select x-model="formulario.estado_civil" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                    <option value="">Selecione...</option>
+                    <template x-for="ec in estadosCivis" :key="ec.valor">
+                      <option :value="ec.valor" x-text="ec.label"></option>
+                    </template>
+                  </select>
+                </div>
+                
+                <div style="grid-column: span 2;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Endereço</label>
+                  <input type="text" x-model="formulario.endereco" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Profissão</label>
+                  <input type="text" x-model="formulario.profissao" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Turma</label>
+                  <select x-model="formulario.turma_id" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                    <option value="">Sem turma</option>
+                    <template x-for="turma in turmas" :key="turma.id">
+                      <option :value="turma.id" x-text="turma.nome"></option>
+                    </template>
+                  </select>
+                </div>
+                
+                <div style="grid-column: span 2;">
+                  <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <input type="checkbox" x-model="formulario.ja_batizado">
+                    <span>Já é batizado?</span>
+                  </label>
+                  <div x-show="formulario.ja_batizado">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Igreja onde foi batizado</label>
+                    <input type="text" x-model="formulario.igreja_anterior" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  </div>
+                </div>
+                
+                <div style="grid-column: span 2;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Como conheceu a igreja?</label>
+                  <input type="text" x-model="formulario.como_conheceu" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                
+                <div style="grid-column: span 2;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Motivação</label>
+                  <textarea x-model="formulario.motivacao" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Status</label>
+                  <select x-model="formulario.status" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                    <template x-for="s in statusOptions" :key="s.valor">
+                      <option :value="s.valor" x-text="s.label"></option>
+                    </template>
+                  </select>
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Disponibilidade</label>
+                  <input type="text" x-model="formulario.disponibilidade" placeholder="Ex: Sábados à tarde" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                
+                <div style="grid-column: span 2;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Observações (apenas admin)</label>
+                  <textarea x-model="formulario.observacoes" rows="2" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+                </div>
+              </div>
+              
+              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
+                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
+                  <span x-show="!carregando">Salvar</span>
+                  <span x-show="carregando">Salvando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Modal de Detalhes -->
+          <div x-show="modalDetalhesAberto" 
+               style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" 
+               @click.self="fecharDetalhes()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;" x-show="catecumenoSelecionado">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+                <div>
+                  <h3 style="margin: 0;" x-text="catecumenoSelecionado?.nome"></h3>
+                  <span :class="getStatusBadge(catecumenoSelecionado?.status)" 
+                        style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-top: 5px;"
+                        x-text="getStatusTexto(catecumenoSelecionado?.status)"></span>
+                </div>
+                <button @click="fecharDetalhes()" style="background: none; border: none; cursor: pointer; font-size: 24px; color: var(--cinza-medio);">&times;</button>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Telefone</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.telefone || '-'"></p>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Email</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.email || '-'"></p>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Data de Nascimento</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="formatarData(catecumenoSelecionado?.data_nascimento)"></p>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Estado Civil</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.estado_civil || '-'"></p>
+                </div>
+                <div style="grid-column: span 2;">
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Endereço</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.endereco || '-'"></p>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Profissão</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.profissao || '-'"></p>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Turma</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.turma?.nome || 'Sem turma'"></p>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Batizado?</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.ja_batizado ? 'Sim' : 'Não'"></p>
+                </div>
+                <div x-show="catecumenoSelecionado?.ja_batizado">
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Igreja Anterior</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.igreja_anterior || '-'"></p>
+                </div>
+                <div style="grid-column: span 2;">
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Como conheceu</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.como_conheceu || '-'"></p>
+                </div>
+                <div style="grid-column: span 2;">
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Motivação</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.motivacao || '-'"></p>
+                </div>
+                <div style="grid-column: span 2;">
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Observações</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="catecumenoSelecionado?.observacoes || '-'"></p>
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; color: var(--cinza-medio); text-transform: uppercase;">Data de Inscrição</label>
+                  <p style="margin: 2px 0 15px 0;" x-text="formatarDataHora(catecumenoSelecionado?.created_at)"></p>
+                </div>
+              </div>
+              
+              <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--cinza-leve); padding-top: 20px;">
+                <button @click="abrirModal(catecumenoSelecionado); fecharDetalhes();" class="botao botao-primario">
+                  <span class="material-icons" style="vertical-align: middle; font-size: 18px;">edit</span>
+                  Editar
+                </button>
+                <button @click="deletar(catecumenoSelecionado?.id)" class="botao botao-secundario" style="color: var(--vermelho);">
+                  <span class="material-icons" style="vertical-align: middle; font-size: 18px;">delete</span>
+                  Excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ==================== TURMAS CATECÚMENOS ==================== -->
+        <div x-show="secaoAtiva === 'turmas-catecumenos'" x-data="crudTurmasCatecumenos()" x-init="init()" x-transition>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+            <div>
+              <h2 style="margin: 0;">Gerenciar Turmas de Catecúmenos</h2>
+              <p style="color: var(--cinza-medio); font-size: 0.9rem; margin-top: 5px;">
+                Configure as turmas e classes de catecúmenos
+              </p>
+            </div>
+            <button @click="abrirModal()" class="botao botao-primario">
+              <span class="material-icons" style="vertical-align: middle;">add</span>
+              Nova Turma
+            </button>
+          </div>
+          
+          <div x-show="carregando" class="text-center" style="padding: 40px;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <p>Carregando...</p>
+          </div>
+          
+          <div x-show="!carregando">
+            <!-- Cards de Turmas -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+              <template x-for="turma in turmas" :key="turma.id">
+                <div class="card" style="padding: 20px; border-left: 4px solid var(--verde-escuro);">
+                  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                    <div>
+                      <h4 style="margin: 0 0 5px 0;" x-text="turma.nome"></h4>
+                      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+                        <span :class="getStatusBadge(turma.status)" 
+                              style="display: inline-block; padding: 3px 10px; border-radius: 15px; font-size: 0.75rem;"
+                              x-text="getStatusTexto(turma.status)"></span>
+                        <!-- Badge de Visibilidade -->
+                        <span x-show="!turma.nivel_acesso || turma.nivel_acesso.includes('visitante')" 
+                              style="background: #4CAF50; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem;">
+                          🌐 Público
+                        </span>
+                        <span x-show="turma.nivel_acesso && !turma.nivel_acesso.includes('visitante') && turma.nivel_acesso.includes('membro')" 
+                              style="background: #2196F3; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem;">
+                          👥 Membros
+                        </span>
+                        <span x-show="turma.nivel_acesso && !turma.nivel_acesso.includes('membro') && turma.nivel_acesso.includes('lideranca')" 
+                              style="background: #FF9800; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem;">
+                          👔 Liderança
+                        </span>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                      <button @click="abrirModal(turma)" class="botao botao-pequeno" title="Editar">
+                        <span class="material-icons" style="font-size: 16px;">edit</span>
+                      </button>
+                      <button @click="deletar(turma.id)" class="botao botao-pequeno botao-secundario" title="Deletar">
+                        <span class="material-icons" style="font-size: 16px;">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <p x-show="turma.descricao" style="color: var(--cinza-medio); font-size: 0.9rem; margin: 0 0 15px 0;" x-text="turma.descricao"></p>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;">
+                    <div>
+                      <span class="material-icons" style="font-size: 16px; vertical-align: middle; color: var(--verde-escuro);">calendar_today</span>
+                      <span x-text="formatarDiaSemana(turma.dia_semana)"></span>
+                    </div>
+                    <div>
+                      <span class="material-icons" style="font-size: 16px; vertical-align: middle; color: var(--verde-escuro);">schedule</span>
+                      <span x-text="turma.horario || '-'"></span>
+                    </div>
+                    <div>
+                      <span class="material-icons" style="font-size: 16px; vertical-align: middle; color: var(--verde-escuro);">place</span>
+                      <span x-text="turma.local || '-'"></span>
+                    </div>
+                    <div>
+                      <span class="material-icons" style="font-size: 16px; vertical-align: middle; color: var(--verde-escuro);">person</span>
+                      <span x-text="turma.instrutor || '-'"></span>
+                    </div>
+                  </div>
+                  
+                  <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--cinza-leve); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <span style="font-size: 1.5rem; font-weight: bold; color: var(--verde-escuro);" x-text="turma.inscritos || 0"></span>
+                      <span style="color: var(--cinza-medio);">/ <span x-text="turma.vagas"></span> vagas</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--cinza-medio);">
+                      Etapa <span x-text="turma.etapa_atual"></span> de <span x-text="turma.total_etapas"></span>
+                    </div>
+                  </div>
+                  
+                  <div style="margin-top: 10px; background: var(--cinza-muito-claro); border-radius: 5px; height: 6px; overflow: hidden;">
+                    <div :style="`width: ${(turma.etapa_atual / turma.total_etapas) * 100}%; background: var(--verde-escuro); height: 100%;`"></div>
+                  </div>
+                </div>
+              </template>
+              
+              <div x-show="turmas.length === 0" style="grid-column: span 2; text-align: center; padding: 40px; color: var(--cinza-medio);">
+                <span class="material-icons" style="font-size: 48px; opacity: 0.5;">groups</span>
+                <p>Nenhuma turma cadastrada</p>
+                <button @click="abrirModal()" class="botao botao-primario" style="margin-top: 15px;">
+                  Criar primeira turma
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Modal de Edição/Criação Turma -->
+          <div x-show="modalAberto" 
+               style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" 
+               @click.self="fecharModal()">
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+              <h3 x-text="turmaEditando ? 'Editar Turma' : 'Nova Turma'"></h3>
+              
+              <div style="margin-top: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome da Turma *</label>
+                <input type="text" x-model="formulario.nome" placeholder="Ex: Turma 2025.1 - Introdução" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Descrição</label>
+                <textarea x-model="formulario.descricao" rows="2" placeholder="Descrição da turma..." style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;"></textarea>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Início *</label>
+                  <input type="date" x-model="formulario.data_inicio" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Data de Término</label>
+                  <input type="date" x-model="formulario.data_fim" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Dia da Semana</label>
+                  <select x-model="formulario.dia_semana" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                    <option value="">Selecione...</option>
+                    <template x-for="dia in diasSemana" :key="dia.valor">
+                      <option :value="dia.valor" x-text="dia.label"></option>
+                    </template>
+                  </select>
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Horário</label>
+                  <input type="text" x-model="formulario.horario" placeholder="Ex: 19:00 - 20:30" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Local</label>
+                  <input type="text" x-model="formulario.local" placeholder="Ex: Sala 3" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Instrutor</label>
+                  <input type="text" x-model="formulario.instrutor" placeholder="Nome do instrutor" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Vagas</label>
+                  <input type="number" x-model="formulario.vagas" min="1" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Etapa Atual</label>
+                  <input type="number" x-model="formulario.etapa_atual" min="1" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold;">Total de Etapas</label>
+                  <input type="number" x-model="formulario.total_etapas" min="1" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                </div>
+              </div>
+              
+              <div style="margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Status</label>
+                <select x-model="formulario.status" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  <template x-for="s in statusOptions" :key="s.valor">
+                    <option :value="s.valor" x-text="s.label"></option>
+                  </template>
+                </select>
+              </div>
+              
+              <!-- Links de Acesso (Google Meet e WhatsApp) -->
+              <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px; border: 1px solid #90caf9;">
+                <h4 style="margin: 0 0 15px 0; color: #1565c0; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                  <span class="material-icons">link</span>
+                  Links de Acesso para Inscritos
+                </h4>
+                
+                <div style="margin-bottom: 15px;">
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                    <span class="material-icons" style="font-size: 18px; vertical-align: middle; color: #4285f4;">videocam</span>
+                    Link do Google Meet
+                  </label>
+                  <input type="url" x-model="formulario.link_google_meet" placeholder="https://meet.google.com/xxx-xxxx-xxx" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  <small style="color: #666; font-size: 0.8rem;">Link da sala virtual para os encontros da turma</small>
+                </div>
+                
+                <div>
+                  <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #333;">
+                    <span class="material-icons" style="font-size: 18px; vertical-align: middle; color: #25d366;">chat</span>
+                    Link do Grupo WhatsApp
+                  </label>
+                  <input type="url" x-model="formulario.link_whatsapp" placeholder="https://chat.whatsapp.com/xxxxxxxxxx" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
+                  <small style="color: #666; font-size: 0.8rem;">Link de convite para o grupo da turma no WhatsApp</small>
+                </div>
+              </div>
+              
+              <!-- Nível de Acesso -->
+              <div style="margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 10px; border: 1px solid #e5e7eb;">
+                <h4 style="margin: 0 0 15px 0; color: #1f2937; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                  <span class="material-icons">visibility</span>
+                  Quem pode ver esta turma?
+                </h4>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['visitante', 'membro', 'lideranca', 'administracao']" 
+                    class="btn-nivel-acesso"
+                    :class="{'ativo': formulario.nivel_acesso && formulario.nivel_acesso.includes('visitante')}"
+                  >
+                    <span class="material-icons" style="color: #1A4731;">public</span> Todos (Público)
+                  </button>
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['membro', 'lideranca', 'administracao']" 
+                    class="btn-nivel-acesso"
+                    :class="{'ativo': formulario.nivel_acesso && !formulario.nivel_acesso.includes('visitante') && formulario.nivel_acesso.includes('membro')}"
+                  >
+                    <span class="material-icons" style="color: #2D5F4A;">people</span> Apenas Membros
+                  </button>
+                  <button type="button" 
+                    @click="formulario.nivel_acesso = ['lideranca', 'administracao']" 
+                    class="btn-nivel-acesso"
+                    :class="{'ativo': formulario.nivel_acesso && !formulario.nivel_acesso.includes('membro') && formulario.nivel_acesso.includes('lideranca')}"
+                  >
+                    <span class="material-icons" style="color: #C8A45C;">admin_panel_settings</span> Liderança
+                  </button>
+                </div>
+                
+                <small style="color: #6b7280; font-size: 0.8rem; display: block;">
+                  <span class="material-icons" style="font-size: 14px; vertical-align: middle;">info</span>
+                  Visitantes não logados só verão turmas marcadas como "Público"
+                </small>
+              </div>
+              
+              <div style="margin-top: 15px; display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                  <input type="checkbox" x-model="formulario.requer_aprovacao">
+                  <span>Requer aprovação do admin</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px;">
+                  <input type="checkbox" x-model="formulario.ativo">
+                  <span>Ativo</span>
+                </label>
+              </div>
+              
               <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
                 <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
                 <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
@@ -1727,10 +2860,20 @@
   <script src="../js/config.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/controle-acesso.js"></script>
+  <script src="../js/nivel-acesso.js"></script>
   <script src="../js/data-manager.js"></script>
   <script src="../js/admin-crud.js"></script>
   <script src="../js/admin-crud-usuarios.js"></script>
   <script src="../js/youtube-sync.js"></script>
+  <script src="../js/notificacoes.js"></script>
+  <script src="../js/avisos-popup.js"></script>
+  <script src="../js/devocionais.js"></script>
+  <script src="../js/catecumenos.js"></script>
+  <script src="../js/grupos-estudo.js"></script>
+  <script src="../js/upload-imagens.js"></script>
+  <script src="../js/email-notificacoes.js"></script>
+  <script src="../js/notificacoes-automaticas.js"></script>
   
   <!-- Proteção Inicial - Executar ANTES do Alpine.js -->
   <script>
@@ -1787,7 +2930,9 @@
           devocionais: 0,
           videos: 0,
           eventos: 0,
-          visitantes: 0
+          visitantes: 0,
+          turmas: 0,
+          inscricoes: 0
         },
         
         get tituloPagina() {
@@ -1847,13 +2992,15 @@
           try {
             // Carregar dados para estatísticas do Supabase
             if (window.supabaseClient && window.supabaseClient.client) {
-              const [usuarios, devocionais, videos, programacao, eventos, visitantes] = await Promise.all([
+              const [usuarios, devocionais, videos, programacao, eventos, visitantes, turmas, inscricoes] = await Promise.all([
                 window.supabaseClient.listar('usuarios').catch(() => []),
                 window.supabaseClient.listar('devocionais').catch(() => []),
                 window.supabaseClient.listar('videos').catch(() => []),
                 window.supabaseClient.listar('programacao').catch(() => []),
                 window.supabaseClient.listar('eventos').catch(() => []),
-                window.supabaseClient.listar('visitantes').catch(() => [])
+                window.supabaseClient.listar('visitantes').catch(() => []),
+                window.supabaseClient.listar('turmas_catecumenos').catch(() => []),
+                window.supabaseClient.listar('inscricoes_catecumenos').catch(() => [])
               ]);
               
               this.stats = {
@@ -1861,7 +3008,9 @@
                 devocionais: Array.isArray(devocionais) ? devocionais.length : 0,
                 videos: Array.isArray(videos) ? videos.length : 0,
                 eventos: Array.isArray(eventos) ? eventos.length : 0,
-                visitantes: Array.isArray(visitantes) ? visitantes.length : 0
+                visitantes: Array.isArray(visitantes) ? visitantes.length : 0,
+                turmas: Array.isArray(turmas) ? turmas.length : 0,
+                inscricoes: Array.isArray(inscricoes) ? inscricoes.length : 0
               };
             } else {
               // Fallback para JSONs (temporário)

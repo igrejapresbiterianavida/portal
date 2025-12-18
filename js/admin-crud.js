@@ -17,7 +17,8 @@ function crudDevocionais() {
       texto: '',
       imagem_url: '',
       ativo: true,
-      data_publicacao: new Date().toISOString().split('T')[0]
+      data_publicacao: new Date().toISOString().split('T')[0],
+      nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
     },
     arquivoImagem: null,
     previewImagem: null,
@@ -48,7 +49,8 @@ function crudDevocionais() {
           texto: devocional.texto || '',
           imagem_url: devocional.imagem_url || '',
           ativo: devocional.ativo !== false,
-          data_publicacao: devocional.data_publicacao || new Date().toISOString().split('T')[0]
+          data_publicacao: devocional.data_publicacao || new Date().toISOString().split('T')[0],
+          nivel_acesso: devocional.nivel_acesso || ['visitante', 'membro', 'lideranca', 'administracao']
         };
         this.previewImagem = devocional.imagem_url;
       } else {
@@ -57,7 +59,8 @@ function crudDevocionais() {
           texto: '',
           imagem_url: '',
           ativo: true,
-          data_publicacao: new Date().toISOString().split('T')[0]
+          data_publicacao: new Date().toISOString().split('T')[0],
+          nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
         };
         this.previewImagem = null;
       }
@@ -112,10 +115,22 @@ function crudDevocionais() {
         }
 
         // Salvar no banco
+        const ehNovo = !this.devocionalEditando;
+        let resultado;
+        
         if (this.devocionalEditando) {
-          await window.supabaseClient.atualizar('devocionais', this.devocionalEditando.id, this.formulario);
+          resultado = await window.supabaseClient.atualizar('devocionais', this.devocionalEditando.id, this.formulario);
         } else {
-          await window.supabaseClient.criar('devocionais', this.formulario);
+          resultado = await window.supabaseClient.criar('devocionais', this.formulario);
+        }
+
+        // Criar notificação automática para novos devocionais
+        if (ehNovo && window.NotificacoesAutomaticas) {
+          await window.NotificacoesAutomaticas.novoDevocional({
+            id: resultado?.id,
+            titulo: this.formulario.titulo || 'Novo Devocional',
+            autor: this.formulario.autor
+          });
         }
 
         this.fecharModal();
@@ -163,7 +178,8 @@ function crudVideos() {
       duracao: '',
       data_publicacao: '',
       destaque: false,
-      ordem: 0
+      ordem: 0,
+      nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
     },
 
     async init() {
@@ -196,7 +212,8 @@ function crudVideos() {
           duracao: video.duracao || '',
           data_publicacao: video.data_publicacao ? video.data_publicacao.split('T')[0] : '',
           destaque: video.destaque || false,
-          ordem: video.ordem || 0
+          ordem: video.ordem || 0,
+          nivel_acesso: video.nivel_acesso || ['visitante', 'membro', 'lideranca', 'administracao']
         };
       } else {
         this.formulario = {
@@ -208,7 +225,8 @@ function crudVideos() {
           duracao: '',
           data_publicacao: '',
           destaque: false,
-          ordem: 0
+          ordem: 0,
+          nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
         };
       }
       this.modalAberto = true;
@@ -255,10 +273,24 @@ function crudVideos() {
       this.carregando = true;
 
       try {
+        const ehNovo = !this.videoEditando;
+        let resultado;
+        
         if (this.videoEditando) {
-          await window.supabaseClient.atualizar('videos', this.videoEditando.id, this.formulario);
+          resultado = await window.supabaseClient.atualizar('videos', this.videoEditando.id, this.formulario);
         } else {
-          await window.supabaseClient.criar('videos', this.formulario);
+          resultado = await window.supabaseClient.criar('videos', this.formulario);
+        }
+
+        // Criar notificação automática para novos vídeos
+        if (ehNovo && window.NotificacoesAutomaticas) {
+          await window.NotificacoesAutomaticas.novoVideo({
+            id: resultado?.id,
+            titulo: this.formulario.titulo,
+            url: `https://youtube.com/watch?v=${this.formulario.video_id}`,
+            video_id: this.formulario.video_id,
+            thumbnail: this.formulario.thumbnail_url
+          });
         }
 
         this.fecharModal();
@@ -312,7 +344,8 @@ function crudProgramacao() {
       imagem_url: '',
       link: '',
       ordem: 0,
-      ativo: true
+      ativo: true,
+      nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
     },
     arquivoImagem: null,
     previewImagem: null,
@@ -339,7 +372,11 @@ function crudProgramacao() {
     abrirModal(programa = null) {
       this.programaEditando = programa;
       if (programa) {
-        this.formulario = { ...programa };
+        this.formulario = { 
+          ...programa,
+          // Garantir que nivel_acesso seja um array válido
+          nivel_acesso: programa.nivel_acesso || ['visitante', 'membro', 'lideranca', 'administracao']
+        };
         this.previewImagem = programa.imagem_url;
       } else {
         this.formulario = {
@@ -357,7 +394,8 @@ function crudProgramacao() {
           imagem_url: '',
           link: '',
           ordem: 0,
-          ativo: true
+          ativo: true,
+          nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
         };
         this.previewImagem = null;
       }
@@ -409,10 +447,26 @@ function crudProgramacao() {
           this.formulario.imagem_url = url;
         }
 
+        const ehNovo = !this.programaEditando;
+        let resultado;
+        
         if (this.programaEditando) {
-          await window.supabaseClient.atualizar('programacao', this.programaEditando.id, this.formulario);
+          resultado = await window.supabaseClient.atualizar('programacao', this.programaEditando.id, this.formulario);
         } else {
-          await window.supabaseClient.criar('programacao', this.formulario);
+          resultado = await window.supabaseClient.criar('programacao', this.formulario);
+        }
+
+        // Criar notificação automática para novos eventos
+        if (ehNovo && window.NotificacoesAutomaticas) {
+          await window.NotificacoesAutomaticas.novaProgramacao({
+            id: resultado?.id,
+            titulo: this.formulario.titulo,
+            dia: this.formulario.dia,
+            mes: this.formulario.mes,
+            horario: this.formulario.horario,
+            local: this.formulario.local,
+            nivel_acesso: this.formulario.nivel_acesso
+          });
         }
 
         this.fecharModal();
@@ -577,7 +631,8 @@ function crudEventos() {
       imagem_url: '',
       inscricao_aberta: false,
       link_inscricao: '',
-      ativo: true
+      ativo: true,
+      nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
     },
     arquivoImagem: null,
     previewImagem: null,
@@ -612,7 +667,8 @@ function crudEventos() {
           imagem_url: evento.imagem_url || '',
           inscricao_aberta: evento.inscricao_aberta || false,
           link_inscricao: evento.link_inscricao || '',
-          ativo: evento.ativo !== false
+          ativo: evento.ativo !== false,
+          nivel_acesso: evento.nivel_acesso || ['visitante', 'membro', 'lideranca', 'administracao']
         };
         this.previewImagem = evento.imagem_url;
       } else {
@@ -625,7 +681,8 @@ function crudEventos() {
           imagem_url: '',
           inscricao_aberta: false,
           link_inscricao: '',
-          ativo: true
+          ativo: true,
+          nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
         };
         this.previewImagem = null;
       }
@@ -1127,7 +1184,8 @@ function crudRedesSociais() {
       cor: '#1A4731',
       descricao: '',
       ativo: true,
-      ordem: 0
+      ordem: 0,
+      nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
     },
     iconesDisponiveis: [
       'bi-youtube', 'bi-instagram', 'bi-facebook', 'bi-whatsapp',
@@ -1170,7 +1228,8 @@ function crudRedesSociais() {
           cor: rede.cor || '#1A4731',
           descricao: rede.descricao || '',
           ativo: rede.ativo !== false,
-          ordem: rede.ordem || 0
+          ordem: rede.ordem || 0,
+          nivel_acesso: rede.nivel_acesso || ['visitante', 'membro', 'lideranca', 'administracao']
         };
       } else {
         this.formulario = {
@@ -1181,7 +1240,8 @@ function crudRedesSociais() {
           cor: '#1A4731',
           descricao: '',
           ativo: true,
-          ordem: 0
+          ordem: 0,
+          nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao']
         };
       }
       this.modalAberto = true;
@@ -1234,6 +1294,512 @@ function crudRedesSociais() {
       } finally {
         this.carregando = false;
       }
+    }
+  };
+}
+
+// ==================== CRUD TURMAS CATECÚMENOS ====================
+function crudTurmasCatecumenos() {
+  return {
+    turmas: [],
+    turmaEditando: null,
+    modalAberto: false,
+    carregando: false,
+    formulario: {
+      nome: '',
+      descricao: '',
+      data_inicio: '',
+      data_fim: '',
+      dia_semana: '',
+      horario: '',
+      local: '',
+      vagas: 20,
+      instrutor: '',
+      etapa_atual: 1,
+      total_etapas: 10,
+      requer_aprovacao: true,
+      status: 'aberta',
+      ativo: true,
+      nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao'],
+      link_google_meet: '',
+      link_whatsapp: ''
+    },
+    diasSemana: [
+      { valor: 'domingo', label: 'Domingo' },
+      { valor: 'segunda', label: 'Segunda-feira' },
+      { valor: 'terca', label: 'Terça-feira' },
+      { valor: 'quarta', label: 'Quarta-feira' },
+      { valor: 'quinta', label: 'Quinta-feira' },
+      { valor: 'sexta', label: 'Sexta-feira' },
+      { valor: 'sabado', label: 'Sábado' }
+    ],
+    statusOptions: [
+      { valor: 'aberta', label: 'Aberta para inscrições' },
+      { valor: 'em_andamento', label: 'Em andamento' },
+      { valor: 'encerrada', label: 'Encerrada' },
+      { valor: 'cancelada', label: 'Cancelada' }
+    ],
+
+    async init() {
+      await this.carregar();
+    },
+
+    async carregar() {
+      this.carregando = true;
+      try {
+        const { data, error } = await window.supabaseClient.client
+          .from('turmas_catecumenos')
+          .select('*')
+          .order('data_inicio', { ascending: false });
+        
+        if (error) throw error;
+        this.turmas = data || [];
+        
+        // Contar inscritos por turma
+        for (let turma of this.turmas) {
+          const { count } = await window.supabaseClient.client
+            .from('catecumenos')
+            .select('*', { count: 'exact', head: true })
+            .eq('turma_id', turma.id);
+          turma.inscritos = count || 0;
+        }
+      } catch (erro) {
+        console.error('Erro ao carregar turmas:', erro);
+      } finally {
+        this.carregando = false;
+      }
+    },
+
+    abrirModal(turma = null) {
+      this.turmaEditando = turma;
+      if (turma) {
+        this.formulario = {
+          nome: turma.nome || '',
+          descricao: turma.descricao || '',
+          data_inicio: turma.data_inicio || '',
+          data_fim: turma.data_fim || '',
+          dia_semana: turma.dia_semana || '',
+          horario: turma.horario || '',
+          local: turma.local || '',
+          vagas: turma.vagas || 20,
+          instrutor: turma.instrutor || '',
+          etapa_atual: turma.etapa_atual || 1,
+          total_etapas: turma.total_etapas || 10,
+          requer_aprovacao: turma.requer_aprovacao !== false,
+          status: turma.status || 'aberta',
+          ativo: turma.ativo !== false,
+          nivel_acesso: turma.nivel_acesso || ['visitante', 'membro', 'lideranca', 'administracao'],
+          link_google_meet: turma.link_google_meet || '',
+          link_whatsapp: turma.link_whatsapp || ''
+        };
+      } else {
+        this.formulario = {
+          nome: '',
+          descricao: '',
+          data_inicio: new Date().toISOString().split('T')[0],
+          data_fim: '',
+          dia_semana: '',
+          horario: '',
+          local: '',
+          vagas: 20,
+          instrutor: '',
+          etapa_atual: 1,
+          total_etapas: 10,
+          requer_aprovacao: true,
+          status: 'aberta',
+          ativo: true,
+          nivel_acesso: ['visitante', 'membro', 'lideranca', 'administracao'],
+          link_google_meet: '',
+          link_whatsapp: ''
+        };
+      }
+      this.modalAberto = true;
+    },
+
+    fecharModal() {
+      this.modalAberto = false;
+      this.turmaEditando = null;
+    },
+
+    async salvar() {
+      if (!this.formulario.nome || !this.formulario.data_inicio) {
+        alert('Nome e data de início são obrigatórios');
+        return;
+      }
+
+      this.carregando = true;
+      try {
+        if (this.turmaEditando) {
+          await window.supabaseClient.atualizar('turmas_catecumenos', this.turmaEditando.id, this.formulario);
+        } else {
+          await window.supabaseClient.criar('turmas_catecumenos', this.formulario);
+        }
+
+        this.fecharModal();
+        await this.carregar();
+        alert('Turma salva com sucesso!');
+      } catch (erro) {
+        console.error('Erro ao salvar turma:', erro);
+        alert('Erro ao salvar turma: ' + erro.message);
+      } finally {
+        this.carregando = false;
+      }
+    },
+
+    async deletar(id) {
+      if (!confirm('Tem certeza que deseja deletar esta turma? Os catecúmenos associados perderão o vínculo.')) return;
+
+      this.carregando = true;
+      try {
+        await window.supabaseClient.deletar('turmas_catecumenos', id);
+        await this.carregar();
+        alert('Turma deletada com sucesso!');
+      } catch (erro) {
+        console.error('Erro ao deletar:', erro);
+        alert('Erro ao deletar turma');
+      } finally {
+        this.carregando = false;
+      }
+    },
+
+    formatarData(data) {
+      if (!data) return '-';
+      return new Date(data + 'T00:00:00').toLocaleDateString('pt-BR');
+    },
+
+    formatarDiaSemana(dia) {
+      const encontrado = this.diasSemana.find(d => d.valor === dia);
+      return encontrado ? encontrado.label : dia || '-';
+    },
+
+    getStatusBadge(status) {
+      const badges = {
+        'aberta': 'badge-success',
+        'em_andamento': 'badge-info',
+        'encerrada': 'badge-secondary',
+        'cancelada': 'badge-danger'
+      };
+      return badges[status] || 'badge-secondary';
+    },
+
+    getStatusTexto(status) {
+      const textos = {
+        'aberta': 'Aberta',
+        'em_andamento': 'Em Andamento',
+        'encerrada': 'Encerrada',
+        'cancelada': 'Cancelada'
+      };
+      return textos[status] || status;
+    }
+  };
+}
+
+// ==================== CRUD CATECÚMENOS ====================
+function crudCatecumenos() {
+  return {
+    catecumenos: [],
+    turmas: [],
+    catecumenoEditando: null,
+    modalAberto: false,
+    modalDetalhesAberto: false,
+    catecumenoSelecionado: null,
+    carregando: false,
+    filtroStatus: 'todos',
+    filtroTurma: 'todas',
+    busca: '',
+    formulario: {
+      nome: '',
+      email: '',
+      telefone: '',
+      data_nascimento: '',
+      endereco: '',
+      estado_civil: '',
+      profissao: '',
+      como_conheceu: '',
+      ja_batizado: false,
+      igreja_anterior: '',
+      motivacao: '',
+      disponibilidade: '',
+      turma_id: '',
+      status: 'pendente',
+      observacoes: ''
+    },
+    estadosCivis: [
+      { valor: 'solteiro', label: 'Solteiro(a)' },
+      { valor: 'casado', label: 'Casado(a)' },
+      { valor: 'divorciado', label: 'Divorciado(a)' },
+      { valor: 'viuvo', label: 'Viúvo(a)' },
+      { valor: 'outro', label: 'Outro' }
+    ],
+    statusOptions: [
+      { valor: 'pendente', label: 'Pendente' },
+      { valor: 'aprovado', label: 'Aprovado' },
+      { valor: 'em_andamento', label: 'Em Andamento' },
+      { valor: 'concluido', label: 'Concluído' },
+      { valor: 'desistente', label: 'Desistente' }
+    ],
+
+    async init() {
+      await Promise.all([
+        this.carregar(),
+        this.carregarTurmas()
+      ]);
+    },
+
+    async carregar() {
+      this.carregando = true;
+      try {
+        const { data, error } = await window.supabaseClient.client
+          .from('catecumenos')
+          .select(`
+            *,
+            turma:turmas_catecumenos(id, nome)
+          `)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        this.catecumenos = data || [];
+      } catch (erro) {
+        console.error('Erro ao carregar catecúmenos:', erro);
+      } finally {
+        this.carregando = false;
+      }
+    },
+
+    async carregarTurmas() {
+      try {
+        const { data, error } = await window.supabaseClient.client
+          .from('turmas_catecumenos')
+          .select('id, nome')
+          .eq('ativo', true)
+          .order('nome');
+        
+        if (error) throw error;
+        this.turmas = data || [];
+      } catch (erro) {
+        console.error('Erro ao carregar turmas:', erro);
+      }
+    },
+
+    get catecumenosFiltrados() {
+      return this.catecumenos.filter(c => {
+        // Filtro de status
+        if (this.filtroStatus !== 'todos' && c.status !== this.filtroStatus) {
+          return false;
+        }
+        
+        // Filtro de turma
+        if (this.filtroTurma !== 'todas') {
+          if (this.filtroTurma === 'sem_turma' && c.turma_id) return false;
+          if (this.filtroTurma !== 'sem_turma' && c.turma_id !== this.filtroTurma) return false;
+        }
+        
+        // Busca
+        if (this.busca.trim()) {
+          const termo = this.busca.toLowerCase();
+          return (
+            c.nome.toLowerCase().includes(termo) ||
+            (c.email && c.email.toLowerCase().includes(termo)) ||
+            c.telefone.includes(termo)
+          );
+        }
+        
+        return true;
+      });
+    },
+
+    abrirModal(catecumeno = null) {
+      this.catecumenoEditando = catecumeno;
+      if (catecumeno) {
+        this.formulario = {
+          nome: catecumeno.nome || '',
+          email: catecumeno.email || '',
+          telefone: catecumeno.telefone || '',
+          data_nascimento: catecumeno.data_nascimento || '',
+          endereco: catecumeno.endereco || '',
+          estado_civil: catecumeno.estado_civil || '',
+          profissao: catecumeno.profissao || '',
+          como_conheceu: catecumeno.como_conheceu || '',
+          ja_batizado: catecumeno.ja_batizado || false,
+          igreja_anterior: catecumeno.igreja_anterior || '',
+          motivacao: catecumeno.motivacao || '',
+          disponibilidade: catecumeno.disponibilidade || '',
+          turma_id: catecumeno.turma_id || '',
+          status: catecumeno.status || 'pendente',
+          observacoes: catecumeno.observacoes || ''
+        };
+      } else {
+        this.formulario = {
+          nome: '',
+          email: '',
+          telefone: '',
+          data_nascimento: '',
+          endereco: '',
+          estado_civil: '',
+          profissao: '',
+          como_conheceu: '',
+          ja_batizado: false,
+          igreja_anterior: '',
+          motivacao: '',
+          disponibilidade: '',
+          turma_id: '',
+          status: 'pendente',
+          observacoes: ''
+        };
+      }
+      this.modalAberto = true;
+    },
+
+    fecharModal() {
+      this.modalAberto = false;
+      this.catecumenoEditando = null;
+    },
+
+    verDetalhes(catecumeno) {
+      this.catecumenoSelecionado = catecumeno;
+      this.modalDetalhesAberto = true;
+    },
+
+    fecharDetalhes() {
+      this.modalDetalhesAberto = false;
+      this.catecumenoSelecionado = null;
+    },
+
+    async salvar() {
+      if (!this.formulario.nome || !this.formulario.telefone) {
+        alert('Nome e telefone são obrigatórios');
+        return;
+      }
+
+      this.carregando = true;
+      try {
+        const dados = { ...this.formulario };
+        if (!dados.turma_id) dados.turma_id = null;
+        if (!dados.data_nascimento) dados.data_nascimento = null;
+
+        if (this.catecumenoEditando) {
+          await window.supabaseClient.atualizar('catecumenos', this.catecumenoEditando.id, dados);
+        } else {
+          await window.supabaseClient.criar('catecumenos', dados);
+        }
+
+        this.fecharModal();
+        await this.carregar();
+        alert('Catecúmeno salvo com sucesso!');
+      } catch (erro) {
+        console.error('Erro ao salvar catecúmeno:', erro);
+        alert('Erro ao salvar catecúmeno: ' + erro.message);
+      } finally {
+        this.carregando = false;
+      }
+    },
+
+    async atualizarStatus(catecumeno, novoStatus) {
+      try {
+        await window.supabaseClient.atualizar('catecumenos', catecumeno.id, { status: novoStatus });
+        catecumeno.status = novoStatus;
+        alert('Status atualizado com sucesso!');
+      } catch (erro) {
+        console.error('Erro ao atualizar status:', erro);
+        alert('Erro ao atualizar status');
+      }
+    },
+
+    async atribuirTurma(catecumeno, turmaId) {
+      try {
+        await window.supabaseClient.atualizar('catecumenos', catecumeno.id, { turma_id: turmaId || null });
+        await this.carregar();
+        alert('Turma atribuída com sucesso!');
+      } catch (erro) {
+        console.error('Erro ao atribuir turma:', erro);
+        alert('Erro ao atribuir turma');
+      }
+    },
+
+    async deletar(id) {
+      if (!confirm('Tem certeza que deseja deletar este catecúmeno?')) return;
+
+      this.carregando = true;
+      try {
+        await window.supabaseClient.deletar('catecumenos', id);
+        await this.carregar();
+        if (this.modalDetalhesAberto) this.fecharDetalhes();
+        alert('Catecúmeno deletado com sucesso!');
+      } catch (erro) {
+        console.error('Erro ao deletar:', erro);
+        alert('Erro ao deletar catecúmeno');
+      } finally {
+        this.carregando = false;
+      }
+    },
+
+    formatarData(data) {
+      if (!data) return '-';
+      return new Date(data + 'T00:00:00').toLocaleDateString('pt-BR');
+    },
+
+    formatarDataHora(data) {
+      if (!data) return '-';
+      return new Date(data).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    },
+
+    getStatusBadge(status) {
+      const badges = {
+        'pendente': 'badge-warning',
+        'aprovado': 'badge-info',
+        'em_andamento': 'badge-primary',
+        'concluido': 'badge-success',
+        'desistente': 'badge-danger'
+      };
+      return badges[status] || 'badge-secondary';
+    },
+
+    getStatusTexto(status) {
+      const textos = {
+        'pendente': 'Pendente',
+        'aprovado': 'Aprovado',
+        'em_andamento': 'Em Andamento',
+        'concluido': 'Concluído',
+        'desistente': 'Desistente'
+      };
+      return textos[status] || status;
+    },
+
+    exportarCSV() {
+      const dados = this.catecumenosFiltrados.map(c => ({
+        Nome: c.nome,
+        Email: c.email || '',
+        Telefone: c.telefone,
+        'Data Nascimento': this.formatarData(c.data_nascimento),
+        'Estado Civil': c.estado_civil || '',
+        Status: this.getStatusTexto(c.status),
+        Turma: c.turma?.nome || 'Sem turma',
+        'Data Inscrição': this.formatarDataHora(c.created_at)
+      }));
+      
+      if (dados.length === 0) {
+        alert('Nenhum dado para exportar');
+        return;
+      }
+      
+      const headers = Object.keys(dados[0]);
+      let csv = headers.join(',') + '\n';
+      
+      dados.forEach(row => {
+        csv += headers.map(h => `"${row[h]}"`).join(',') + '\n';
+      });
+      
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `catecumenos_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
     }
   };
 }

@@ -591,6 +591,84 @@
   transform: scale(1.05);
 }
 
+/* ==================== PROGRAMAÇÃO - OVERLAY E TEXTO ==================== */
+
+/* Esconder info overlay em todos os tamanhos (só mostra no modal) */
+.programacao-info-overlay {
+  display: none !important;
+}
+
+/* Desktop: Mostrar "Clique para ver detalhes" */
+.programacao-clique-desktop {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 50px 16px 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0) 100%);
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  z-index: 5;
+}
+
+.programacao-clique-desktop i {
+  font-size: 1.3rem;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.programacao-clique-desktop span {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: #fff;
+}
+
+/* Desktop: Esconder texto "toque" */
+.programacao-toque-mobile {
+  display: none !important;
+}
+
+/* MOBILE: Esconder "clique", mostrar "toque" */
+@media (max-width: 768px) {
+  /* Esconder "clique para ver detalhes" no mobile */
+  .programacao-clique-desktop {
+    display: none !important;
+  }
+  
+  /* Mostrar tarja gradiente com "toque" no mobile */
+  .programacao-toque-mobile {
+    display: flex !important;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px 16px 16px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%);
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 5;
+  }
+  
+  .programacao-toque-mobile i {
+    font-size: 1.2rem;
+    color: #fff;
+    opacity: 0.9;
+  }
+  
+  .programacao-toque-mobile span {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #fff;
+  }
+}
+
 .card-data-badge {
   position: absolute;
   top: var(--espacamento-md);
@@ -898,11 +976,18 @@
   border-radius: 5px;
 }
 
-/* Lista de Programações */
+/* Lista de Programações - normal no mobile, será ocultada via media query abaixo */
 .programacao-lista {
   display: flex;
   flex-direction: column;
   gap: var(--espacamento-md);
+}
+
+/* MOBILE: Ocultar a lista de programações */
+@media (max-width: 768px) {
+  .programacao-lista {
+    display: none !important;
+  }
 }
 
 .lista-titulo {
@@ -998,6 +1083,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0; /* Permite que o flex-item encolha */
 }
 
 .programa-titulo {
@@ -1005,6 +1091,54 @@
   font-weight: var(--peso-semi-negrito);
   color: var(--cinza-escuro);
   line-height: 1.3;
+}
+
+/* Descrição da programação - visível no mobile */
+.programa-descricao {
+  font-size: 0.85rem;
+  color: var(--cinza-medio);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* Mobile: Mostrar descrição expandível */
+@media (max-width: 767px) {
+  .programa-descricao {
+    -webkit-line-clamp: 3;
+    max-height: none;
+  }
+  
+  .programa-descricao.expandida {
+    -webkit-line-clamp: unset;
+    display: block;
+  }
+  
+  .programa-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--espacamento-sm);
+  }
+  
+  .programa-item .programa-data-badge {
+    align-self: flex-start;
+  }
+  
+  .programa-info {
+    width: 100%;
+  }
+  
+  .programa-ver-mais {
+    font-size: 0.75rem;
+    color: var(--verde-medio);
+    cursor: pointer;
+    font-weight: var(--peso-medio);
+    margin-top: 4px;
+    display: inline-block;
+  }
 }
 
 .programa-detalhes {
@@ -1288,16 +1422,17 @@
   /* Menu principal mobile */
   .navbar-menu {
     position: fixed !important;
-    top: 85px !important;
+    top: 55px !important; /* Rente ao header */
     left: -110% !important;
     width: 100vw !important;
-    height: calc(100vh - 70px) !important;
+    height: calc(100vh - 55px) !important;
     background: var(--branco) !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
-    padding: var(--espacamento-lg) !important;
-    gap: var(--espacamento-sm) !important;
+    padding: var(--espacamento-md) !important;
+    padding-top: 8px !important; /* Menor espaço no topo */
+    gap: 0 !important;
     box-shadow: var(--sombra-forte) !important;
     transition: left 0.3s ease !important;
     overflow-y: auto !important;
@@ -1320,10 +1455,12 @@
     flex-direction: column !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
+    border-bottom: 1px solid #f0f0f0;
   }
 
   .navbar-item > a {
     display: block !important;
+    padding: 14px 16px !important;
     width: 100% !important;
     padding: var(--espacamento-sm) !important;
     font-size: 1.125rem !important;

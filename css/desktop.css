@@ -4,6 +4,31 @@
 
 /* ==================== TABLETS (768px+) ==================== */
 @media (min-width: 768px) {
+  /* NAVBAR DESKTOP - Esconder hambúrguer e mostrar menu */
+  .navbar-toggle {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  .navbar-menu {
+    display: flex !important;
+    position: static !important;
+    flex-direction: row !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    height: auto !important;
+    width: auto !important;
+    left: auto !important;
+    top: auto !important;
+  }
+  
+  .navbar-notificacoes {
+    display: flex !important;
+    order: 3;
+    margin-left: 12px;
+  }
+  
   /* Navbar desktop - reset mobile styles */
   .navbar-auth {
     position: static;
@@ -130,6 +155,8 @@
     object-fit: cover;
     object-position: center;
   }
+  
+  /* Programação: estilos já definidos em mobile.css com media queries */
 
   .carrossel-seta-prog {
     width: 45px;

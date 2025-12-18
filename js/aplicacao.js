@@ -194,6 +194,7 @@ function devocionalDiario() {
   return {
     devocional: null,
     textoExpandido: false,
+    podeVer: false,
     
     async carregar() {
       try {
@@ -202,11 +203,22 @@ function devocionalDiario() {
           const devocionais = await window.supabaseClient.listar('devocionais', {
             filtro: { campo: 'ativo', operador: 'eq', valor: true },
             ordem: { campo: 'data_publicacao', ascendente: false },
-            limite: 1
+            limite: 10 // Buscar mais para encontrar um que o usuário possa ver
           });
           
           if (devocionais && devocionais.length > 0) {
-            const devocional = devocionais[0];
+            // Filtrar por nível de acesso
+            const devocionaisFiltrados = window.controleAcesso 
+              ? window.controleAcesso.filtrarPorAcesso(devocionais, 'nivel_acesso')
+              : devocionais.filter(d => !d.nivel_acesso || d.nivel_acesso.includes('visitante'));
+            
+            if (devocionaisFiltrados.length === 0) {
+              console.warn('⚠️ Nenhum devocional disponível para o nível de acesso do usuário');
+              this.podeVer = false;
+              return;
+            }
+            
+            const devocional = devocionaisFiltrados[0];
             const imagemUrl = devocional.imagem_url || '';
             // Adicionar timestamp para forçar atualização da imagem (evita cache)
             const imagemComCache = imagemUrl ? (imagemUrl.includes('?') ? imagemUrl : imagemUrl + '?t=' + Date.now()) : 'assets/images/corrida.jpg?t=' + Date.now();
@@ -218,16 +230,20 @@ function devocionalDiario() {
               imagem: imagemComCache, // Campo usado no HTML com cache busting
               imagem_url: imagemUrl, // Mantém compatibilidade
               data_publicacao: devocional.data_publicacao || new Date().toISOString().split('T')[0],
-              ativo: devocional.ativo
+              ativo: devocional.ativo,
+              nivel_acesso: devocional.nivel_acesso
             };
+            this.podeVer = true;
             console.log('✅ Devocional diário carregado do Supabase:', this.devocional.id, 'Imagem:', this.devocional.imagem);
             return;
           }
         }
         
         console.warn('⚠️ Nenhum devocional encontrado no Supabase');
+        this.podeVer = false;
       } catch (erro) {
         console.error('❌ Erro ao carregar devocional diário:', erro);
+        this.podeVer = false;
       }
     },
     
@@ -385,16 +401,15 @@ function videosYoutube() {
           return dataB.localeCompare(dataA); // Mais recentes primeiro
         });
         
-        // Não limitar - mostrar todos os vídeos do YouTube
+        // Mostrar todos os vídeos encontrados (SEM fallback para JSON - respeitar nível de acesso)
         this.videos = todosVideos;
         
         if (this.videos.length > 0) {
           const videosYouTube = todosVideos.filter(v => v.origem === 'youtube').length;
           const videosSupabase = todosVideos.filter(v => v.origem === 'supabase').length;
-          console.log(`✅ Total de ${this.videos.length} vídeos carregados (${videosYouTube} do YouTube com PRIORIDADE, ${videosSupabase} do Supabase)`);
+          console.log(`✅ Total de ${this.videos.length} vídeos carregados (YT: ${videosYouTube}, Supabase: ${videosSupabase})`);
         } else {
-          console.warn('⚠️ Nenhum vídeo encontrado');
-          console.warn('💡 Verifique se há vídeos cadastrados no Supabase ou se o Canal ID está correto');
+          console.warn('⚠️ Nenhum vídeo encontrado - será exibido empty state');
         }
       } catch (erro) {
         console.error('❌ Erro ao carregar vídeos:', erro);
@@ -448,6 +463,7 @@ function videosYoutube() {
         slideAtual: 0,
         programas: [],
         gruposBanners: [],
+        programaSelecionado: null,
         
         async init() {
       await this.carregarProgramacao();
@@ -455,36 +471,63 @@ function videosYoutube() {
       this.iniciarAutoPlay();
     },
     
+    mostrarDetalhes(programa) {
+      this.programaSelecionado = programa;
+      document.body.style.overflow = 'hidden';
+    },
+    
+    fecharDetalhes() {
+      this.programaSelecionado = null;
+      document.body.style.overflow = '';
+    },
+    
     async carregarProgramacao() {
       try {
-        // Carregar do Supabase
+        // 1. Tentar carregar do Supabase
         if (window.supabaseClient && window.supabaseClient.client) {
-          const programacao = await window.supabaseClient.listar('programacao', {
-            ordem: { campo: 'dia', ascendente: true }
-          });
-          
-          if (programacao && programacao.length > 0) {
-            this.programas = programacao.map(p => ({
-              id: p.id,
-              titulo: p.titulo || '',
-              descricao: p.descricao || '',
-              dia: p.dia || '',
-              mes: p.mes || '',
-              horario: p.horario || '',
-              local: p.local || '',
-              categoria: p.categoria || 'GERAL',
-              corCategoria: p.cor_categoria || '#1A4731',
-              link: p.link || '#',
-              cor1: p.cor1 || '#1A4731',
-              cor2: p.cor2 || '#2D5F4A',
-              imagem: p.imagem_url || 'assets/images/programacao/default.svg'
-            }));
-            console.log(`✅ ${this.programas.length} programas carregados do Supabase`);
-            return;
+          try {
+            const programacao = await window.supabaseClient.listar('programacao', {
+              ordem: { campo: 'dia', ascendente: true }
+            });
+            
+            if (programacao && programacao.length > 0) {
+              // Filtrar por nível de acesso
+              const programacaoFiltrada = programacao.filter(p => this.podeVerConteudo(p.nivel_acesso));
+              
+              this.programas = programacaoFiltrada.map(p => {
+                const programa = {
+                  id: p.id,
+                  titulo: p.titulo || '',
+                  descricao: p.descricao || '',
+                  dia: p.dia || '',
+                  mes: p.mes || '',
+                  horario: p.horario || '',
+                  local: p.local || '',
+                  categoria: p.categoria || 'GERAL',
+                  corCategoria: p.cor_categoria || '#1A4731',
+                  link: p.link || '#',
+                  cor1: p.cor1 || '#1A4731',
+                  cor2: p.cor2 || '#2D5F4A'
+                };
+                // Se não tiver imagem, gerar SVG dinâmico
+                programa.imagem = p.imagem_url || this.gerarSVGProgramacao(programa);
+                return programa;
+              });
+              console.log(`✅ ${this.programas.length} programas carregados do Supabase (após filtro de acesso)`);
+              return;
+            }
+          } catch (erroSupabase) {
+            console.warn('⚠️ Erro ao carregar do Supabase:', erroSupabase.message);
+            this.programas = [];
           }
         }
         
-        // Se não encontrou no Supabase, deixar vazio
+        // Se não encontrou no Supabase, mostrar empty state (SEM fallback para JSON - respeitar nível de acesso)
+        if (!this.programas || this.programas.length === 0) {
+          console.warn('⚠️ Nenhuma programação disponível - será exibido empty state');
+        }
+        
+        // Verificação final
         if (!this.programas || this.programas.length === 0) {
           console.warn('⚠️ Nenhuma programação encontrada no Supabase');
           this.programas = [];
@@ -507,20 +550,103 @@ function videosYoutube() {
       }
     },
     
+    // Programas válidos para o carrossel (filtra vazios/deletados)
+    get programasCarrossel() {
+      return this.programas.filter(p => p && p.id && p.titulo).slice(0, 6);
+    },
+    
     proximoSlide() {
-      // Usa 6 programas individuais em vez de grupos
-      this.slideAtual = (this.slideAtual + 1) % 6;
+      const total = this.programasCarrossel.length;
+      if (total === 0) return;
+      this.slideAtual = (this.slideAtual + 1) % total;
     },
     
     anteriorSlide() {
-      // Usa 6 programas individuais em vez de grupos
-      this.slideAtual = this.slideAtual === 0 ? 5 : this.slideAtual - 1;
+      const total = this.programasCarrossel.length;
+      if (total === 0) return;
+      this.slideAtual = this.slideAtual === 0 ? total - 1 : this.slideAtual - 1;
     },
     
     iniciarAutoPlay() {
       setInterval(() => {
         this.proximoSlide();
       }, 5000);
+    },
+    
+    // Gerar SVG dinâmico para programação sem imagem
+    gerarSVGProgramacao(programa) {
+      const cor1 = programa.cor1 || '#1A4731';
+      const cor2 = programa.cor2 || '#2D5F4A';
+      const titulo = this.truncarTexto(programa.titulo, 20);
+      const descricao = this.truncarTexto(programa.descricao || '', 36);
+      const dia = programa.dia || '';
+      const mes = (programa.mes || '').toUpperCase().substring(0, 3);
+      const horario = programa.horario || '';
+      const local = this.truncarTexto(programa.local || '', 18);
+      const categoria = (programa.categoria || 'GERAL').toUpperCase();
+      
+      // ID único para evitar conflito de gradientes
+      const uid = Math.random().toString(36).substring(2, 8);
+      
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="g${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${cor1}"/>
+      <stop offset="100%" stop-color="${cor2}"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="500" fill="url(#g${uid})"/>
+  <circle cx="320" cy="80" r="100" fill="rgba(255,255,255,0.06)"/>
+  <circle cx="80" cy="420" r="80" fill="rgba(255,255,255,0.06)"/>
+  <rect x="20" y="20" width="90" height="26" rx="13" fill="rgba(255,255,255,0.25)"/>
+  <text x="65" y="38" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="white" text-anchor="middle">${categoria}</text>
+  <rect x="155" y="100" width="90" height="100" rx="10" fill="white"/>
+  <text x="200" y="155" font-family="Arial,sans-serif" font-size="38" font-weight="bold" fill="${cor1}" text-anchor="middle">${dia}</text>
+  <text x="200" y="182" font-family="Arial,sans-serif" font-size="14" fill="${cor2}" text-anchor="middle">${mes}</text>
+  <text x="200" y="250" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">${titulo}</text>
+  <text x="200" y="290" font-family="Arial,sans-serif" font-size="13" fill="rgba(255,255,255,0.85)" text-anchor="middle">${descricao}</text>
+  <text x="200" y="340" font-family="Arial,sans-serif" font-size="16" fill="rgba(255,255,255,0.9)" text-anchor="middle">${horario}</text>
+  <text x="200" y="375" font-family="Arial,sans-serif" font-size="13" fill="rgba(255,255,255,0.7)" text-anchor="middle">${local}</text>
+  <text x="200" y="470" font-family="Arial,sans-serif" font-size="12" fill="rgba(255,255,255,0.4)" text-anchor="middle">IP Vida</text>
+</svg>`;
+      
+      // Converter para Data URL
+      return 'data:image/svg+xml,' + encodeURIComponent(svg);
+    },
+    
+    truncarTexto(texto, maxLength) {
+      if (!texto) return '';
+      if (texto.length <= maxLength) return texto;
+      return texto.substring(0, maxLength) + '...';
+    },
+    
+    /**
+     * Verifica se o usuário pode ver o conteúdo baseado no nível de acesso
+     */
+    podeVerConteudo(nivelAcesso) {
+      // Se não tem nível de acesso definido, é público
+      if (!nivelAcesso || nivelAcesso.length === 0) return true;
+      if (nivelAcesso.includes('visitante')) return true;
+      
+      // Verificar se há controle de acesso disponível
+      if (window.controleAcesso) {
+        return window.controleAcesso.podeAcessar(nivelAcesso);
+      }
+      
+      // Verificar via localStorage
+      const usuario = localStorage.getItem('ipvida_usuario');
+      if (usuario) {
+        try {
+          const tipoUsuario = JSON.parse(usuario).tipo || 'visitante';
+          if (tipoUsuario === 'administracao') return true;
+          if (nivelAcesso.includes('membro') && ['membro', 'lideranca', 'administracao'].includes(tipoUsuario)) return true;
+          if (nivelAcesso.includes('lideranca') && ['lideranca', 'administracao'].includes(tipoUsuario)) return true;
+        } catch {
+          return false;
+        }
+      }
+      
+      return false;
     }
   };
 }
@@ -545,7 +671,10 @@ function eventosIgreja() {
           });
           
           if (eventos && eventos.length > 0) {
-            this.eventos = eventos.map(e => ({
+            // Filtrar por nível de acesso
+            const eventosFiltrados = eventos.filter(e => this.podeVerConteudo(e.nivel_acesso));
+            
+            this.eventos = eventosFiltrados.map(e => ({
               id: e.id,
               titulo: e.titulo || '',
               descricao: e.descricao || '',
@@ -556,7 +685,7 @@ function eventosIgreja() {
               link: e.link_inscricao || null,
               inscricao_aberta: e.inscricao_aberta || false
             }));
-            console.log(`✅ ${this.eventos.length} eventos carregados do Supabase`);
+            console.log(`✅ ${this.eventos.length} eventos carregados do Supabase (após filtro de acesso)`);
             return;
           }
         }
@@ -582,6 +711,32 @@ function eventosIgreja() {
         month: 'long',
         year: 'numeric'
       });
+    },
+    
+    /**
+     * Verifica se o usuário pode ver o conteúdo baseado no nível de acesso
+     */
+    podeVerConteudo(nivelAcesso) {
+      if (!nivelAcesso || nivelAcesso.length === 0) return true;
+      if (nivelAcesso.includes('visitante')) return true;
+      
+      if (window.controleAcesso) {
+        return window.controleAcesso.podeAcessar(nivelAcesso);
+      }
+      
+      const usuario = localStorage.getItem('ipvida_usuario');
+      if (usuario) {
+        try {
+          const tipoUsuario = JSON.parse(usuario).tipo || 'visitante';
+          if (tipoUsuario === 'administracao') return true;
+          if (nivelAcesso.includes('membro') && ['membro', 'lideranca', 'administracao'].includes(tipoUsuario)) return true;
+          if (nivelAcesso.includes('lideranca') && ['lideranca', 'administracao'].includes(tipoUsuario)) return true;
+        } catch {
+          return false;
+        }
+      }
+      
+      return false;
     }
   };
 }
@@ -737,24 +892,11 @@ function contribuicoesIgreja() {
             console.log('✅ Dados bancários carregados do Supabase');
           }
         } else {
-          // Fallback para JSON
-          const dadosBancarios = await dataManager.carregarDadosBancarios();
-          if (dadosBancarios) {
-            this.dados = dadosBancarios;
-            console.log('✅ Dados bancários carregados do JSON (fallback)');
-          }
+          console.warn('⚠️ Supabase não disponível para dados bancários');
         }
       } catch (erro) {
         console.error('Erro ao carregar dados bancários:', erro);
-        // Fallback para JSON em caso de erro
-        try {
-          const dadosBancarios = await dataManager.carregarDadosBancarios();
-          if (dadosBancarios) {
-            this.dados = dadosBancarios;
-          }
-        } catch (e) {
-          console.error('Erro no fallback:', e);
-        }
+        this.dados = null;
       }
     },
     
@@ -850,26 +992,11 @@ function localizacaoIgreja() {
             console.log('✅ Dados da igreja carregados do Supabase');
           }
         } else {
-          // Fallback para JSON
-          const dadosIgreja = await dataManager.carregarDadosIgreja();
-          if (dadosIgreja) {
-            this.dados = dadosIgreja;
-            window.localizacaoIgrejaData = this.dados;
-            console.log('✅ Dados da igreja carregados do JSON (fallback)');
-          }
+          console.warn('⚠️ Supabase não disponível para dados da igreja');
         }
       } catch (erro) {
         console.error('Erro ao carregar dados da igreja:', erro);
-        // Fallback para JSON em caso de erro
-        try {
-          const dadosIgreja = await dataManager.carregarDadosIgreja();
-          if (dadosIgreja) {
-            this.dados = dadosIgreja;
-            window.localizacaoIgrejaData = this.dados;
-          }
-        } catch (e) {
-          console.error('Erro no fallback:', e);
-        }
+        this.dados = null;
       }
     },
     
@@ -891,6 +1018,96 @@ function localizacaoIgreja() {
     }
   };
 }
+
+// Redes Sociais do Footer (carrega do banco de dados)
+function redesSociaisFooter() {
+  return {
+    redes: [],
+    carregando: true,
+    
+    // Redes padrão caso não exista no banco
+    redesPadrao: [
+      { nome: 'Instagram', url: 'https://instagram.com/ip.vida', icone: 'bi-instagram', ativo: true },
+      { nome: 'YouTube', url: 'https://youtube.com/@ipbvida', icone: 'bi-youtube', ativo: true },
+      { nome: 'Facebook', url: 'https://facebook.com/ipvida', icone: 'bi-facebook', ativo: true },
+      { nome: 'E-mail', url: 'mailto:ipvida.res.cosmos@gmail.com', icone: 'bi-envelope-fill', ativo: true }
+    ],
+    
+    async init() {
+      await this.carregarRedes();
+    },
+    
+    async carregarRedes() {
+      this.carregando = true;
+      try {
+        if (window.supabaseClient && window.supabaseClient.client) {
+          const { data, error } = await window.supabaseClient.client
+            .from('redes_sociais')
+            .select('*')
+            .eq('ativo', true)
+            .order('ordem', { ascending: true });
+          
+          if (error) throw error;
+          
+          if (data && data.length > 0) {
+            // Filtrar por nível de acesso
+            this.redes = data.filter(r => this.podeVerConteudo(r.nivel_acesso));
+            console.log('✅ Redes sociais carregadas do Supabase:', this.redes.length);
+          } else {
+            // Sem dados no banco, usar padrão
+            this.redes = this.redesPadrao;
+            console.log('📋 Usando redes sociais padrão (banco vazio)');
+          }
+        } else {
+          // Sem Supabase, usar padrão
+          this.redes = this.redesPadrao;
+          console.log('📋 Usando redes sociais padrão (sem Supabase)');
+        }
+      } catch (erro) {
+        console.warn('⚠️ Erro ao carregar redes sociais:', erro);
+        this.redes = this.redesPadrao;
+      } finally {
+        this.carregando = false;
+      }
+    },
+    
+    getIcone(rede) {
+      // Garantir que o ícone tenha o prefixo 'bi' se necessário
+      const icone = rede.icone || 'bi-link-45deg';
+      if (icone.startsWith('bi-')) return icone;
+      if (icone.startsWith('bi ')) return icone.replace('bi ', '');
+      return icone;
+    },
+    
+    /**
+     * Verifica se o usuário pode ver o conteúdo baseado no nível de acesso
+     */
+    podeVerConteudo(nivelAcesso) {
+      if (!nivelAcesso || nivelAcesso.length === 0) return true;
+      if (nivelAcesso.includes('visitante')) return true;
+      
+      if (window.controleAcesso) {
+        return window.controleAcesso.podeAcessar(nivelAcesso);
+      }
+      
+      const usuario = localStorage.getItem('ipvida_usuario');
+      if (usuario) {
+        try {
+          const tipoUsuario = JSON.parse(usuario).tipo || 'visitante';
+          if (tipoUsuario === 'administracao') return true;
+          if (nivelAcesso.includes('membro') && ['membro', 'lideranca', 'administracao'].includes(tipoUsuario)) return true;
+          if (nivelAcesso.includes('lideranca') && ['lideranca', 'administracao'].includes(tipoUsuario)) return true;
+        } catch {
+          return false;
+        }
+      }
+      
+      return false;
+    }
+  };
+}
+
+window.redesSociaisFooter = redesSociaisFooter;
 
 // Modal Visitante
 function modalVisitante() {

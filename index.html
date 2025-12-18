@@ -33,7 +33,9 @@
   <link rel="stylesheet" href="css/animacoes.css">
   <link rel="stylesheet" href="css/mobile.css">
   <link rel="stylesheet" href="css/desktop.css">
-  
+  <link rel="stylesheet" href="css/novos-componentes.css">
+  <link rel="stylesheet" href="css/ux-ui-fixes.css">
+  <link rel="stylesheet" href="css/admin.css">
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
   
@@ -47,18 +49,109 @@
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
-  <!-- VLibras -->
-  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <!-- Supressão de erros do VLibras/Unity (DEVE vir antes do VLibras) -->
+  <script>
+    (function() {
+      var _onerror = window.onerror;
+      window.onerror = function(msg, src, line, col, err) {
+        if (msg && (
+          String(msg).toLowerCase().indexOf('unity') !== -1 ||
+          String(msg).toLowerCase().indexOf('script error') !== -1 ||
+          String(msg).toLowerCase().indexOf('vlibras') !== -1 ||
+          (src && String(src).toLowerCase().indexOf('vlibras') !== -1)
+        )) {
+          return true; // Suprime o erro completamente
+        }
+        return _onerror ? _onerror(msg, src, line, col, err) : false;
+      };
+    })();
+  </script>
+  
+  <!-- VLibras - Carrega após a página -->
+  <script>
+    // Carregar VLibras após DOM pronto para evitar conflitos
+    document.addEventListener('DOMContentLoaded', function() {
+      var script = document.createElement('script');
+      script.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+      script.onload = function() {
+        if (window.VLibras && window.VLibras.Widget) {
+          new window.VLibras.Widget('https://vlibras.gov.br/app');
+          console.log('✅ VLibras carregado e inicializado');
+        }
+      };
+      document.head.appendChild(script);
+    });
+  </script>
   
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body x-data="aplicacao()">
   
+  <!-- ==================== SISTEMA DE AVISOS POP-UP ==================== -->
+  <div x-data="sistemaAvisosPopup()" x-cloak>
+    <!-- Modal de Avisos -->
+    <div 
+      x-show="mostrarModal && avisoAtual" 
+      class="aviso-popup-overlay"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+    >
+      <div 
+        class="aviso-popup-modal" 
+        :class="getTipoClasse()"
+        @click.away="fecharAviso()"
+      >
+        <!-- Indicador de múltiplos avisos -->
+        <div x-show="avisos.length > 1" class="aviso-contador">
+          <span x-text="(indiceAtual + 1) + ' de ' + avisos.length"></span>
+        </div>
+        
+        <!-- Cabeçalho -->
+        <div class="aviso-popup-header">
+          <div class="aviso-icone">
+            <i :class="getTipoIcone()"></i>
+          </div>
+          <h3 x-text="avisoAtual?.titulo"></h3>
+          <button @click="fecharAviso()" class="aviso-fechar" aria-label="Fechar">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        
+        <!-- Conteúdo -->
+        <div class="aviso-popup-body">
+          <div x-html="avisoAtual?.conteudo"></div>
+          
+          <!-- Imagem se houver -->
+          <img 
+            x-show="avisoAtual?.imagem_url" 
+            :src="avisoAtual?.imagem_url" 
+            :alt="avisoAtual?.titulo"
+            class="aviso-imagem"
+          >
+        </div>
+        
+        <!-- Rodapé com ações -->
+        <div class="aviso-popup-footer">
+          <button @click="marcarComoLido()" class="botao botao-primario">
+            <i class="bi bi-check2"></i>
+            Entendi, não mostrar novamente
+          </button>
+          <button @click="fecharAviso()" class="botao botao-secundario">
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <!-- ==================== NAVBAR ==================== -->
   <nav class="navbar">
     <div class="navbar-container">
-      <!-- Sistema de Autenticação - PRIMEIRO (esquerda no mobile) -->
+      <!-- LINHA ÚNICA: User | Notificações | Logo | Menu -->
+      
+      <!-- 1. Sistema de Autenticação (esquerda) -->
       <div class="navbar-auth" x-data="authNavbar()">
         <!-- Não logado - Mostrar saudação e botão de login -->
         <div x-show="!estaLogado" class="auth-section">
@@ -128,12 +221,85 @@
         </div>
       </div><!-- navbar-auth !-->
       
-      <!-- Logo - SEGUNDO (centro no mobile) -->
+      <!-- 2. Sistema de Notificações (após user) -->
+      <div class="navbar-notificacoes" x-data="sistemaNotificacoes()">
+        <button 
+          class="notificacao-btn" 
+          @click="dropdownAberto = !dropdownAberto"
+          :class="{'tem-notificacoes': naoLidas > 0}"
+        >
+          <i class="bi bi-bell"></i>
+          <span x-show="naoLidas > 0" class="notificacao-badge" x-text="naoLidas > 99 ? '99+' : naoLidas"></span>
+        </button>
+        
+        <!-- Dropdown de Notificações -->
+        <div 
+          class="notificacao-dropdown" 
+          x-show="dropdownAberto" 
+          @click.away="dropdownAberto = false"
+          x-transition
+        >
+          <div class="notificacao-header">
+            <h4>Notificações</h4>
+            <button x-show="naoLidas > 0" @click="marcarTodasComoLidas()" class="btn-texto">
+              Marcar todas como lidas
+            </button>
+          </div>
+          
+          <div class="notificacao-lista">
+            <template x-if="carregando">
+              <div class="notificacao-loading">
+                <i class="bi bi-arrow-repeat spin"></i>
+                Carregando...
+              </div>
+            </template>
+            
+            <template x-if="!carregando && notificacoes.length === 0">
+              <div class="notificacao-vazia">
+                <i class="bi bi-bell-slash"></i>
+                <p>Nenhuma notificação</p>
+              </div>
+            </template>
+            
+            <template x-for="notif in notificacoes.slice(0, 5)" :key="notif.id">
+              <div 
+                class="notificacao-item" 
+                :class="{'nao-lida': !notif.lida}"
+                @click="abrirNotificacao(notif)"
+              >
+                <div class="notificacao-icone" :class="'tipo-' + notif.tipo">
+                  <i class="material-icons" x-text="obterIcone(notif.tipo)"></i>
+                </div>
+                <div class="notificacao-conteudo">
+                  <strong x-text="notif.titulo"></strong>
+                  <p x-text="notif.mensagem"></p>
+                  <span class="notificacao-tempo" x-text="formatarTempo(notif.created_at)"></span>
+                </div>
+              </div>
+            </template>
+          </div>
+          
+          <div class="notificacao-footer">
+            <a href="pagina/notificacoes.html" class="btn-texto">
+              Ver todas as notificações
+            </a>
+          </div>
+        </div>
+      </div><!-- navbar-notificacoes !-->
+      
+      <!-- 3. Logo (centro) -->
       <div class="navbar-logo">
         <img src="assets/images/logo.svg" alt="Logo IPV">
-        <span class="navbar-logo-texto"></span>
       </div><!-- navbar-logo !-->
       
+      <!-- 4. Menu Hamburger (direita) -->
+      <button class="navbar-toggle" @click="menuAberto = !menuAberto" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button><!-- navbar-toggle !-->
+      
+      <!-- Menu de Navegação (aparece ao clicar no hamburger) -->
       <ul class="navbar-menu" :class="{ 'aberto': menuAberto }">
         <li class="navbar-item"><a href="#inicio" @click="fecharMenu">Início</a></li>
         <li class="navbar-item"><a href="#sobre" @click="fecharMenu">Sobre</a></li>
@@ -150,6 +316,7 @@
             <li><a href="#devocionais" @click="fecharMenu; dropdown = false">Devocionais</a></li>
             <li><a href="#videos" @click="fecharMenu; dropdown = false">Cultos</a></li>
             <li><a href="#programacao" @click="fecharMenu; dropdown = false">Programação</a></li>
+            <li><a href="#catecumenos" @click="fecharMenu; dropdown = false">Catecúmenos</a></li>
             <li><a href="#noticias-ipb" @click="fecharMenu; dropdown = false">Notícias IPB</a></li>
             <li><a href="#cremos" @click="fecharMenu; dropdown = false">O Que Cremos</a></li>
             <li><a href="#" @click.prevent="baixarMidias(); fecharMenu(); dropdown = false">Mídias</a></li>
@@ -161,12 +328,6 @@
         <li class="navbar-item"><a href="#contato" @click="fecharMenu">Contato</a></li>
       </ul><!-- navbar-menu !-->
       
-      <!-- Menu Hamburger - TERCEIRO (direita no mobile) -->
-      <button class="navbar-toggle" @click="menuAberto = !menuAberto" aria-label="Menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button><!-- navbar-toggle !-->
     </div><!-- navbar-container !-->
   </nav><!-- navbar !-->
   
@@ -335,28 +496,57 @@
   
   <!-- ==================== VÍDEOS / CULTOS ==================== -->
   <section id="videos" class="secao">
-    <div class="container" x-data="videosYoutube()">
+    <div class="container" x-data="videosYoutubeMelhorado()">
       <h2 class="secao-titulo">Nossos Cultos</h2>
       <p class="secao-subtitulo">
         Assista aos cultos e estudos bíblicos em nosso canal do YouTube
       </p>
       
-      <!-- Botões de Ação -->
-      <div class="videos-acoes">
-        <button 
-          @click="assistirAoVivo()" 
-          class="botao botao-grande"
-          :class="live && live.aoVivo ? 'botao-live' : 'botao-secundario'"
-        >
-          <span class="material-icons" style="vertical-align: middle;">
-            <span x-text="live && live.aoVivo ? 'sensors' : 'videocam_off'"></span>
-          </span>
-          <span x-text="live && live.aoVivo ? '🔴 AO VIVO AGORA' : 'Nenhuma transmissão ao vivo'"></span>
-        </button>
+      <!-- Controles de Visualização -->
+      <div class="videos-controles">
+        <div class="videos-acoes-esquerda">
+          <button 
+            @click="assistirAoVivo()" 
+            class="botao"
+            :class="live && live.aoVivo ? 'botao-live' : 'botao-secundario'"
+          >
+            <span class="material-icons">
+              <span x-text="live && live.aoVivo ? 'sensors' : 'videocam_off'"></span>
+            </span>
+            <span x-text="live && live.aoVivo ? '🔴 AO VIVO' : 'Sem transmissão'"></span>
+          </button>
+        </div>
         
-        <button @click="inscreverCanal()" class="botao botao-primario botao-grande">
-          <span class="material-icons" style="vertical-align: middle;">notifications_active</span>
-          Inscrever-se no Canal
+        <div class="videos-modos">
+          <button 
+            @click="mudarModo('grid')" 
+            class="modo-btn" 
+            :class="{'ativo': modoVisualizacao === 'grid'}"
+            title="Grade 2x3"
+          >
+            <i class="bi bi-grid-3x2-gap"></i>
+          </button>
+          <button 
+            @click="mudarModo('lista')" 
+            class="modo-btn" 
+            :class="{'ativo': modoVisualizacao === 'lista'}"
+            title="Lista"
+          >
+            <i class="bi bi-list-ul"></i>
+          </button>
+          <button 
+            @click="mudarModo('cheio')" 
+            class="modo-btn" 
+            :class="{'ativo': modoVisualizacao === 'cheio'}"
+            title="Cards grandes"
+          >
+            <i class="bi bi-square"></i>
+          </button>
+        </div>
+        
+        <button @click="inscreverCanal()" class="botao botao-primario">
+          <i class="bi bi-youtube"></i>
+          Inscrever-se
         </button>
       </div>
       
@@ -370,96 +560,211 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;"
+        class="modal-overlay modal-video"
         x-cloak
       >
-        <div 
-          @click.stop
-          style="position: relative; width: 100%; max-width: 1200px; background: #000; border-radius: 8px; overflow: hidden;"
-        >
-          <!-- Botão Fechar -->
-          <button 
-            @click="fecharModalLive()"
-            style="position: absolute; top: 10px; right: 10px; z-index: 10000; background: rgba(0, 0, 0, 0.7); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: background 0.3s;"
-            onmouseover="this.style.background='rgba(255, 0, 0, 0.8)'"
-            onmouseout="this.style.background='rgba(0, 0, 0, 0.7)'"
-            aria-label="Fechar player"
-          >
-            ×
+        <div @click.stop class="modal-video-container">
+          <button @click="fecharModalLive()" class="modal-fechar" aria-label="Fechar">
+            <i class="bi bi-x-lg"></i>
           </button>
           
-          <!-- Player YouTube -->
-          <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+          <div class="video-player-wrapper">
             <iframe 
               :src="live && live.embedUrl ? live.embedUrl : (live && live.videoId ? 'https://www.youtube.com/embed/' + live.videoId + '?autoplay=1' : '')"
-              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
-              frameborder="0"
             ></iframe>
           </div>
           
-          <!-- Informações do Live -->
-          <div style="padding: 20px; background: #1a1a1a; color: white;">
-            <h3 style="margin: 0 0 10px 0; color: #ff0000; display: flex; align-items: center; gap: 10px;">
-              <span class="material-icons" style="animation: pulse 2s infinite;">sensors</span>
+          <div class="modal-video-info">
+            <h3>
+              <span class="live-indicator" x-show="live && live.aoVivo">🔴</span>
               <span x-text="live && live.titulo ? live.titulo : 'Transmissão ao vivo'"></span>
             </h3>
-            <p style="margin: 0; color: #ccc; font-size: 0.9rem;">
-              Transmissão ao vivo do canal @ipbvida
-            </p>
+            <p>Transmissão do canal @ipbvida</p>
           </div>
         </div>
       </div>
       
       <!-- Grade de Vídeos -->
-      <div class="grid grid-3">
-        <!-- Skeleton Loading -->
-        <template x-show="carregando">
-          <template x-for="i in 6" :key="'skeleton-' + i">
-            <div class="card video-card skeleton-card">
-              <div class="skeleton-thumbnail"></div>
-              <div class="card-corpo">
-                <div class="skeleton-line skeleton-line-small"></div>
-                <div class="skeleton-line skeleton-line-medium"></div>
-                <div class="skeleton-line skeleton-line-large"></div>
-                <div class="skeleton-line skeleton-line-medium" style="margin-top: 10px;"></div>
-                <div class="skeleton-button"></div>
+      <div 
+        class="videos-grid"
+        :class="{
+          'modo-grid': modoVisualizacao === 'grid',
+          'modo-lista': modoVisualizacao === 'lista',
+          'modo-cheio': modoVisualizacao === 'cheio'
+        }"
+      >
+        <!-- Skeleton Loading - Grid -->
+        <template x-if="carregando && modoVisualizacao === 'grid'">
+          <div class="skeleton-container-grid">
+            <template x-for="i in 6" :key="'skel-grid-' + i">
+              <div class="video-skeleton video-skeleton-grid">
+                <div class="skeleton-thumb"></div>
+                <div class="skeleton-overlay">
+                  <div class="skeleton-line skeleton-date"></div>
+                  <div class="skeleton-play"></div>
+                  <div class="skeleton-line skeleton-title"></div>
+                </div>
               </div>
-            </div>
+            </template>
+          </div>
+        </template>
+        
+        <!-- Skeleton Loading - Lista -->
+        <template x-if="carregando && modoVisualizacao === 'lista'">
+          <div class="skeleton-container-lista">
+            <template x-for="i in 4" :key="'skel-list-' + i">
+              <div class="video-skeleton video-skeleton-lista">
+                <div class="skeleton-thumb-lista"></div>
+                <div class="skeleton-detalhes">
+                  <div class="skeleton-line skeleton-title-lg"></div>
+                  <div class="skeleton-line skeleton-desc"></div>
+                  <div class="skeleton-line skeleton-desc"></div>
+                  <div class="skeleton-meta">
+                    <div class="skeleton-line skeleton-date-sm"></div>
+                    <div class="skeleton-line skeleton-duration"></div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+        
+        <!-- Skeleton Loading - Cheio -->
+        <template x-if="carregando && modoVisualizacao === 'cheio'">
+          <div class="skeleton-container-cheio">
+            <template x-for="i in 3" :key="'skel-full-' + i">
+              <div class="video-skeleton video-skeleton-cheio">
+                <div class="skeleton-thumb-cheio"></div>
+                <div class="skeleton-overlay-cheio">
+                  <div class="skeleton-line skeleton-date"></div>
+                  <div class="skeleton-play-lg"></div>
+                  <div class="skeleton-line skeleton-title-xl"></div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+        
+        <!-- Vídeos Reais - Grid (4x3 desktop, 2x3 mobile) -->
+        <template x-if="!carregando && modoVisualizacao === 'grid'">
+          <template x-for="video in videosPaginados" :key="'grid-' + video.id">
+            <a :href="video.url" target="_blank" class="video-card video-card-grid">
+                <div class="video-thumb">
+                  <img :src="video.thumbnail" :alt="video.titulo" loading="lazy">
+                  <div class="video-overlay">
+                    <!-- Data: canto SUPERIOR ESQUERDO -->
+                    <span class="video-data" x-text="formatarData(video.data)"></span>
+                    <!-- YouTube: canto SUPERIOR DIREITO -->
+                    <i class="bi bi-youtube video-yt-icon"></i>
+                    <!-- Play: CENTRO -->
+                    <div class="video-play"><i class="bi bi-play-fill"></i></div>
+                    <!-- Título: INFERIOR CENTRO -->
+                    <span class="video-titulo" x-text="video.titulo"></span>
+                    <!-- Duração: canto INFERIOR DIREITO -->
+                    <span class="video-duracao" x-text="video.duracao || '—'"></span>
+                  </div>
+                </div>
+            </a>
           </template>
         </template>
         
-        <!-- Vídeos Reais -->
-        <template x-show="!carregando" x-for="video in videos" :key="video.id">
-          <div class="card hover-lift video-card">
-            <div class="video-thumbnail-container">
-              <img :src="video.thumbnail" :alt="video.titulo" class="card-imagem">
-              <span class="video-duracao" x-show="video.duracao" x-text="video.duracao"></span>
-            </div>
-            <div class="card-corpo">
-              <div class="video-meta" x-show="video.data">
-                <span class="material-icons">event</span>
-                <span x-text="formatarData(video.data)"></span>
-              </div>
-              <h4 class="card-titulo" x-text="video.titulo"></h4>
-              <!-- <p class="card-texto" x-text="video.descricao"></p>-->
-              <a :href="video.url" target="_blank" class="botao botao-primario" style="margin-top: auto;">
-                <span class="material-icons" style="vertical-align: middle;">play_arrow</span> Assistir
-              </a>
-            </div><!-- card-corpo !-->
-          </div><!-- card !-->
+        <!-- Vídeos Reais - Lista -->
+        <template x-if="!carregando && modoVisualizacao === 'lista'">
+          <template x-for="video in videosPaginados" :key="'list-' + video.id">
+            <a :href="video.url" target="_blank" class="video-card video-card-lista">
+                <div class="video-thumb-lista">
+                  <img :src="video.thumbnail" :alt="video.titulo" loading="lazy">
+                  <div class="video-play-sm"><i class="bi bi-play-fill"></i></div>
+                  <span class="video-duracao" x-show="video.duracao" x-text="video.duracao"></span>
+                </div>
+                <div class="video-detalhes">
+                  <h4 class="video-titulo-lista" x-text="video.titulo"></h4>
+                  <p class="video-descricao" x-text="video.descricao || 'Assista a este vídeo no nosso canal do YouTube'"></p>
+                  <div class="video-meta-lista">
+                    <span class="video-data-lista">
+                      <i class="bi bi-calendar3"></i>
+                      <span x-text="formatarData(video.data)"></span>
+                    </span>
+                    <span class="video-canal">
+                      <i class="bi bi-youtube"></i>
+                      @ipbvida
+                    </span>
+                  </div>
+                </div>
+            </a>
+          </template>
         </template>
-      </div><!-- grid !-->
+        
+        <!-- Vídeos Reais - Cheio (Cards Grandes) -->
+        <template x-if="!carregando && modoVisualizacao === 'cheio'">
+          <template x-for="video in videosPaginados" :key="'full-' + video.id">
+            <a :href="video.url" target="_blank" class="video-card video-card-cheio">
+                <div class="video-thumb-cheio">
+                  <img :src="video.thumbnail" :alt="video.titulo" loading="lazy">
+                  <div class="video-overlay-cheio">
+                    <span class="video-data-cheio" x-text="formatarData(video.data)"></span>
+                    <div class="video-play-cheio"><i class="bi bi-play-fill"></i></div>
+                    <div class="video-info-cheio">
+                      <i class="bi bi-youtube video-yt-icon-cheio"></i>
+                      <h3 class="video-titulo-cheio" x-text="video.titulo"></h3>
+                      <p class="video-desc-cheio" x-text="video.descricao || ''"></p>
+                    </div>
+                  </div>
+                  <span class="video-duracao-cheio" x-show="video.duracao" x-text="video.duracao"></span>
+                </div>
+            </a>
+          </template>
+        </template>
+      </div>
+      
+      <!-- Mensagem se não houver vídeos -->
+      <div x-show="!carregando && videos.length === 0" class="videos-vazio">
+        <i class="bi bi-camera-video-off"></i>
+        <p>Nenhum vídeo disponível no momento</p>
+        <button @click="carregarVideos()" class="botao botao-secundario">
+          <i class="bi bi-arrow-clockwise"></i>
+          Tentar novamente
+        </button>
+      </div>
+      
+      <!-- Paginação -->
+      <div x-show="!carregando && totalPaginas > 1" class="videos-paginacao">
+        <button 
+          @click="paginaAnterior()" 
+          :disabled="paginaAtual === 1"
+          class="paginacao-btn"
+        >
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        
+        <template x-for="pagina in totalPaginas" :key="pagina">
+          <button 
+            @click="irParaPagina(pagina)"
+            class="paginacao-btn"
+            :class="{'ativo': paginaAtual === pagina}"
+            x-text="pagina"
+          ></button>
+        </template>
+        
+        <button 
+          @click="proximaPagina()" 
+          :disabled="paginaAtual === totalPaginas"
+          class="paginacao-btn"
+        >
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
       
       <div class="text-center mt-4">
         <a href="https://youtube.com/@ipbvida" target="_blank" class="botao botao-secundario botao-grande">
-          <span class="material-icons" style="vertical-align: middle;">video_library</span>
-          Ver Todos os Vídeos
+          <i class="bi bi-youtube"></i>
+          Ver Todos os Vídeos no YouTube
         </a>
       </div>
-    </div><!-- container !-->
-  </section><!-- videos !-->
+    </div>
+  </section>
   
   <!-- ==================== PROGRAMAÇÃO ==================== -->
   <section id="programacao" class="secao" style="background: var(--branco);">
@@ -472,23 +777,48 @@
       <div class="programacao-grid" x-data="programacaoIgreja()">
         <!-- Coluna 1: Carrossel de Programação -->
         <div class="carrossel-programacao">
-          <div class="carrossel-programacao-slides">
-            <template x-for="(programa, index) in programas.slice(0, 6)" :key="programa.id">
-              <div class="card-programacao-vertical" :class="{ 'ativo': slideAtual === index }">
-                <div class="card-programacao-imagem-full" :style="`background: linear-gradient(135deg, ${programa.cor1}dd, ${programa.cor2}dd);`">
-                  <img :src="programa.imagem" :alt="programa.titulo" class="programacao-icone-grande">
+          <div class="carrossel-programacao-slides" x-show="programasCarrossel.length > 0">
+            <template x-for="(programa, index) in programasCarrossel" :key="programa.id">
+              <div class="card-programacao-vertical" :class="{ 'ativo': slideAtual === index }" @click="mostrarDetalhes(programa)">
+                <div class="card-programacao-imagem-full" :style="`background: linear-gradient(135deg, ${programa.cor1 || '#1A4731'}dd, ${programa.cor2 || '#2D5F4A'}dd);`">
+                  <img :src="programa.imagem" :alt="programa.titulo" class="programacao-icone-grande" onerror="this.style.display='none'">
+                  <!-- Mobile: toque para ver detalhes -->
+                  <div class="programacao-toque-mobile">
+                    <i class="bi bi-hand-index"></i>
+                    <span>Toque para ver detalhes</span>
+                  </div>
+                  <!-- Desktop: clique para ver detalhes -->
+                  <div class="programacao-clique-desktop">
+                    <i class="bi bi-cursor"></i>
+                    <span>Clique para ver detalhes</span>
+                  </div>
+                  <!-- Info overlay (detalhes no card) -->
+                  <div class="programacao-info-overlay">
+                    <span class="programacao-categoria" x-text="programa.categoria"></span>
+                    <h3 class="programacao-titulo-card" x-text="programa.titulo"></h3>
+                    <div class="programacao-data-hora">
+                      <span><i class="bi bi-calendar3"></i> <span x-text="programa.dia + ' ' + programa.mes"></span></span>
+                      <span><i class="bi bi-clock"></i> <span x-text="programa.horario"></span></span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </template>
           </div>
           
+          <!-- Mensagem se não houver programas -->
+          <div x-show="programasCarrossel.length === 0" class="programacao-vazia">
+            <i class="bi bi-calendar-x"></i>
+            <p>Nenhuma programação disponível no momento</p>
+          </div>
+          
           <!-- Controles do Carrossel -->
-          <div class="carrossel-programacao-controles">
+          <div class="carrossel-programacao-controles" x-show="programasCarrossel.length > 1">
             <button @click="anteriorSlide()" class="carrossel-seta-prog">
               <span class="material-icons">chevron_left</span>
             </button>
             <div class="carrossel-programacao-indicadores">
-              <template x-for="(programa, index) in programas.slice(0, 6)" :key="index">
+              <template x-for="(programa, index) in programasCarrossel" :key="'ind-' + programa.id">
                 <button 
                   @click="slideAtual = index" 
                   class="indicador-prog"
@@ -500,6 +830,46 @@
             <button @click="proximoSlide()" class="carrossel-seta-prog">
               <span class="material-icons">chevron_right</span>
             </button>
+          </div>
+        </div>
+        
+        <!-- Modal de Detalhes da Programação -->
+        <div x-show="programaSelecionado" class="modal-overlay" @click.self="fecharDetalhes()" x-cloak>
+          <div class="modal-programacao" @click.stop>
+            <button @click="fecharDetalhes()" class="modal-fechar">
+              <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="modal-programacao-conteudo" x-show="programaSelecionado">
+              <div class="modal-programacao-header" :style="`background: linear-gradient(135deg, ${programaSelecionado?.cor1 || '#1A4731'}, ${programaSelecionado?.cor2 || '#2D5F4A'})`">
+                <span class="modal-categoria" x-text="programaSelecionado?.categoria"></span>
+                <h2 x-text="programaSelecionado?.titulo"></h2>
+              </div>
+              <div class="modal-programacao-body">
+                <!-- Grid: Data, Horário, Local em linha -->
+                <div class="modal-info-grid">
+                  <div class="modal-info-item">
+                    <i class="bi bi-calendar-event"></i>
+                    <strong>Data</strong>
+                    <span x-text="(programaSelecionado?.dia || '') + ' ' + (programaSelecionado?.mes || '')"></span>
+                  </div>
+                  <div class="modal-info-item">
+                    <i class="bi bi-clock"></i>
+                    <strong>Horário</strong>
+                    <span x-text="programaSelecionado?.horario || 'A definir'"></span>
+                  </div>
+                  <div class="modal-info-item">
+                    <i class="bi bi-geo-alt"></i>
+                    <strong>Local</strong>
+                    <span x-text="programaSelecionado?.local || 'Igreja'"></span>
+                  </div>
+                </div>
+                <!-- Descrição -->
+                <div class="modal-descricao" x-show="programaSelecionado?.descricao">
+                  <strong>Descrição</strong>
+                  <p x-text="programaSelecionado?.descricao"></p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -925,6 +1295,312 @@
     </div><!-- container !-->
   </section><!-- localizacao !-->
   
+  <!-- ==================== CATECÚMENOS ==================== -->
+  <section id="catecumenos" class="secao secao-catecumenos" style="background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde-medio) 100%);">
+    <div class="container">
+      <h2 class="secao-titulo" style="color: var(--branco);">Classe de Catecúmenos</h2>
+      <p class="secao-subtitulo" style="color: rgba(255,255,255,0.9);">
+        Deseja conhecer mais sobre a fé cristã reformada? Escolha uma turma e inscreva-se!
+      </p>
+      
+      <div class="catecumenos-sistema" x-data="inscricaoCatecumeno()">
+        
+        <!-- ========== TELA 1: CARDS DE TURMAS ========== -->
+        <div x-show="tela === 'turmas'" x-transition>
+          
+          <!-- Loading -->
+          <div x-show="carregandoTurmas" class="turmas-loading">
+            <div class="loading-spinner"></div>
+            <p>Carregando turmas disponíveis...</p>
+          </div>
+          
+          <!-- Nenhuma turma -->
+          <div x-show="!carregandoTurmas && turmas.length === 0" class="turmas-vazio">
+            <i class="bi bi-calendar-x" style="font-size: 4rem; opacity: 0.5;"></i>
+            <h3>Nenhuma turma disponível</h3>
+            <p>No momento não há turmas de catecúmenos abertas. Volte em breve!</p>
+          </div>
+          
+          <!-- Grid de Turmas -->
+          <div x-show="!carregandoTurmas && turmas.length > 0" class="turmas-grid">
+            <template x-for="turma in turmas" :key="turma.id">
+              <div class="turma-card" :class="{'turma-lotada': turma.vagas_disponiveis <= 0}">
+                
+                <!-- Header do Card -->
+                <div class="turma-card-header">
+                  <div class="turma-status" :class="'status-' + getStatusTurma(turma)">
+                    <span x-text="getStatusTextoTurma(turma)"></span>
+                  </div>
+                  <div class="turma-vagas">
+                    <span class="vagas-numero" x-text="turma.inscritos"></span>
+                    <span class="vagas-total">/ <span x-text="turma.vagas"></span></span>
+                    <span class="vagas-texto">inscritos</span>
+                  </div>
+                </div>
+                
+                <!-- Corpo do Card -->
+                <div class="turma-card-body">
+                  <h3 class="turma-nome" x-text="turma.nome"></h3>
+                  <p class="turma-descricao" x-text="turma.descricao || 'Classe de formação para novos membros'"></p>
+                  
+                  <div class="turma-detalhes">
+                    <div class="turma-detalhe">
+                      <i class="bi bi-calendar3"></i>
+                      <span>Início: <strong x-text="formatarData(turma.data_inicio)"></strong></span>
+                    </div>
+                    <div class="turma-detalhe" x-show="turma.dia_semana">
+                      <i class="bi bi-clock"></i>
+                      <span x-text="formatarDiaSemana(turma.dia_semana) + (turma.horario ? ', ' + turma.horario : '')"></span>
+                    </div>
+                    <div class="turma-detalhe" x-show="turma.local">
+                      <i class="bi bi-geo-alt"></i>
+                      <span x-text="turma.local"></span>
+                    </div>
+                    <div class="turma-detalhe" x-show="turma.instrutor">
+                      <i class="bi bi-person-badge"></i>
+                      <span x-text="turma.instrutor"></span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Footer do Card -->
+                <div class="turma-card-footer">
+                  
+                  <!-- Mensagem de disponibilidade (quando inscrito mas não é o horário) -->
+                  <div 
+                    x-show="estaInscritoNaTurma(turma.id) && !podeAcessarSala(turma)" 
+                    class="turma-aviso-horario"
+                    x-transition
+                  >
+                    <i class="bi bi-info-circle"></i>
+                    <span x-text="getMensagemDisponibilidade(turma)"></span>
+                  </div>
+                  
+                  <div class="turma-acoes">
+                    <!-- Botão Principal Inteligente -->
+                    <button 
+                      @click="acaoPrincipal(turma)" 
+                      class="botao botao-turma"
+                      :class="{
+                        'botao-primario': usuarioLogado() && estaInscritoNaTurma(turma.id) && podeAcessarSala(turma),
+                        'botao-secundario': !usuarioLogado() || (estaInscritoNaTurma(turma.id) && !podeAcessarSala(turma)),
+                        'botao-desabilitado': botaoDesabilitado(turma)
+                      }"
+                      :disabled="botaoDesabilitado(turma)"
+                    >
+                      <i class="bi" :class="'bi-' + getIconeBotao(turma)"></i>
+                      <span x-text="getTextoBotao(turma)"></span>
+                    </button>
+                    
+                    <!-- Botão WhatsApp (se inscrito e tem link) -->
+                    <template x-if="estaInscritoNaTurma(turma.id) && turma.link_whatsapp">
+                      <button 
+                        @click="entrarGrupoWhatsApp(turma)" 
+                        class="botao botao-whatsapp-turma"
+                        title="Entrar no grupo do WhatsApp da turma"
+                      >
+                        <i class="bi bi-whatsapp"></i>
+                        <span>Grupo WhatsApp</span>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+        
+        <!-- ========== TELA 2: FORMULÁRIO ========== -->
+        <div x-show="tela === 'formulario'" x-transition class="catecumenos-formulario-wrapper">
+          
+          <!-- Botão Voltar -->
+          <button @click="voltarParaTurmas()" class="btn-voltar-turmas">
+            <i class="bi bi-arrow-left"></i> Voltar às turmas
+          </button>
+          
+          <!-- Turma Selecionada -->
+          <div class="turma-selecionada-info" x-show="turmaSelecionada">
+            <i class="bi bi-bookmark-check-fill"></i>
+            <div>
+              <small>Inscrevendo-se em:</small>
+              <strong x-text="turmaSelecionada?.nome"></strong>
+            </div>
+          </div>
+          
+          <div class="catecumenos-card">
+            <!-- Indicador de Progresso -->
+            <div class="progresso-etapas">
+              <div class="progresso-barra">
+                <div class="progresso-preenchido" :style="'width: ' + getProgressoPercentual() + '%'"></div>
+              </div>
+              <div class="progresso-etapas-num">
+                <span :class="{'ativo': etapaAtual >= 1}">1</span>
+                <span :class="{'ativo': etapaAtual >= 2}">2</span>
+                <span :class="{'ativo': etapaAtual >= 3}">3</span>
+              </div>
+            </div>
+            
+            <!-- Etapa 1: Dados Pessoais -->
+            <div x-show="etapaAtual === 1" x-transition>
+              <h3 class="etapa-titulo"><i class="bi bi-person"></i> Dados Pessoais</h3>
+              
+              <div class="form-grid">
+                <div class="formulario-grupo">
+                  <label class="formulario-label">Nome Completo *</label>
+                  <input type="text" class="formulario-input" x-model="formulario.nome"
+                    :class="{'erro': erros.nome}" placeholder="Seu nome completo">
+                  <span class="erro-msg" x-show="erros.nome" x-text="erros.nome"></span>
+                </div>
+                
+                <div class="formulario-grupo">
+                  <label class="formulario-label">Telefone *</label>
+                  <input type="tel" class="formulario-input" x-model="formulario.telefone"
+                    @input="formatarTelefone($event)" :class="{'erro': erros.telefone}" placeholder="(00) 00000-0000">
+                  <span class="erro-msg" x-show="erros.telefone" x-text="erros.telefone"></span>
+                </div>
+                
+                <div class="formulario-grupo">
+                  <label class="formulario-label">E-mail</label>
+                  <input type="email" class="formulario-input" x-model="formulario.email"
+                    :class="{'erro': erros.email}" placeholder="seu@email.com">
+                  <span class="erro-msg" x-show="erros.email" x-text="erros.email"></span>
+                </div>
+                
+                <div class="formulario-grupo">
+                  <label class="formulario-label">Data de Nascimento</label>
+                  <input type="date" class="formulario-input" x-model="formulario.data_nascimento">
+                </div>
+                
+                <div class="formulario-grupo full-width">
+                  <label class="formulario-label">Endereço</label>
+                  <input type="text" class="formulario-input" x-model="formulario.endereco" placeholder="Rua, número, bairro">
+                </div>
+              </div>
+              
+              <div class="etapa-acoes">
+                <div></div>
+                <button type="button" @click="proximaEtapa()" class="botao botao-primario">
+                  Próximo <i class="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Etapa 2: Informações Complementares -->
+            <div x-show="etapaAtual === 2" x-transition>
+              <h3 class="etapa-titulo"><i class="bi bi-info-circle"></i> Sobre Você</h3>
+              
+              <div class="form-grid">
+                <div class="formulario-grupo">
+                  <label class="formulario-label">Estado Civil</label>
+                  <select class="formulario-input" x-model="formulario.estado_civil">
+                    <option value="">Selecione...</option>
+                    <option value="solteiro">Solteiro(a)</option>
+                    <option value="casado">Casado(a)</option>
+                    <option value="divorciado">Divorciado(a)</option>
+                    <option value="viuvo">Viúvo(a)</option>
+                  </select>
+                </div>
+                
+                <div class="formulario-grupo">
+                  <label class="formulario-label">Profissão</label>
+                  <input type="text" class="formulario-input" x-model="formulario.profissao" placeholder="Sua profissão">
+                </div>
+                
+                <div class="formulario-grupo full-width">
+                  <label class="formulario-label">Como conheceu a IP Vida?</label>
+                  <input type="text" class="formulario-input" x-model="formulario.como_conheceu" placeholder="Internet, indicação de amigo, etc.">
+                </div>
+                
+                <div class="formulario-grupo full-width">
+                  <label class="checkbox-label">
+                    <input type="checkbox" x-model="formulario.ja_batizado">
+                    <span>Já fui batizado(a) em outra igreja</span>
+                  </label>
+                </div>
+                
+                <div class="formulario-grupo full-width" x-show="formulario.ja_batizado">
+                  <label class="formulario-label">Em qual igreja?</label>
+                  <input type="text" class="formulario-input" x-model="formulario.igreja_anterior" placeholder="Nome da igreja">
+                </div>
+                
+                <div class="formulario-grupo full-width">
+                  <label class="formulario-label">O que te motiva a fazer parte desta classe? *</label>
+                  <textarea class="formulario-input" x-model="formulario.motivacao" :class="{'erro': erros.motivacao}"
+                    rows="3" placeholder="Conte-nos um pouco sobre sua motivação..."></textarea>
+                  <span class="erro-msg" x-show="erros.motivacao" x-text="erros.motivacao"></span>
+                </div>
+              </div>
+              
+              <div class="etapa-acoes">
+                <button type="button" @click="etapaAnterior()" class="botao botao-secundario">
+                  <i class="bi bi-arrow-left"></i> Voltar
+                </button>
+                <button type="button" @click="proximaEtapa()" class="botao botao-primario">
+                  Próximo <i class="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Etapa 3: Confirmação -->
+            <div x-show="etapaAtual === 3" x-transition>
+              <h3 class="etapa-titulo"><i class="bi bi-check-circle"></i> Confirmação</h3>
+              
+              <div class="formulario-grupo">
+                <label class="formulario-label">Disponibilidade de horário</label>
+                <textarea class="formulario-input" x-model="formulario.disponibilidade" rows="2"
+                  placeholder="Quais dias e horários você tem disponibilidade?"></textarea>
+              </div>
+              
+              <div class="formulario-grupo">
+                <label class="checkbox-label termos">
+                  <input type="checkbox" x-model="formulario.aceita_termos">
+                  <span>Li e concordo com os termos de participação da classe de catecúmenos</span>
+                </label>
+                <span class="erro-msg" x-show="erros.aceita_termos" x-text="erros.aceita_termos"></span>
+              </div>
+              
+              <div x-show="erro" class="alerta alerta-erro">
+                <i class="bi bi-exclamation-circle"></i>
+                <span x-text="erro"></span>
+              </div>
+              
+              <div class="etapa-acoes">
+                <button type="button" @click="etapaAnterior()" class="botao botao-secundario">
+                  <i class="bi bi-arrow-left"></i> Voltar
+                </button>
+                <button type="button" @click="enviarInscricao()" class="botao botao-primario" :disabled="carregando">
+                  <template x-if="carregando">
+                    <span><i class="bi bi-arrow-repeat spin"></i> Enviando...</span>
+                  </template>
+                  <template x-if="!carregando">
+                    <span><i class="bi bi-check2"></i> Enviar Inscrição</span>
+                  </template>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ========== TELA 3: SUCESSO ========== -->
+        <div x-show="tela === 'sucesso'" x-transition class="catecumenos-sucesso">
+          <div class="sucesso-icone">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <h3>Inscrição Enviada!</h3>
+          <p>
+            Obrigado pelo seu interesse! Sua inscrição para a turma 
+            <strong x-text="turmaSelecionada?.nome || 'selecionada'"></strong> foi recebida com sucesso. 
+            Em breve entraremos em contato pelo telefone informado.
+          </p>
+          <button @click="reiniciar()" class="botao botao-secundario">
+            <i class="bi bi-arrow-counterclockwise"></i> Ver Outras Turmas
+          </button>
+        </div>
+        
+      </div>
+    </div>
+  </section><!-- catecumenos !-->
+  
   <!-- ==================== CONTATO ==================== -->
   <section id="contato" class="secao">
     <div class="container">
@@ -1023,21 +1699,31 @@
           </ul>
         </div><!-- footer-secao !-->
         
-        <div class="footer-secao">
+        <div class="footer-secao" x-data="redesSociaisFooter()">
           <h4>Redes Sociais</h4>
           <div class="footer-redes-sociais">
-            <a href="https://instagram.com/ip.vida" target="_blank" class="footer-rede-social" aria-label="Instagram">
-              <i class="bi bi-instagram"></i>
-            </a>
-            <a href="https://youtube.com/@ipbvida" target="_blank" class="footer-rede-social" aria-label="YouTube">
-              <i class="bi bi-youtube"></i>
-            </a>
-            <a href="https://facebook.com/ipvida" target="_blank" class="footer-rede-social" aria-label="Facebook">
-              <i class="bi bi-facebook"></i>
-            </a>
-            <a href="mailto:ipvida.res.cosmos@gmail.com" class="footer-rede-social" aria-label="E-mail">
-              <i class="bi bi-envelope-fill"></i>
-            </a>
+            <!-- Skeleton loading -->
+            <template x-if="carregando">
+              <div class="redes-loading">
+                <span class="skeleton" style="width:40px;height:40px;border-radius:50%;"></span>
+                <span class="skeleton" style="width:40px;height:40px;border-radius:50%;"></span>
+                <span class="skeleton" style="width:40px;height:40px;border-radius:50%;"></span>
+              </div>
+            </template>
+            <!-- Redes sociais dinâmicas do banco de dados -->
+            <template x-if="!carregando">
+              <template x-for="rede in redes" :key="rede.id || rede.nome">
+                <a 
+                  :href="rede.url" 
+                  target="_blank" 
+                  class="footer-rede-social" 
+                  :aria-label="rede.nome"
+                  :title="rede.nome"
+                >
+                  <i :class="'bi ' + getIcone(rede)"></i>
+                </a>
+              </template>
+            </template>
           </div><!-- footer-redes-sociais !-->
         </div><!-- footer-secao !-->
       </div><!-- footer-content !-->
@@ -1187,10 +1873,19 @@
   <script src="js/config.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/controle-acesso.js"></script>
   <script src="js/data-manager.js"></script>
   <script src="js/aplicacao.js"></script>
   <script src="js/api-integracao.js"></script>
   <script src="js/youtube-sync.js"></script>
+  <script src="js/videos-melhorado.js"></script>
+  <script src="js/notificacoes.js"></script>
+  <script src="js/avisos-popup.js"></script>
+  <script src="js/devocionais.js"></script>
+  <script src="js/catecumenos.js"></script>
+  <script src="js/grupos-estudo.js"></script>
+  <script src="js/upload-imagens.js"></script>
+  <script src="js/email-notificacoes.js"></script>
   <script src="js/interface.js"></script>
   <script src="js/acessibilidade.js"></script>
   
@@ -1221,51 +1916,7 @@
     });
   </script>
   
-  <!-- VLibras Init -->
-  <script>
-    // Inicializar VLibras com tratamento de erros
-    (function() {
-      try {
-        // Aguardar o VLibras carregar completamente
-        if (typeof window.VLibras !== 'undefined' && window.VLibras.Widget) {
-          const vlibrasWidget = new window.VLibras.Widget('https://vlibras.gov.br/app');
-          
-          // Tratar erros do Unity (usado pelo VLibras)
-          window.addEventListener('error', function(event) {
-            // Ignorar erros do Unity/VLibras ao fechar
-            if (event.message && (
-              event.message.includes('Unity') || 
-              event.message.includes('Script error') ||
-              event.message.includes('vlibras')
-            )) {
-              event.preventDefault();
-              event.stopPropagation();
-              console.log('ℹ️ Erro do VLibras ignorado (normal ao fechar o widget)');
-              return false;
-            }
-          }, true);
-          
-          // Tratar erros não capturados
-          window.addEventListener('unhandledrejection', function(event) {
-            if (event.reason && (
-              event.reason.toString().includes('Unity') ||
-              event.reason.toString().includes('Script error')
-            )) {
-              event.preventDefault();
-              console.log('ℹ️ Promise rejeitada do VLibras ignorada');
-            }
-          });
-          
-          console.log('✅ VLibras inicializado com sucesso');
-        } else {
-          console.warn('⚠️ VLibras não está disponível');
-        }
-      } catch (erro) {
-        // Ignorar erros do VLibras/Unity silenciosamente
-        console.log('ℹ️ Erro ao inicializar VLibras (pode ser normal):', erro.message);
-      }
-    })();
-  </script>
+  <!-- VLibras já inicializado no head -->
   
   <!-- PWA Install -->
   <script>

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Notificações - Igreja Presbiteriana Vida">
+  <title>Notificações | IPV - Igreja Presbiteriana Vida</title>
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" href="../assets/icons/ipvida.png">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/globais.css">
+  <link rel="stylesheet" href="../css/componentes.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+  <link rel="stylesheet" href="../css/desktop.css">
+  <link rel="stylesheet" href="../css/novos-componentes.css">
+  <link rel="stylesheet" href="../css/ux-ui-fixes.css">
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    .notificacoes-page-content {
+      min-height: calc(100vh - 200px);
+      background: var(--cinza-muito-claro);
+      padding-top: 100px;
+      padding-bottom: var(--espacamento-xxl);
+    }
+    
+    .notificacoes-page-header {
+      background: linear-gradient(135deg, var(--verde-escuro), var(--verde-medio));
+      color: var(--branco);
+      padding: var(--espacamento-xl) var(--espacamento-md);
+      text-align: center;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: var(--espacamento-xl);
+    }
+    
+    .notificacoes-page-header h1 {
+      margin: 0;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--espacamento-sm);
+    }
+    
+    .notificacoes-page-header p {
+      margin: var(--espacamento-sm) 0 0;
+      opacity: 0.9;
+    }
+    
+    .notificacoes-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 var(--espacamento-lg);
+    }
+    
+    .notificacoes-filtros {
+      display: flex;
+      gap: var(--espacamento-sm);
+      margin-bottom: var(--espacamento-lg);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .filtro-btn {
+      padding: var(--espacamento-sm) var(--espacamento-md);
+      border: 2px solid var(--cinza-leve);
+      border-radius: 25px;
+      background: var(--branco);
+      color: var(--cinza-escuro);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .filtro-btn:hover {
+      border-color: var(--verde-medio);
+      transform: translateY(-2px);
+    }
+    
+    .filtro-btn:active {
+      transform: translateY(0);
+    }
+    
+    .filtro-btn.ativo {
+      background: var(--verde-medio);
+      border-color: var(--verde-medio);
+      color: var(--branco);
+    }
+    
+    .marcar-lidas-btn {
+      margin-left: auto;
+      background: var(--verde-escuro) !important;
+      color: var(--branco) !important;
+      border-color: var(--verde-escuro) !important;
+    }
+    
+    .notificacoes-lista {
+      display: flex;
+      flex-direction: column;
+      gap: var(--espacamento-md);
+    }
+    
+    .notificacao-card {
+      display: flex;
+      gap: var(--espacamento-md);
+      padding: var(--espacamento-lg);
+      background: var(--branco);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    
+    .notificacao-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+      border-color: var(--verde-claro);
+    }
+    
+    .notificacao-card:active {
+      transform: translateY(0);
+    }
+    
+    .notificacao-card.nao-lida {
+      border-left: 4px solid var(--verde-medio);
+      background: linear-gradient(90deg, rgba(76, 175, 80, 0.05) 0%, var(--branco) 100%);
+    }
+    
+    .notificacao-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .notificacao-icon.video { background: linear-gradient(135deg, #ffebee, #ffcdd2); color: #c62828; }
+    .notificacao-icon.programacao { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1565c0; }
+    .notificacao-icon.aviso { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #ef6c00; }
+    .notificacao-icon.grupo { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+    .notificacao-icon.catecumeno { background: linear-gradient(135deg, #f3e5f5, #e1bee7); color: #7b1fa2; }
+    .notificacao-icon.sistema { background: linear-gradient(135deg, #eceff1, #cfd8dc); color: #607d8b; }
+    .notificacao-icon.devocional { background: linear-gradient(135deg, #e8eaf6, #c5cae9); color: #3949ab; }
+    
+    .notificacao-icon i {
+      font-size: 1.5rem;
+    }
+    
+    .notificacao-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .notificacao-titulo {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--cinza-escuro);
+      margin-bottom: 6px;
+    }
+    
+    .notificacao-mensagem {
+      color: var(--cinza-medio);
+      font-size: 0.95rem;
+      margin-bottom: var(--espacamento-sm);
+      line-height: 1.6;
+    }
+    
+    .notificacao-meta {
+      display: flex;
+      gap: var(--espacamento-md);
+      font-size: 0.85rem;
+      color: var(--cinza-claro);
+    }
+    
+    .notificacao-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .nova-badge {
+      background: var(--verde-medio);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    
+    .notificacoes-vazio {
+      text-align: center;
+      padding: var(--espacamento-xxl);
+      color: var(--cinza-medio);
+    }
+    
+    .notificacoes-vazio i {
+      font-size: 5rem;
+      margin-bottom: var(--espacamento-md);
+      opacity: 0.3;
+      color: var(--verde-medio);
+    }
+    
+    .notificacoes-vazio h3 {
+      margin: 0 0 var(--espacamento-sm);
+      color: var(--cinza-escuro);
+    }
+    
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .notificacoes-page-content {
+        padding-top: 80px;
+      }
+      
+      .notificacoes-page-header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .notificacoes-container {
+        padding: 0 var(--espacamento-md);
+      }
+      
+      .notificacao-card {
+        padding: var(--espacamento-md);
+      }
+      
+      .notificacao-icon {
+        width: 48px;
+        height: 48px;
+      }
+      
+      .notificacao-titulo {
+        font-size: 1rem;
+      }
+      
+      .filtro-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+      }
+      
+      .marcar-lidas-btn {
+        margin-left: 0;
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body x-data="{ menuAberto: false }">
+  
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <!-- 1. Sistema de Autenticação -->
+      <div class="navbar-auth" x-data="authNavbar()">
+        <div x-show="!estaLogado" class="auth-section">
+          <span class="user-greeting">Olá visitante!</span>
+          <button type="button" @click="irParaLogin()" class="login-button">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>Entrar</span>
+          </button>
+        </div>
+        
+        <div x-show="estaLogado" class="user-dropdown" @click.away="fecharDropdown()">
+          <button class="user-button" @click="toggleDropdown()">
+            <img 
+              :src="usuario?.avatar || `https://ui-avatars.com/api/?name=${usuario?.nome}&background=1A4731&color=fff&size=128`" 
+              :alt="usuario?.nome" 
+              class="user-avatar"
+            >
+            <span class="user-name" x-text="saudacao"></span>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+          
+          <div class="dropdown-content" :class="{ 'show': dropdownAberto }">
+            <a href="perfil.html">
+              <i class="bi bi-person-circle"></i>
+              Meu Perfil
+            </a>
+            <div x-show="usuario?.tipo === 'administracao'">
+              <a href="../admin.html">
+                <i class="bi bi-gear"></i>
+                Painel Administrativo
+              </a>
+            </div>
+            <a href="#" @click.prevent="logout()" class="logout">
+              <i class="bi bi-box-arrow-right"></i>
+              Sair
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 2. Sistema de Notificações -->
+      <div class="navbar-notificacoes" x-data="{ naoLidas: 0 }">
+        <a href="notificacoes.html" class="notificacao-btn" :class="{'tem-notificacoes': naoLidas > 0}">
+          <i class="bi bi-bell"></i>
+          <span x-show="naoLidas > 0" class="notificacao-badge" x-text="naoLidas > 9 ? '9+' : naoLidas"></span>
+        </a>
+      </div>
+      
+      <!-- 3. Logo -->
+      <div class="navbar-logo">
+        <a href="../index.html"><img src="../assets/images/logo-ipvida.svg" alt="Logo IPVida"></a>
+      </div>
+      
+      <!-- 4. Menu Toggle -->
+      <button class="navbar-toggle" @click="menuAberto = !menuAberto" aria-label="Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+      
+      <!-- 5. Menu -->
+      <ul class="navbar-menu" :class="{ 'aberto': menuAberto }">
+        <li class="navbar-item"><a href="../index.html">Início</a></li>
+        <li class="navbar-item"><a href="../index.html#sobre">Sobre</a></li>
+        <li class="navbar-item"><a href="../index.html#videos">Vídeos</a></li>
+        <li class="navbar-item"><a href="../index.html#programacao">Programação</a></li>
+        <li class="navbar-item"><a href="../index.html#localizacao">Localização</a></li>
+        <li class="navbar-item"><a href="../index.html#contato">Contato</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <!-- ==================== CONTEÚDO ==================== -->
+  <main class="notificacoes-page-content" x-data="paginaNotificacoes()">
+    
+    <!-- Header da Página -->
+    <header class="notificacoes-page-header">
+      <div class="container">
+        <h1><i class="bi bi-bell"></i> Notificações</h1>
+        <p x-text="naoLidas > 0 ? `Você tem ${naoLidas} notificação(ões) não lida(s)` : 'Todas as notificações estão lidas'"></p>
+      </div>
+    </header>
+    
+    <!-- Container Principal -->
+    <div class="notificacoes-container">
+      
+      <!-- Filtros -->
+      <div class="notificacoes-filtros">
+        <button 
+          class="filtro-btn" 
+          :class="{'ativo': filtro === 'todas'}"
+          @click="filtro = 'todas'"
+        >
+          <i class="bi bi-list"></i> Todas
+        </button>
+        <button 
+          class="filtro-btn" 
+          :class="{'ativo': filtro === 'nao-lidas'}"
+          @click="filtro = 'nao-lidas'"
+        >
+          <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i>
+          Não lidas
+          <span x-show="naoLidas > 0" x-text="'(' + naoLidas + ')'"></span>
+        </button>
+        <button 
+          class="filtro-btn" 
+          :class="{'ativo': filtro === 'video'}"
+          @click="filtro = 'video'"
+        >
+          <i class="bi bi-play-circle"></i> Vídeos
+        </button>
+        <button 
+          class="filtro-btn" 
+          :class="{'ativo': filtro === 'programacao'}"
+          @click="filtro = 'programacao'"
+        >
+          <i class="bi bi-calendar"></i> Programação
+        </button>
+        <button 
+          class="filtro-btn" 
+          :class="{'ativo': filtro === 'aviso'}"
+          @click="filtro = 'aviso'"
+        >
+          <i class="bi bi-megaphone"></i> Avisos
+        </button>
+        
+        <!-- Marcar todas como lidas -->
+        <button 
+          x-show="naoLidas > 0"
+          @click="marcarTodasComoLidas()"
+          class="filtro-btn marcar-lidas-btn"
+        >
+          <i class="bi bi-check-all"></i> Marcar todas como lidas
+        </button>
+      </div>
+      
+      <!-- Loading -->
+      <div x-show="carregando" class="notificacoes-vazio">
+        <i class="bi bi-arrow-repeat spin"></i>
+        <p>Carregando notificações...</p>
+      </div>
+      
+      <!-- Lista vazia -->
+      <div x-show="!carregando && notificacoesFiltradas.length === 0" class="notificacoes-vazio">
+        <i class="bi bi-bell-slash"></i>
+        <h3>Nenhuma notificação</h3>
+        <p>Você está em dia! Novas notificações aparecerão aqui.</p>
+      </div>
+      
+      <!-- Lista de notificações -->
+      <div class="notificacoes-lista" x-show="!carregando && notificacoesFiltradas.length > 0">
+        <template x-for="notif in notificacoesFiltradas" :key="notif.id">
+          <div 
+            class="notificacao-card" 
+            :class="{'nao-lida': !notif.lida}"
+            @click="abrirNotificacao(notif)"
+          >
+            <div class="notificacao-icon" :class="notif.tipo || 'sistema'">
+              <i :class="getIcone(notif.tipo)"></i>
+            </div>
+            <div class="notificacao-content">
+              <div class="notificacao-titulo" x-text="notif.titulo"></div>
+              <div class="notificacao-mensagem" x-text="notif.mensagem"></div>
+              <div class="notificacao-meta">
+                <span>
+                  <i class="bi bi-clock"></i>
+                  <span x-text="formatarData(notif.created_at)"></span>
+                </span>
+                <span x-show="!notif.lida" class="nova-badge">Nova</span>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+      
+    </div>
+  </main>
+  
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-secao">
+          <img src="../assets/images/logo-branco.svg" alt="Logo IPV" style="height: 60px; margin-bottom: var(--espacamento-md);">
+          <p style="color: var(--cinza-leve); line-height: 1.8;">
+            Igreja Presbiteriana Vida<br>
+            Uma comunidade reformada<br>
+            comprometida com Cristo e Sua Palavra
+          </p>
+        </div>
+        
+        <div class="footer-secao">
+          <h4>Links Rápidos</h4>
+          <ul class="footer-links">
+            <li><a href="../index.html">Início</a></li>
+            <li><a href="../index.html#sobre">Sobre Nós</a></li>
+            <li><a href="../index.html#programacao">Programação</a></li>
+            <li><a href="confissao-fe.html">Confissão de Fé</a></li>
+            <li><a href="../index.html#contribuicoes">Contribuir</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-secao">
+          <h4>Cultos</h4>
+          <ul class="footer-links">
+            <li>Sexta-feira: 20h</li>
+            <li>Domingo: 10h</li>
+            <li><a href="tel:+5519995161006">(19) 99516-1006</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-secao">
+          <h4>Redes Sociais</h4>
+          <div class="footer-redes-sociais">
+            <a href="https://youtube.com/@ipbvida" target="_blank" class="footer-rede-social" title="YouTube">
+              <i class="bi bi-youtube"></i>
+            </a>
+            <a href="https://instagram.com/ipvida" target="_blank" class="footer-rede-social" title="Instagram">
+              <i class="bi bi-instagram"></i>
+            </a>
+            <a href="https://facebook.com/ipvida" target="_blank" class="footer-rede-social" title="Facebook">
+              <i class="bi bi-facebook"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>© 2025 Igreja Presbiteriana Vida. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/env-dev.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  
+  <script>
+    // Auth Navbar Component
+    function authNavbar() {
+      return {
+        estaLogado: false,
+        usuario: null,
+        dropdownAberto: false,
+        saudacao: '',
+        
+        async init() {
+          await this.verificarSessao();
+          window.addEventListener('sessao-atualizada', () => this.verificarSessao());
+        },
+        
+        async verificarSessao() {
+          const dadosUsuario = localStorage.getItem('ipvida_usuario');
+          if (dadosUsuario) {
+            try {
+              this.usuario = JSON.parse(dadosUsuario);
+              this.estaLogado = true;
+              this.atualizarSaudacao();
+            } catch {
+              this.estaLogado = false;
+            }
+          }
+        },
+        
+        atualizarSaudacao() {
+          const hora = new Date().getHours();
+          let periodo = 'Olá';
+          if (hora >= 5 && hora < 12) periodo = 'Bom dia';
+          else if (hora >= 12 && hora < 18) periodo = 'Boa tarde';
+          else periodo = 'Boa noite';
+          
+          const nome = this.usuario?.nome?.split(' ')[0] || 'Usuário';
+          this.saudacao = `${periodo}, ${nome}!`;
+        },
+        
+        toggleDropdown() {
+          this.dropdownAberto = !this.dropdownAberto;
+        },
+        
+        fecharDropdown() {
+          this.dropdownAberto = false;
+        },
+        
+        irParaLogin() {
+          window.location.href = '../pagina/login.html';
+        },
+        
+        async logout() {
+          localStorage.removeItem('ipvida_usuario');
+          localStorage.removeItem('ipvida_sessao');
+          if (window.supabaseClient) {
+            await window.supabaseClient.client.auth.signOut();
+          }
+          window.location.href = '../index.html';
+        }
+      };
+    }
+    
+    // Página de Notificações
+    function paginaNotificacoes() {
+      return {
+        notificacoes: [],
+        carregando: true,
+        filtro: 'todas',
+        naoLidas: 0,
+        
+        async init() {
+          await this.carregarNotificacoes();
+        },
+        
+        async carregarNotificacoes() {
+          this.carregando = true;
+          
+          try {
+            if (window.supabaseClient && window.supabaseClient.client) {
+              const { data, error } = await window.supabaseClient.client
+                .from('notificacoes')
+                .select('*')
+                .eq('ativo', true)
+                .order('created_at', { ascending: false })
+                .limit(100);
+              
+              if (error) throw error;
+              
+              // Verificar quais já foram lidas
+              const usuarioId = this.obterUsuarioId();
+              let lidas = [];
+              
+              if (usuarioId && data && data.length > 0) {
+                const { data: lidasData } = await window.supabaseClient.client
+                  .from('notificacoes_usuarios')
+                  .select('notificacao_id')
+                  .eq('usuario_id', usuarioId)
+                  .eq('lida', true);
+                
+                lidas = (lidasData || []).map(l => l.notificacao_id);
+              }
+              
+              this.notificacoes = (data || []).map(n => ({
+                ...n,
+                lida: lidas.includes(n.id)
+              }));
+              
+              this.naoLidas = this.notificacoes.filter(n => !n.lida).length;
+            }
+          } catch (error) {
+            console.error('Erro ao carregar notificações:', error);
+          } finally {
+            this.carregando = false;
+          }
+        },
+        
+        get notificacoesFiltradas() {
+          return this.notificacoes.filter(n => {
+            if (this.filtro === 'todas') return true;
+            if (this.filtro === 'nao-lidas') return !n.lida;
+            return n.tipo === this.filtro;
+          });
+        },
+        
+        async abrirNotificacao(notif) {
+          if (!notif.lida) {
+            await this.marcarComoLida(notif);
+          }
+          
+          if (notif.dados_extras?.url) {
+            window.location.href = notif.dados_extras.url;
+          }
+        },
+        
+        async marcarComoLida(notif) {
+          const usuarioId = this.obterUsuarioId();
+          if (!usuarioId) return;
+          
+          try {
+            await window.supabaseClient.client
+              .from('notificacoes_usuarios')
+              .upsert({
+                notificacao_id: notif.id,
+                usuario_id: usuarioId,
+                lida: true
+              }, {
+                onConflict: 'notificacao_id,usuario_id'
+              });
+            
+            notif.lida = true;
+            this.naoLidas = this.notificacoes.filter(n => !n.lida).length;
+          } catch (error) {
+            console.error('Erro ao marcar como lida:', error);
+          }
+        },
+        
+        async marcarTodasComoLidas() {
+          const usuarioId = this.obterUsuarioId();
+          if (!usuarioId) return;
+          
+          const naoLidas = this.notificacoes.filter(n => !n.lida);
+          
+          for (const notif of naoLidas) {
+            await this.marcarComoLida(notif);
+          }
+        },
+        
+        getIcone(tipo) {
+          const icones = {
+            'video': 'bi bi-play-circle-fill',
+            'programacao': 'bi bi-calendar-event-fill',
+            'aviso': 'bi bi-megaphone-fill',
+            'grupo': 'bi bi-people-fill',
+            'catecumeno': 'bi bi-person-plus-fill',
+            'sistema': 'bi bi-bell-fill',
+            'devocional': 'bi bi-book-fill'
+          };
+          return icones[tipo] || 'bi bi-bell-fill';
+        },
+        
+        formatarData(dataString) {
+          if (!dataString) return '';
+          const data = new Date(dataString);
+          const agora = new Date();
+          const diff = agora - data;
+          
+          if (diff < 3600000) {
+            const minutos = Math.floor(diff / 60000);
+            return minutos <= 1 ? 'agora' : `há ${minutos} min`;
+          }
+          
+          if (diff < 86400000) {
+            const horas = Math.floor(diff / 3600000);
+            return `há ${horas}h`;
+          }
+          
+          if (diff < 604800000) {
+            const dias = Math.floor(diff / 86400000);
+            return `há ${dias} dia${dias > 1 ? 's' : ''}`;
+          }
+          
+          return data.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: 'short'
+          });
+        },
+        
+        obterUsuarioId() {
+          const usuario = localStorage.getItem('ipvida_usuario');
+          if (usuario) {
+            try {
+              return JSON.parse(usuario).id || null;
+            } catch {
+              return null;
+            }
+          }
+          return null;
+        }
+      };
+    }
+  </script>
+</body>
+</html>

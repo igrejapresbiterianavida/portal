@@ -11,25 +11,61 @@ async function buscarVideosYouTubeRSS(canalId) {
     }
     
     // YouTube RSS Feed - Público, não precisa de API key
-    // Formato: https://www.youtube.com/feeds/videos.xml?channel_id=CHANNEL_ID
-    // Usar proxy CORS para evitar bloqueio
     const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${canalId}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+    
+    // Lista de proxies CORS para tentar (com fallbacks)
+    const proxies = [
+      `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`,
+      `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`,
+      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rssUrl)}`
+    ];
     
     console.log('📡 Buscando vídeos via RSS Feed do YouTube...');
     console.log('🔗 URL:', rssUrl);
     
-    // Fazer requisição ao RSS via proxy CORS
-    const response = await fetch(proxyUrl);
+    let xmlText = null;
     
-    if (!response.ok) {
-      console.error('❌ Erro ao buscar RSS:', response.status);
-      return [];
+    // Tentar cada proxy até um funcionar
+    for (const proxyUrl of proxies) {
+      try {
+        console.log('🔄 Tentando proxy:', proxyUrl.split('?')[0]);
+        const response = await fetch(proxyUrl, { 
+          method: 'GET',
+          headers: { 'Accept': 'application/json, text/plain, */*' }
+        });
+        
+        if (!response.ok) {
+          console.warn(`⚠️ Proxy retornou ${response.status}, tentando próximo...`);
+          continue;
+        }
+        
+        // Detectar tipo de resposta
+        const contentType = response.headers.get('content-type') || '';
+        
+        if (contentType.includes('application/json')) {
+          const data = await response.json();
+          xmlText = data.contents || data.body || data;
+        } else {
+          xmlText = await response.text();
+        }
+        
+        if (xmlText && typeof xmlText === 'string' && xmlText.includes('<entry>')) {
+          console.log('✅ Proxy funcionou!');
+          break;
+        } else {
+          console.warn('⚠️ Resposta não contém dados válidos, tentando próximo...');
+          xmlText = null;
+        }
+      } catch (proxyError) {
+        console.warn('⚠️ Erro no proxy:', proxyError.message);
+        continue;
+      }
     }
     
-    // Se usar proxy, extrair o conteúdo
-    const data = await response.json();
-    const xmlText = data.contents || await response.text();
+    if (!xmlText) {
+      console.error('❌ Nenhum proxy funcionou');
+      return [];
+    }
     
     // Parsear XML
     const parser = new DOMParser();

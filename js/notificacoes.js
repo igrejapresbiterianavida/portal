@@ -51,38 +51,35 @@ function sistemaNotificacoes() {
     },
     
     verificarUsuarioLogado() {
-      // Verifica se há sessão ativa via auth
-      if (window.auth && typeof window.auth.verificarSessaoAtiva === 'function') {
-        return window.auth.verificarSessaoAtiva();
-      }
-      
-      // Fallback: verificar localStorage (chaves corretas)
-      const authToken = localStorage.getItem('auth_token');
-      const authUsuario = localStorage.getItem('auth_usuario');
-      const ipvidaUsuario = localStorage.getItem('ipvida_usuario');
-      
-      // Só considera logado se tiver token E dados do usuário
-      if (authToken && authUsuario) {
-        try {
+      try {
+        // Verificar localStorage - auth_usuario é a fonte principal
+        const authUsuario = localStorage.getItem('auth_usuario');
+        
+        if (authUsuario) {
           const usuario = JSON.parse(authUsuario);
-          // Verifica se é um usuário real (não visitante sem login)
-          return usuario && usuario.id && usuario.tipo !== 'visitante_anonimo';
-        } catch (e) {
-          return false;
+          // Só considera logado se tiver ID e email (usuário real autenticado)
+          if (usuario && usuario.id && usuario.email) {
+            console.log('✅ Usuário autenticado encontrado:', usuario.email);
+            return true;
+          }
         }
-      }
-      
-      // Verificar formato alternativo
-      if (ipvidaUsuario) {
-        try {
+        
+        // Verificar ipvida_usuario como fallback
+        const ipvidaUsuario = localStorage.getItem('ipvida_usuario');
+        if (ipvidaUsuario) {
           const usuario = JSON.parse(ipvidaUsuario);
-          return usuario && usuario.id;
-        } catch (e) {
-          return false;
+          if (usuario && usuario.id && usuario.email) {
+            console.log('✅ Usuário IPVida encontrado:', usuario.email);
+            return true;
+          }
         }
+        
+        console.log('❌ Nenhum usuário autenticado encontrado');
+        return false;
+      } catch (e) {
+        console.error('Erro ao verificar usuário:', e);
+        return false;
       }
-      
-      return false;
     },
     
     async carregarNotificacoes() {

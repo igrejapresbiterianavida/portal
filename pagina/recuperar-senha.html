@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Recuperar Senha - Igreja Presbiteriana Vida">
+  <title>Recuperar Senha | IPV - Igreja Presbiteriana Vida</title>
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" href="../assets/icons/ipvida.png">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/globais.css">
+  <link rel="stylesheet" href="../css/componentes.css">
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .recuperar-container {
+      background: var(--branco);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      width: 100%;
+      max-width: 450px;
+    }
+    
+    .recuperar-header {
+      background: linear-gradient(135deg, #1A4731 0%, #2D6A4F 100%);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+    }
+    
+    .recuperar-header .icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    
+    .recuperar-header .icon i {
+      font-size: 40px;
+    }
+    
+    .recuperar-header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    
+    .recuperar-header p {
+      margin: 10px 0 0;
+      opacity: 0.9;
+      font-size: 0.9rem;      color: #ffffff;
+    }
+    
+    .recuperar-form {
+      padding: 30px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1A4731;
+      margin-bottom: 8px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #ffffff;
+      box-sizing: border-box;
+      color: #1A4731;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #1A4731;
+      box-shadow: 0 0 0 4px rgba(26, 71, 49, 0.1);
+    }
+    
+    .btn-recuperar {
+      width: 100%;
+      background: linear-gradient(135deg, #1A4731 0%, #2D6A4F 100%);
+      color: #ffffff;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(26, 71, 49, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .btn-recuperar:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 71, 49, 0.5);
+    }
+    
+    .btn-recuperar:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    .alerta {
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .alerta-erro {
+      background: #FEE2E2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+    }
+    
+    .alerta-sucesso {
+      background: #D1FAE5;
+      color: #059669;
+      border: 1px solid #A7F3D0;
+    }
+    
+    .alerta i {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    .recuperar-footer {
+      text-align: center;
+      padding: 20px 30px 30px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .recuperar-footer p {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    
+    .recuperar-footer a {
+      color: #1A4731;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    
+    .recuperar-footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .voltar-site {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(26, 71, 49, 0.1);
+      color: #1A4731;
+      padding: 10px 15px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+      z-index: 10;
+    }
+    
+    .voltar-site:hover {
+      background: rgba(26, 71, 49, 0.2);
+    }
+    
+    .sucesso-container {
+      text-align: center;
+      padding: 40px 30px;
+    }
+    
+    .sucesso-icon {
+      width: 100px;
+      height: 100px;
+      background: #D1FAE5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    
+    .sucesso-icon i {
+      font-size: 50px;
+      color: #059669;
+    }
+    
+    .sucesso-container h2 {
+      color: #1A4731;
+      margin: 0 0 15px;
+    }
+    
+    .sucesso-container p {
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+    
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  
+  <a href="login.html" class="voltar-site">
+    <span class="material-icons" style="font-size: 18px;">arrow_back</span>
+    Voltar ao login
+  </a>
+  
+  <div class="recuperar-container" x-data="recuperarSenhaForm()">
+    
+    <!-- Tela de Solicitação -->
+    <template x-if="!enviado">
+      <div>
+        <div class="recuperar-header">
+          <div class="icon">
+            <i class="bi bi-key"></i>
+          </div>
+          <h1>Recuperar Senha</h1>
+          <p>Digite seu email para receber um link de recuperação</p>
+        </div>
+        
+        <div class="recuperar-form">
+          
+          <div x-show="erro" class="alerta alerta-erro" x-transition>
+            <i class="bi bi-exclamation-circle"></i>
+            <span x-text="erro"></span>
+          </div>
+          
+          <form @submit.prevent="enviar()">
+            <div class="form-group">
+              <label class="form-label">Email cadastrado</label>
+              <input 
+                type="email" 
+                class="form-input" 
+                x-model="email"
+                placeholder="seu@email.com"
+                required
+                :disabled="carregando"
+              >
+            </div>
+            
+            <button type="submit" class="btn-recuperar" :disabled="carregando || !email">
+              <span x-show="!carregando">
+                <i class="bi bi-envelope"></i>
+                Enviar link de recuperação
+              </span>
+              <span x-show="carregando">
+                <i class="bi bi-arrow-repeat spin"></i>
+                Enviando...
+              </span>
+            </button>
+          </form>
+          
+        </div>
+        
+        <div class="recuperar-footer">
+          <p>Lembrou a senha? <a href="login.html">Fazer login</a></p>
+        </div>
+      </div>
+    </template>
+    
+    <!-- Tela de Sucesso -->
+    <template x-if="enviado">
+      <div class="sucesso-container">
+        <div class="sucesso-icon">
+          <i class="bi bi-envelope-check"></i>
+        </div>
+        <h2>Email Enviado!</h2>
+        <p>
+          Enviamos um link de recuperação para <strong x-text="email"></strong>. 
+          Verifique sua caixa de entrada e spam.
+        </p>
+        <p style="font-size: 0.85rem; color: #9CA3AF;">
+          O link expira em 1 hora.
+        </p>
+        <a href="login.html" class="btn-recuperar" style="text-decoration: none; margin-top: 20px;">
+          <i class="bi bi-arrow-left"></i>
+          Voltar ao login
+        </a>
+      </div>
+    </template>
+    
+  </div>
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config-prod.js"></script>
+  <script src="../js/env-dev.js" onerror="console.log('⚠️ env-dev.js não encontrado')"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  
+  <script>
+    function recuperarSenhaForm() {
+      return {
+        email: '',
+        carregando: false,
+        erro: '',
+        enviado: false,
+        
+        async enviar() {
+          this.erro = '';
+          
+          if (!this.email) {
+            this.erro = 'Por favor, digite seu email.';
+            return;
+          }
+          
+          this.carregando = true;
+          
+          try {
+            const { error } = await window.supabaseClient.client.auth.resetPasswordForEmail(
+              this.email,
+              {
+                redirectTo: window.location.origin + '/pagina/redefinir-senha.html'
+              }
+            );
+            
+            if (error) throw error;
+            
+            this.enviado = true;
+            
+          } catch (error) {
+            console.error('Erro ao enviar email:', error);
+            
+            if (error.message.includes('not found')) {
+              this.erro = 'Email não encontrado em nossa base.';
+            } else if (error.message.includes('rate limit')) {
+              this.erro = 'Muitas tentativas. Aguarde alguns minutos.';
+            } else {
+              this.erro = 'Erro ao enviar email. Tente novamente.';
+            }
+          } finally {
+            this.carregando = false;
+          }
+        }
+      };
+    }
+  </script>
+</body>
+</html>
+

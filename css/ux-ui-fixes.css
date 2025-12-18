@@ -964,4 +964,66 @@ input[type="radio"] {
   animation: spin 1s linear infinite;
 }
 
+/* ==================== HEADERS VERDES COM TEXTO BRANCO ==================== */
+
+/* Regra geral: qualquer elemento com background gradiente verde terá texto branco */
+[style*="linear-gradient"][style*="1A4731"],
+[style*="linear-gradient"][style*="verde"] {
+  color: white !important;
+}
+
+/* Headers de Seção com fundo verde */
+.secao-header-verde,
+.header-verde,
+[class*="header"][style*="verde"],
+.cadastro-header,
+.recuperar-header,
+.login-header,
+.auth-header {
+  color: white !important;
+}
+
+.cadastro-header *,
+.recuperar-header *,
+.login-header *,
+.auth-header *,
+.secao-header-verde *,
+.header-verde * {
+  color: white !important;
+}
+
+/* Modal headers com fundo verde */
+.modal-legal .modal-header,
+.modal-legal .modal-header h2,
+.modal-legal .modal-header p,
+.modal-legal .modal-header span,
+.modal-header-verde,
+.modal-header-verde h2,
+.modal-header-verde p {
+  color: white !important;
+}
+
+/* Seção de Notificações Header */
+.notificacoes-header,
+.notificacoes-header h1,
+.notificacoes-header p {
+  color: white !important;
+}
+
+/* Admin Headers */
+.admin-header-verde,
+.admin-header-verde h1,
+.admin-header-verde h2,
+.admin-header-verde p,
+.admin-topbar {
+  color: white !important;
+}
+
+/* Página de perfil header */
+.perfil-header,
+.perfil-header h1,
+.perfil-header p {
+  color: white !important;
+}
+
 /* ==================== FIM DO ARQUIVO ==================== */

@@ -23,6 +23,19 @@ html {
   display: none !important;
 }
 
+/* Esconder sininho de notificações para visitantes não logados */
+.navbar-notificacoes[x-cloak] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Alpine.js - Garantir que x-show funcione mesmo com CSS display */
+[x-cloak],
+[style*="display: none"] {
+  display: none !important;
+}
+
 /* Variáveis CSS */
 :root {
   /* Cores Principais */

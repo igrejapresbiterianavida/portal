@@ -15,13 +15,36 @@ function crudUsuarios() {
       email: '',
       telefone: '',
       tipo: 'visitante',
-      status: 'ativo'
+      status: 'ativo',
+      // Novos campos
+      data_nascimento: '',
+      endereco: '',
+      cidade: '',
+      estado: '',
+      cep: '',
+      estado_civil: '',
+      profissao: '',
+      como_conheceu: '',
+      observacoes: ''
     },
     tipos: [
       { valor: 'visitante', label: 'Visitante' },
       { valor: 'membro', label: 'Membro' },
       { valor: 'lideranca', label: 'Liderança' },
       { valor: 'administracao', label: 'Administração' }
+    ],
+    estadosCivis: [
+      { valor: '', label: 'Selecione...' },
+      { valor: 'solteiro', label: 'Solteiro(a)' },
+      { valor: 'casado', label: 'Casado(a)' },
+      { valor: 'divorciado', label: 'Divorciado(a)' },
+      { valor: 'viuvo', label: 'Viúvo(a)' },
+      { valor: 'uniao_estavel', label: 'União Estável' }
+    ],
+    estados: [
+      'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 
+      'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 
+      'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
     ],
 
     async init() {
@@ -51,7 +74,17 @@ function crudUsuarios() {
           email: usuario.email || '',
           telefone: usuario.telefone || '',
           tipo: usuario.tipo || 'visitante',
-          status: usuario.status || 'ativo'
+          status: usuario.status || 'ativo',
+          // Novos campos
+          data_nascimento: usuario.data_nascimento || '',
+          endereco: usuario.endereco || '',
+          cidade: usuario.cidade || '',
+          estado: usuario.estado || '',
+          cep: usuario.cep || '',
+          estado_civil: usuario.estado_civil || '',
+          profissao: usuario.profissao || '',
+          como_conheceu: usuario.como_conheceu || '',
+          observacoes: usuario.observacoes || ''
         };
       } else {
         this.formulario = {
@@ -60,7 +93,16 @@ function crudUsuarios() {
           email: '',
           telefone: '',
           tipo: 'visitante',
-          status: 'ativo'
+          status: 'ativo',
+          data_nascimento: '',
+          endereco: '',
+          cidade: '',
+          estado: '',
+          cep: '',
+          estado_civil: '',
+          profissao: '',
+          como_conheceu: '',
+          observacoes: ''
         };
       }
       this.modalAberto = true;
@@ -111,7 +153,17 @@ function crudUsuarios() {
             email: this.formulario.email.toLowerCase(),
             telefone: this.formulario.telefone || '',
             tipo: this.formulario.tipo || 'visitante',
-            status: this.formulario.status || 'ativo'
+            status: this.formulario.status || 'ativo',
+            // Novos campos
+            data_nascimento: this.formulario.data_nascimento || null,
+            endereco: this.formulario.endereco || null,
+            cidade: this.formulario.cidade || null,
+            estado: this.formulario.estado || null,
+            cep: this.formulario.cep || null,
+            estado_civil: this.formulario.estado_civil || null,
+            profissao: this.formulario.profissao || null,
+            como_conheceu: this.formulario.como_conheceu || null,
+            observacoes: this.formulario.observacoes || null
           };
 
           await window.supabaseClient.criar('usuarios', novoUsuario);
@@ -206,6 +258,35 @@ function crudUsuarios() {
     getLabelTipo(tipo) {
       const tipoObj = this.tipos.find(t => t.valor === tipo);
       return tipoObj ? tipoObj.label : tipo;
+    },
+
+    getLabelEstadoCivil(estado) {
+      const estadoObj = this.estadosCivis.find(e => e.valor === estado);
+      return estadoObj ? estadoObj.label : estado || '-';
+    },
+
+    formatarCEP(e) {
+      let valor = e.target.value.replace(/\D/g, '');
+      if (valor.length > 8) valor = valor.slice(0, 8);
+      if (valor.length > 5) {
+        valor = valor.slice(0, 5) + '-' + valor.slice(5);
+      }
+      this.formulario.cep = valor;
+    },
+
+    formatarTelefone(e) {
+      let valor = e.target.value.replace(/\D/g, '');
+      if (valor.length > 11) valor = valor.slice(0, 11);
+      
+      if (valor.length > 6) {
+        valor = `(${valor.slice(0,2)}) ${valor.slice(2,7)}-${valor.slice(7)}`;
+      } else if (valor.length > 2) {
+        valor = `(${valor.slice(0,2)}) ${valor.slice(2)}`;
+      } else if (valor.length > 0) {
+        valor = `(${valor}`;
+      }
+      
+      this.formulario.telefone = valor;
     }
   };
 }

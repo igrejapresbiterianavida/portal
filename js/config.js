@@ -60,18 +60,26 @@ const CONFIG = {
   
   // Método para buscar variáveis de ambiente (funciona em build)
   getEnvVar(name, defaultValue = '') {
-    // Em produção, essas variáveis devem ser injetadas no build
+    // 1. Primeiro tenta config-prod.js (window.SUPABASE_CONFIG)
+    if (typeof window !== 'undefined' && window.SUPABASE_CONFIG) {
+      if (window.SUPABASE_CONFIG[name]) {
+        return window.SUPABASE_CONFIG[name];
+      }
+    }
+    
+    // 2. Depois tenta env-dev.js (window.ENV)
+    if (typeof window !== 'undefined' && window.ENV) {
+      if (window.ENV[name]) {
+        return window.ENV[name];
+      }
+    }
+    
+    // 3. Em ambientes Node.js
     if (typeof process !== 'undefined' && process.env) {
       return process.env[name] || defaultValue;
     }
     
-    // Para desenvolvimento local, pode usar um objeto global
-    if (typeof window !== 'undefined' && window.ENV) {
-      return window.ENV[name] || defaultValue;
-    }
-    
-    // Fallback para desenvolvimento
-    console.warn(`Variável de ambiente ${name} não encontrada`);
+    // Fallback
     return defaultValue;
   },
   

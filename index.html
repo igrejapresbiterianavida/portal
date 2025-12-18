@@ -221,8 +221,8 @@
         </div>
       </div><!-- navbar-auth !-->
       
-      <!-- 2. Sistema de Notificações (após user) -->
-      <div class="navbar-notificacoes" x-data="sistemaNotificacoes()">
+      <!-- 2. Sistema de Notificações (apenas para usuários logados) -->
+      <div class="navbar-notificacoes" x-data="sistemaNotificacoes()" x-show="usuarioLogado" x-cloak style="display: none !important;" :style="usuarioLogado ? 'display: flex !important;' : 'display: none !important;'">
         <button 
           class="notificacao-btn" 
           @click="dropdownAberto = !dropdownAberto"
@@ -422,7 +422,14 @@
       <div x-data="devocionalDiario()" x-init="carregar()">
         <template x-if="devocional">
           <div class="devocional-card">
-            <img :src="devocional.imagem || devocional.imagem_url || 'assets/images/corrida.jpg'" :alt="'Devocional ' + devocional.id" class="devocional-imagem" :key="devocional.id" @error="this.onerror=null;this.src='assets/images/corrida.jpg'">
+            <img 
+              :src="devocional.imagem" 
+              :alt="'Devocional: ' + devocional.titulo" 
+              class="devocional-imagem" 
+              :key="devocional.id"
+              @error="$event.target.style.opacity='0'"
+              :style="devocional.imagem && devocional.imagem.startsWith('data:') ? 'object-fit:cover;' : ''"
+            >
             <div class="devocional-conteudo">
               <div class="devocional-texto" :class="{ 'expandido': textoExpandido }">
                 <p x-text="textoExibido"></p>
@@ -781,7 +788,13 @@
             <template x-for="(programa, index) in programasCarrossel" :key="programa.id">
               <div class="card-programacao-vertical" :class="{ 'ativo': slideAtual === index }" @click="mostrarDetalhes(programa)">
                 <div class="card-programacao-imagem-full" :style="`background: linear-gradient(135deg, ${programa.cor1 || '#1A4731'}dd, ${programa.cor2 || '#2D5F4A'}dd);`">
-                  <img :src="programa.imagem" :alt="programa.titulo" class="programacao-icone-grande" onerror="this.style.display='none'">
+                  <img 
+                    :src="programa.imagem" 
+                    :alt="programa.titulo" 
+                    class="programacao-icone-grande" 
+                    @error="$event.target.style.opacity='0'"
+                    :style="programa.imagem && programa.imagem.startsWith('data:') ? 'width:100%;height:100%;object-fit:cover;' : ''"
+                  >
                   <!-- Mobile: toque para ver detalhes -->
                   <div class="programacao-toque-mobile">
                     <i class="bi bi-hand-index"></i>
@@ -1731,6 +1744,11 @@
       <div class="footer-bottom">
         <p>© 2025 Igreja Presbiteriana Vida. Todos os direitos reservados.</p>
         <p>Desenvolvido por Matheus bonotto da squidev.com.br para a glória de Deus</p>
+        <div class="footer-legal">
+          <a href="#" @click.prevent="$dispatch('abrir-modal', {tipo: 'privacidade'})">Política de Privacidade</a>
+          <span>•</span>
+          <a href="#" @click.prevent="$dispatch('abrir-modal', {tipo: 'termos'})">Termos de Serviço</a>
+        </div>
       </div><!-- footer-bottom !-->
     </div><!-- container !-->
   </footer><!-- footer !-->
@@ -1867,9 +1885,288 @@
     </div>
   </div>
   
+  <!-- ==================== MODAL TERMOS E PRIVACIDADE ==================== -->
+  <div 
+    x-data="modalLegal()"
+    @abrir-modal.window="abrirModal($event.detail.tipo)"
+    x-show="modalAberto" 
+    x-transition
+    class="modal-overlay"
+    @click.self="fecharModal()"
+    x-cloak>
+    
+    <div class="modal-conteudo modal-legal" @click.stop>
+      <button @click="fecharModal()" class="modal-fechar">
+        <span class="material-icons">close</span>
+      </button>
+      
+      <div class="modal-header">
+        <span class="material-icons" style="font-size: 3rem; color: var(--verde-medio);">
+          <span x-show="tipoModal === 'privacidade'">privacy_tip</span>
+          <span x-show="tipoModal === 'termos'">description</span>
+        </span>
+        <h2>
+          <span x-show="tipoModal === 'privacidade'">Política de Privacidade</span>
+          <span x-show="tipoModal === 'termos'">Termos de Serviço</span>
+        </h2>
+        <p x-show="tipoModal === 'privacidade'">
+          Conforme a Lei Geral de Proteção de Dados (LGPD - Lei 13.709/2018)
+        </p>
+        <p x-show="tipoModal === 'termos'">
+          Leia atentamente antes de utilizar nossos serviços
+        </p>
+      </div>
+      
+      <!-- Conteúdo de Privacidade -->
+      <div x-show="tipoModal === 'privacidade'" class="modal-legal-conteudo">
+        <div class="legal-secao">
+          <h3><span class="material-icons">info</span> 1. Introdução</h3>
+          <p>
+            A <strong>Igreja Presbiteriana Vida</strong> (IPV), localizada em Campinas-SP, respeita sua privacidade 
+            e está comprometida em proteger seus dados pessoais conforme a <strong>Lei Geral de Proteção de Dados (LGPD)</strong>.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">person</span> 2. Dados que Coletamos</h3>
+          <p><strong>Dados coletados quando você:</strong></p>
+          <ul>
+            <li><strong>Visita nosso site:</strong> Endereço IP, tipo de navegador, páginas visitadas (via cookies técnicos)</li>
+            <li><strong>Preenche formulário de contato:</strong> Nome, e-mail, telefone e mensagem</li>
+            <li><strong>Cadastra-se como visitante:</strong> Nome, e-mail, telefone e data de visita pretendida</li>
+            <li><strong>Faz login via Google:</strong> Nome, e-mail e foto de perfil (fornecidos pelo Google)</li>
+            <li><strong>Contribui financeiramente:</strong> Apenas dados bancários da igreja (não coletamos seus dados bancários)</li>
+          </ul>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">settings</span> 3. Como Usamos Seus Dados</h3>
+          <p>Utilizamos seus dados pessoais para:</p>
+          <ul>
+            <li>Responder suas solicitações e dúvidas via formulário de contato</li>
+            <li>Preparar sua recepção quando você se cadastra como visitante</li>
+            <li>Gerenciar seu acesso como membro ou visitante autenticado</li>
+            <li>Melhorar nossos serviços e experiência do usuário</li>
+            <li>Cumprir obrigações legais e regulatórias</li>
+            <li>Enviar comunicações sobre eventos e atividades da igreja (com seu consentimento)</li>
+          </ul>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">storage</span> 4. Armazenamento e Segurança</h3>
+          <p>Seus dados são armazenados de forma segura utilizando:</p>
+          <ul>
+            <li><strong>Supabase:</strong> Plataforma segura com criptografia de ponta a ponta</li>
+            <li><strong>Row Level Security (RLS):</strong> Acesso restrito baseado em políticas de segurança</li>
+            <li><strong>Edge Functions:</strong> Processamento seguro no servidor</li>
+            <li><strong>Google OAuth:</strong> Autenticação segura via Google</li>
+          </ul>
+          <p>
+            <strong>✅ SEGURANÇA GARANTIDA:</strong> Nenhuma credencial sensível é exposta no código frontend. 
+            Todas as operações sensíveis são realizadas via Edge Functions no servidor.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">share</span> 5. Compartilhamento de Dados</h3>
+          <p><strong>Não vendemos</strong> seus dados pessoais. Compartilhamos apenas com:</p>
+          <ul>
+            <li><strong>Google:</strong> Para autenticação via OAuth (apenas com seu consentimento)</li>
+            <li><strong>EmailJS:</strong> Para envio de e-mails via formulário de contato</li>
+            <li><strong>Supabase:</strong> Como provedor de infraestrutura (conforme seu Termo de Privacidade)</li>
+          </ul>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">visibility</span> 6. Seus Direitos (LGPD)</h3>
+          <p>Você tem direito a:</p>
+          <ul>
+            <li><strong>Acesso:</strong> Solicitar uma cópia dos seus dados pessoais</li>
+            <li><strong>Correção:</strong> Solicitar correção de dados incompletos ou desatualizados</li>
+            <li><strong>Exclusão:</strong> Solicitar exclusão dos seus dados pessoais</li>
+            <li><strong>Portabilidade:</strong> Solicitar transferência dos seus dados para outro serviço</li>
+            <li><strong>Revogação:</strong> Retirar seu consentimento a qualquer momento</li>
+            <li><strong>Oposição:</strong> Opor-se ao tratamento dos seus dados</li>
+          </ul>
+          <p>Para exercer seus direitos, entre em contato: <strong>ipvida.res.cosmos@gmail.com</strong></p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">cookie</span> 7. Cookies e Tecnologias</h3>
+          <p>Utilizamos cookies técnicos essenciais para:</p>
+          <ul>
+            <li>Manter sua sessão de autenticação</li>
+            <li>Melhorar a performance do site</li>
+            <li>Personalizar sua experiência</li>
+          </ul>
+          <p>Você pode desabilitar cookies nas configurações do seu navegador, mas isso pode afetar o funcionamento do site.</p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">update</span> 8. Atualizações desta Política</h3>
+          <p>
+            Podemos atualizar esta política periodicamente. A data da última atualização está indicada abaixo. 
+            Recomendamos que você revise esta política regularmente.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">contact_support</span> 9. Contato</h3>
+          <p>
+            <strong>Controlador de Dados:</strong> Igreja Presbiteriana Vida<br>
+            <strong>E-mail:</strong> ipvida.res.cosmos@gmail.com<br>
+            <strong>Endereço:</strong> Campinas-SP, Brasil
+          </p>
+        </div>
+
+        <div class="legal-rodape">
+          <p><strong>Última atualização:</strong> Janeiro de 2025</p>
+        </div>
+      </div>
+
+      <!-- Conteúdo de Termos -->
+      <div x-show="tipoModal === 'termos'" class="modal-legal-conteudo">
+        <div class="legal-secao">
+          <h3><span class="material-icons">gavel</span> 1. Aceitação dos Termos</h3>
+          <p>
+            Ao acessar e utilizar o site da <strong>Igreja Presbiteriana Vida</strong>, você concorda em cumprir 
+            e estar vinculado a estes Termos de Serviço. Se você não concordar com qualquer parte destes termos, 
+            não deve utilizar nossos serviços.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">description</span> 2. Descrição do Serviço</h3>
+          <p>O site da IPV oferece:</p>
+          <ul>
+            <li>Informações sobre a igreja e atividades</li>
+            <li>Devocionais diários e conteúdo bíblico</li>
+            <li>Transmissões de cultos ao vivo e vídeos</li>
+            <li>Programação de eventos e atividades</li>
+            <li>Formulário de contato e cadastro de visitantes</li>
+            <li>Área restrita para membros autenticados</li>
+            <li>Informações sobre contribuições financeiras</li>
+          </ul>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">verified_user</span> 3. Uso Aceitável</h3>
+          <p>Você concorda em:</p>
+          <ul>
+            <li>Utilizar o site apenas para fins legítimos e de acordo com estes termos</li>
+            <li>Não tentar acessar áreas restritas sem autorização</li>
+            <li>Não utilizar o site para atividades ilegais ou fraudulentas</li>
+            <li>Não transmitir vírus, malware ou código malicioso</li>
+            <li>Respeitar os direitos de propriedade intelectual</li>
+            <li>Fornecer informações verdadeiras e atualizadas</li>
+          </ul>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">account_circle</span> 4. Contas de Usuário</h3>
+          <p>Para acessar áreas restritas, você precisará criar uma conta. Você é responsável por:</p>
+          <ul>
+            <li>Manter a confidencialidade de suas credenciais</li>
+            <li>Todas as atividades realizadas em sua conta</li>
+            <li>Notificar-nos imediatamente sobre uso não autorizado</li>
+            <li>Fornecer informações precisas e atualizadas</li>
+          </ul>
+          <p>A IPV reserva-se o direito de suspender ou encerrar contas que violem estes termos.</p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">copyright</span> 5. Propriedade Intelectual</h3>
+          <p>
+            Todo o conteúdo do site (textos, imagens, vídeos, logos) é de propriedade da 
+            <strong>Igreja Presbiteriana Vida</strong> ou de seus respectivos detentores de direitos.
+          </p>
+          <p>
+            Você pode visualizar, baixar e imprimir conteúdo apenas para uso pessoal e não comercial. 
+            Qualquer outro uso requer autorização prévia por escrito.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">cancel</span> 6. Isenção de Responsabilidade</h3>
+          <p>O site é fornecido "como está". A IPV não garante que:</p>
+          <ul>
+            <li>O site estará sempre disponível ou livre de erros</li>
+            <li>As informações sejam completamente precisas ou atualizadas</li>
+            <li>As transmissões ao vivo funcionem sem interrupções</li>
+          </ul>
+          <p>
+            A IPV não se responsabiliza por danos diretos, indiretos ou consequenciais decorrentes 
+            do uso ou incapacidade de usar o site.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">link</span> 7. Links Externos</h3>
+          <p>
+            Nosso site pode conter links para sites de terceiros (YouTube, Instagram, etc.). 
+            Não somos responsáveis pelo conteúdo ou práticas de privacidade desses sites externos.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">security</span> 8. Segurança</h3>
+          <p>Implementamos medidas de segurança para proteger seus dados, incluindo:</p>
+          <ul>
+            <li>Criptografia de dados (HTTPS/SSL)</li>
+            <li>Autenticação segura via Google OAuth</li>
+            <li>Row Level Security (RLS) no banco de dados</li>
+            <li>Edge Functions para operações sensíveis</li>
+          </ul>
+          <p>No entanto, nenhum sistema é 100% seguro. Você utiliza o site por sua própria conta e risco.</p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">change_circle</span> 9. Modificações dos Termos</h3>
+          <p>
+            A IPV reserva-se o direito de modificar estes termos a qualquer momento. 
+            Alterações significativas serão notificadas no site. O uso continuado do site após 
+            alterações constitui aceitação dos novos termos.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">gavel</span> 10. Lei Aplicável</h3>
+          <p>
+            Estes termos são regidos pelas leis brasileiras. Qualquer disputa será resolvida 
+            nos tribunais competentes de Campinas-SP, Brasil.
+          </p>
+        </div>
+
+        <div class="legal-secao">
+          <h3><span class="material-icons">contact_support</span> 11. Contato</h3>
+          <p>
+            Para questões sobre estes termos, entre em contato:<br>
+            <strong>E-mail:</strong> ipvida.res.cosmos@gmail.com<br>
+            <strong>Igreja Presbiteriana Vida</strong><br>
+            Campinas-SP, Brasil
+          </p>
+        </div>
+
+        <div class="legal-rodape">
+          <p><strong>Última atualização:</strong> Janeiro de 2025</p>
+        </div>
+      </div>
+
+      <div class="modal-acoes modal-acoes-legal">
+        <button @click="fecharModal()" class="botao botao-primario botao-grande" style="width: 100%;">
+          <span class="material-icons" style="vertical-align: middle;">check</span>
+          Entendi e Concordo
+        </button>
+      </div>
+    </div>
+  </div>
+  
   <!-- JavaScript -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/env-dev.js"></script>
+  <!-- Config de produção (carrega primeiro para ter prioridade) -->
+  <script src="js/config-prod.js"></script>
+  <!-- Config de desenvolvimento (apenas localmente, não vai para produção) -->
+  <script src="js/env-dev.js" onerror="console.log('⚠️ env-dev.js não encontrado (normal em produção)')"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/auth.js"></script>

@@ -11,15 +11,78 @@ function sistemaNotificacoes() {
     naoLidas: 0,
     dropdownAberto: false,
     carregando: false,
+    usuarioLogado: false, // Começa como false, só muda após verificação
     
     async init() {
-      await this.carregarNotificacoes();
+      // Verificar se usuário está logado (com pequeno delay para garantir que auth carregou)
+      await this.$nextTick();
+      this.usuarioLogado = this.verificarUsuarioLogado();
       
-      // Atualizar a cada 2 minutos
-      setInterval(() => this.carregarNotificacoes(), 120000);
+      console.log('🔔 Sistema de Notificações - Usuário logado:', this.usuarioLogado);
       
-      // Verificar permissão de push
-      this.verificarPermissaoPush();
+      // Só carregar notificações se estiver logado
+      if (this.usuarioLogado) {
+        await this.carregarNotificacoes();
+        
+        // Atualizar a cada 2 minutos
+        setInterval(() => this.carregarNotificacoes(), 120000);
+        
+        // Verificar permissão de push
+        this.verificarPermissaoPush();
+      }
+      
+      // Listener para quando a sessão mudar
+      window.addEventListener('sessao-atualizada', () => {
+        this.usuarioLogado = this.verificarUsuarioLogado();
+        if (this.usuarioLogado) {
+          this.carregarNotificacoes();
+        } else {
+          this.notificacoes = [];
+          this.naoLidas = 0;
+        }
+      });
+      
+      // Listener para logout
+      window.addEventListener('usuario-deslogado', () => {
+        this.usuarioLogado = false;
+        this.notificacoes = [];
+        this.naoLidas = 0;
+      });
+    },
+    
+    verificarUsuarioLogado() {
+      // Verifica se há sessão ativa via auth
+      if (window.auth && typeof window.auth.verificarSessaoAtiva === 'function') {
+        return window.auth.verificarSessaoAtiva();
+      }
+      
+      // Fallback: verificar localStorage (chaves corretas)
+      const authToken = localStorage.getItem('auth_token');
+      const authUsuario = localStorage.getItem('auth_usuario');
+      const ipvidaUsuario = localStorage.getItem('ipvida_usuario');
+      
+      // Só considera logado se tiver token E dados do usuário
+      if (authToken && authUsuario) {
+        try {
+          const usuario = JSON.parse(authUsuario);
+          // Verifica se é um usuário real (não visitante sem login)
+          return usuario && usuario.id && usuario.tipo !== 'visitante_anonimo';
+        } catch (e) {
+          return false;
+        }
+      }
+      
+      // Verificar formato alternativo
+      if (ipvidaUsuario) {
+        try {
+          const usuario = JSON.parse(ipvidaUsuario);
+          return usuario && usuario.id;
+        } catch (e) {
+          return false;
+        }
+      }
+      
+      return false;
     },
     
     async carregarNotificacoes() {

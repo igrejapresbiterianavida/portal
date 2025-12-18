@@ -271,14 +271,11 @@ function inscricaoCatecumeno() {
      * Ação do botão principal da turma
      */
     async acaoPrincipal(turma) {
-      // Se não está logado, redireciona para criar conta
+      // Se não está logado, redireciona para página de cadastro
       if (!this.usuarioLogado()) {
-        if (window.mostrarModalLogin) {
-          window.mostrarModalLogin();
-        } else {
-          alert('Por favor, crie uma conta ou faça login para se inscrever.');
-          window.location.href = '/index.html#login';
-        }
+        // Redireciona para a página de cadastro
+        const cadastroUrl = window.CONFIG ? window.CONFIG.buildPageUrl('cadastro.html') : 'pagina/cadastro.html';
+        window.location.href = cadastroUrl;
         return;
       }
       

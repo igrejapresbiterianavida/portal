@@ -219,16 +219,21 @@ function devocionalDiario() {
             }
             
             const devocional = devocionaisFiltrados[0];
-            const imagemUrl = devocional.imagem_url || '';
-            // Adicionar timestamp para forçar atualização da imagem (evita cache)
-            const imagemComCache = imagemUrl ? (imagemUrl.includes('?') ? imagemUrl : imagemUrl + '?t=' + Date.now()) : 'assets/images/corrida.jpg?t=' + Date.now();
+            const imagemUrl = devocional.imagem_url && devocional.imagem_url.trim() !== '' ? devocional.imagem_url : null;
+            // Se não tem imagem, gerar SVG dinâmico; senão, adicionar cache busting
+            let imagemFinal;
+            if (imagemUrl) {
+              imagemFinal = imagemUrl.includes('?') ? imagemUrl : imagemUrl + '?t=' + Date.now();
+            } else {
+              imagemFinal = this.gerarSVGDevocional(devocional);
+            }
             
             this.devocional = {
               id: devocional.id,
               titulo: devocional.titulo || '',
               texto: devocional.texto || '',
-              imagem: imagemComCache, // Campo usado no HTML com cache busting
-              imagem_url: imagemUrl, // Mantém compatibilidade
+              imagem: imagemFinal, // Campo usado no HTML (URL ou SVG)
+              imagem_url: imagemUrl || '', // Mantém compatibilidade
               data_publicacao: devocional.data_publicacao || new Date().toISOString().split('T')[0],
               ativo: devocional.ativo,
               nivel_acesso: devocional.nivel_acesso
@@ -255,6 +260,45 @@ function devocionalDiario() {
       }
       
       return this.devocional.texto.substring(0, 350) + '...';
+    },
+    
+    // Gerar SVG dinâmico para devocional sem imagem
+    gerarSVGDevocional(devocional) {
+      const titulo = this.truncarTexto(devocional.titulo || 'Devocional', 30);
+      const texto = this.truncarTexto(devocional.texto || '', 80);
+      const data = devocional.data_publicacao 
+        ? new Date(devocional.data_publicacao).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
+        : '';
+      
+      // ID único para evitar conflito de gradientes
+      const uid = Math.random().toString(36).substring(2, 8);
+      
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="gd${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A4731"/>
+      <stop offset="50%" stop-color="#2D5F4A"/>
+      <stop offset="100%" stop-color="#3d8b5a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#gd${uid})"/>
+  <circle cx="700" cy="80" r="150" fill="rgba(255,255,255,0.05)"/>
+  <circle cx="100" cy="350" r="120" fill="rgba(255,255,255,0.05)"/>
+  <rect x="40" y="40" width="120" height="32" rx="16" fill="rgba(255,255,255,0.2)"/>
+  <text x="100" y="62" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">DEVOCIONAL</text>
+  <text x="400" y="160" font-family="Georgia,serif" font-size="32" font-weight="bold" fill="white" text-anchor="middle">${titulo}</text>
+  <text x="400" y="220" font-family="Georgia,serif" font-size="16" fill="rgba(255,255,255,0.85)" text-anchor="middle">${texto}</text>
+  <text x="400" y="320" font-family="Arial,sans-serif" font-size="14" fill="rgba(255,255,255,0.7)" text-anchor="middle">${data}</text>
+  <text x="400" y="370" font-family="Arial,sans-serif" font-size="12" fill="rgba(255,255,255,0.4)" text-anchor="middle">Igreja Presbiteriana Vida</text>
+</svg>`;
+      
+      return 'data:image/svg+xml,' + encodeURIComponent(svg);
+    },
+    
+    truncarTexto(texto, maxLength) {
+      if (!texto) return '';
+      if (texto.length <= maxLength) return texto;
+      return texto.substring(0, maxLength) + '...';
     }
   };
 }
@@ -507,10 +551,14 @@ function videosYoutube() {
                   corCategoria: p.cor_categoria || '#1A4731',
                   link: p.link || '#',
                   cor1: p.cor1 || '#1A4731',
-                  cor2: p.cor2 || '#2D5F4A'
+                  cor2: p.cor2 || '#2D5F4A',
+                  imagem_url: p.imagem_url || '' // Guardar URL original
                 };
-                // Se não tiver imagem, gerar SVG dinâmico
-                programa.imagem = p.imagem_url || this.gerarSVGProgramacao(programa);
+                // Se não tiver imagem (vazio ou null), gerar SVG dinâmico
+                // Verifica se a URL existe E se não é uma string vazia
+                programa.imagem = (p.imagem_url && p.imagem_url.trim() !== '') 
+                  ? p.imagem_url 
+                  : this.gerarSVGProgramacao(programa);
                 return programa;
               });
               console.log(`✅ ${this.programas.length} programas carregados do Supabase (após filtro de acesso)`);
@@ -1725,4 +1773,25 @@ function baixarTodasMidias(midias) {
   });
   
   alert(`✅ Download de ${midias.length} mídias iniciado!\nOs arquivos serão baixados automaticamente.`);
+}
+
+// ============================================
+// MODAL LEGAL - Termos e Política de Privacidade
+// ============================================
+function modalLegal() {
+  return {
+    modalAberto: false,
+    tipoModal: 'privacidade', // 'privacidade' ou 'termos'
+    
+    abrirModal(tipo) {
+      this.tipoModal = tipo;
+      this.modalAberto = true;
+      document.body.style.overflow = 'hidden';
+    },
+    
+    fecharModal() {
+      this.modalAberto = false;
+      document.body.style.overflow = '';
+    }
+  };
 }

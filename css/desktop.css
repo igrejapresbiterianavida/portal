@@ -24,9 +24,13 @@
   }
   
   .navbar-notificacoes {
-    display: flex !important;
     order: 3;
     margin-left: 12px;
+  }
+  
+  /* Respeitar x-show do Alpine.js */
+  .navbar-notificacoes[style*="display: none"] {
+    display: none !important;
   }
   
   /* Navbar desktop - reset mobile styles */

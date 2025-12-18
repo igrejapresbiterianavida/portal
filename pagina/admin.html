@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="../css/admin-modals.css">
   <link rel="stylesheet" href="../css/admin-tables.css">
   <link rel="stylesheet" href="../css/ux-ui-fixes.css">
+  <link rel="stylesheet" href="../css/admin-melhorias.css">
   
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
@@ -475,14 +476,14 @@
             Programação
           </a>
         </div>
-        
+        <!--
         <div class="nav-item">
           <a href="#eventos" class="nav-link" @click="mudarSecao('eventos')">
             <span class="material-icons">calendar_today</span>
             Eventos
           </a>
         </div>
-        
+      -->
         <!-- Divisor -->
         <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0;"></div>
         
@@ -754,15 +755,17 @@
                     </td>
                     <td style="padding: 15px;" x-text="formatarData(usuario.data_criacao)"></td>
                     <td style="padding: 15px; text-align: center;">
-                      <button @click="abrirModal(usuario)" class="botao botao-pequeno" style="margin-right: 5px;" title="Editar">
-                        <span class="material-icons" style="font-size: 16px;">edit</span>
-                      </button>
-                      <button @click="deletar(usuario.id)" 
-                              class="botao botao-pequeno botao-secundario" 
-                              title="Deletar"
-                              x-show="usuario.tipo !== 'administracao' || usuarios.filter(u => u.tipo === 'administracao').length > 1">
-                        <span class="material-icons" style="font-size: 16px;">delete</span>
-                      </button>
+                      <div class="table-actions" style="display: flex; gap: 8px; justify-content: center;">
+                        <button @click="abrirModal(usuario)" class="btn-action btn-edit" title="Editar">
+                          <span class="material-icons">edit</span>
+                        </button>
+                        <button @click="deletar(usuario.id)" 
+                                class="btn-action btn-delete" 
+                                title="Deletar"
+                                x-show="usuario.tipo !== 'administracao' || usuarios.filter(u => u.tipo === 'administracao').length > 1">
+                          <span class="material-icons">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </template>
@@ -775,58 +778,176 @@
             </table>
           </div>
           
-          <!-- Modal de Edição/Criação -->
-          <div x-show="modalAberto" 
-               style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;" 
-               @click.self="fecharModal()">
-            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
-              <h3 x-text="usuarioEditando ? 'Editar Usuário' : 'Novo Usuário'"></h3>
+          <!-- Modal de Edição/Criação Usuário - Enterprise -->
+          <div x-show="modalAberto" class="modal-crud-overlay" @click.self="fecharModal()">
+            <div class="modal-crud-container" style="max-width: 800px;">
               
-              <div style="margin-top: 20px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome *</label>
-                <input type="text" x-model="formulario.nome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Sobrenome</label>
-                <input type="text" x-model="formulario.sobrenome" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email *</label>
-                <input type="email" x-model="formulario.email" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;" required>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Telefone</label>
-                <input type="tel" x-model="formulario.telefone" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Tipo</label>
-                <select x-model="formulario.tipo" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-                  <template x-for="tipo in tipos" :key="tipo.valor">
-                    <option :value="tipo.valor" x-text="tipo.label"></option>
-                  </template>
-                </select>
-              </div>
-              
-              <div style="margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Status</label>
-                <select x-model="formulario.status" style="width: 100%; padding: 10px; border: 1px solid var(--cinza-leve); border-radius: 5px;">
-                  <option value="ativo">Ativo</option>
-                  <option value="inativo">Inativo</option>
-                  <option value="suspenso">Suspenso</option>
-                </select>
-              </div>
-              
-              <div style="margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end;">
-                <button @click="fecharModal()" class="botao botao-secundario" :disabled="carregando">Cancelar</button>
-                <button @click="salvar()" class="botao botao-primario" :disabled="carregando">
-                  <span x-show="!carregando">Salvar</span>
-                  <span x-show="carregando">Salvando...</span>
+              <!-- Header -->
+              <div class="modal-crud-header">
+                <div class="modal-crud-title-wrapper">
+                  <div class="modal-crud-icon">
+                    <span class="material-icons">person</span>
+                  </div>
+                  <div class="modal-crud-title-content">
+                    <h3 x-text="usuarioEditando ? 'Editar Usuário' : 'Novo Usuário'"></h3>
+                    <p x-text="usuarioEditando ? 'Atualize as informações do usuário' : 'Preencha os dados para criar um novo usuário'"></p>
+                  </div>
+                </div>
+                <button @click="fecharModal()" class="modal-crud-close">
+                  <span class="material-icons">close</span>
                 </button>
               </div>
+              
+              <!-- Body -->
+              <div class="modal-crud-body">
+                
+                <!-- Seção: Informações Básicas -->
+                <div class="form-section-modal">
+                  <h4 class="form-section-modal-title">
+                    <span class="material-icons">badge</span>
+                    Informações Básicas
+                  </h4>
+                  
+                  <div class="form-grid-2">
+                    <div class="form-field">
+                      <label>Nome <span class="required">*</span></label>
+                      <input type="text" x-model="formulario.nome" placeholder="Nome" required>
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Sobrenome</label>
+                      <input type="text" x-model="formulario.sobrenome" placeholder="Sobrenome">
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Email <span class="required">*</span></label>
+                      <input type="email" x-model="formulario.email" placeholder="email@exemplo.com" required>
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Telefone</label>
+                      <input type="tel" x-model="formulario.telefone" placeholder="(00) 00000-0000" @input="formatarTelefone">
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Data de Nascimento</label>
+                      <input type="date" x-model="formulario.data_nascimento">
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Profissão</label>
+                      <input type="text" x-model="formulario.profissao" placeholder="Ex: Engenheiro">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Seção: Endereço -->
+                <div class="form-section-modal">
+                  <h4 class="form-section-modal-title">
+                    <span class="material-icons">location_on</span>
+                    Endereço
+                  </h4>
+                  
+                  <div class="form-grid-2">
+                    <div class="form-field form-col-span-2">
+                      <label>Endereço</label>
+                      <input type="text" x-model="formulario.endereco" placeholder="Rua, número, complemento">
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Cidade</label>
+                      <input type="text" x-model="formulario.cidade" placeholder="Cidade">
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Estado</label>
+                      <select x-model="formulario.estado">
+                        <option value="">Selecione...</option>
+                        <template x-for="uf in estados" :key="uf">
+                          <option :value="uf" x-text="uf"></option>
+                        </template>
+                      </select>
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>CEP</label>
+                      <input type="text" x-model="formulario.cep" placeholder="00000-000" @input="formatarCEP" maxlength="9">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Seção: Informações Adicionais -->
+                <div class="form-section-modal">
+                  <h4 class="form-section-modal-title">
+                    <span class="material-icons">info</span>
+                    Informações Adicionais
+                  </h4>
+                  
+                  <div class="form-grid-2">
+                    <div class="form-field">
+                      <label>Estado Civil</label>
+                      <select x-model="formulario.estado_civil">
+                        <template x-for="ec in estadosCivis" :key="ec.valor">
+                          <option :value="ec.valor" x-text="ec.label"></option>
+                        </template>
+                      </select>
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Como Conheceu a Igreja?</label>
+                      <input type="text" x-model="formulario.como_conheceu" placeholder="Ex: Indicação de amigo">
+                    </div>
+                    
+                    <div class="form-field form-col-span-2">
+                      <label>Observações</label>
+                      <textarea x-model="formulario.observacoes" rows="3" placeholder="Notas ou observações sobre o usuário..."></textarea>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Seção: Configurações -->
+                <div class="form-section-modal">
+                  <h4 class="form-section-modal-title">
+                    <span class="material-icons">settings</span>
+                    Configurações
+                  </h4>
+                  
+                  <div class="form-grid-2">
+                    <div class="form-field">
+                      <label>Tipo de Usuário</label>
+                      <select x-model="formulario.tipo">
+                        <template x-for="tipo in tipos" :key="tipo.valor">
+                          <option :value="tipo.valor" x-text="tipo.label"></option>
+                        </template>
+                      </select>
+                    </div>
+                    
+                    <div class="form-field">
+                      <label>Status</label>
+                      <select x-model="formulario.status">
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                        <option value="suspenso">Suspenso</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+              
+              <!-- Footer -->
+              <div class="modal-crud-footer">
+                <button @click="fecharModal()" class="btn-modal btn-modal-cancel" :disabled="carregando">
+                  <span class="material-icons">close</span>
+                  Cancelar
+                </button>
+                <button @click="salvar()" class="btn-modal btn-modal-save" :disabled="carregando">
+                  <span x-show="!carregando" class="material-icons">check</span>
+                  <span x-show="carregando" class="spinner"></span>
+                  <span x-text="carregando ? 'Salvando...' : 'Salvar'"></span>
+                </button>
+              </div>
+              
             </div>
           </div>
         </div>
@@ -1494,7 +1615,6 @@
             <table class="crud-table">
               <thead>
                 <tr>
-                  <th style="width: 60px;">Avatar</th>
                   <th>Nome</th>
                   <th>Contato</th>
                   <th style="width: 140px;">Data Visita</th>
@@ -1506,15 +1626,13 @@
                 <template x-for="visitante in visitantes" :key="visitante.id">
                   <tr>
                     <td>
-                      <div class="table-thumbnail">
-                        <img :src="visitante.avatar || '../assets/images/default-user.jpg'" alt="Visitante" onerror="this.src='../assets/images/default-user.jpg'">
-                      </div>
+                      <div class="table-title" x-text="visitante.nome || 'Visitante'"></div>
+                      <div class="table-subtitle" x-text="visitante.telefone || 'Sem telefone'"></div>
                     </td>
                     <td>
-                      <div class="table-title" x-text="visitante.nome || 'Visitante'"></div>
-                      <div class="table-subtitle" x-text="visitante.email || visitante.telefone || 'Sem contato'"></div>
+                      <div x-show="visitante.email" style="font-size: 0.9rem;">📧 <span x-text="visitante.email"></span></div>
+                      <div x-show="visitante.telefone" style="font-size: 0.9rem;">📞 <span x-text="visitante.telefone"></span></div>
                     </td>
-                    <td x-text="visitante.email || visitante.telefone || '-'"></td>
                     <td x-text="formatarData(visitante.data_visita)"></td>
                     <td>
                       <span class="badge" :class="visitante.status === 'confirmado' ? 'badge-success' : (visitante.status === 'cancelado' ? 'badge-danger' : 'badge-info')" x-text="visitante.status || '-'"></span>
@@ -1534,10 +1652,7 @@
             <div class="crud-mobile-cards">
               <template x-for="visitante in visitantes" :key="visitante.id">
                 <div class="mobile-card">
-                  <div class="mobile-card-image">
-                    <img :src="visitante.avatar || '../assets/images/default-user.jpg'" alt="Visitante" onerror="this.src='../assets/images/default-user.jpg'">
-                  </div>
-                  <div class="mobile-card-content">
+                  <div class="mobile-card-content" style="width: 100%;">
                     <h4 x-text="visitante.nome || 'Visitante'"></h4>
                     <div class="mobile-card-meta">
                       <span>📧 <span x-text="visitante.email || '-'"></span></span>
@@ -1695,8 +1810,10 @@
                       <span x-show="!evento.ativo" style="color: red;">Inativo</span>
                     </td>
                     <td style="padding: 15px; text-align: center;">
-                      <button @click="abrirModal(evento)" class="botao botao-pequeno">Editar</button>
-                      <button @click="deletar(evento.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                      <div class="table-actions" style="display: flex; gap: 8px; justify-content: center;">
+                        <button @click="abrirModal(evento)" class="btn-action btn-edit"><span class="material-icons">edit</span></button>
+                        <button @click="deletar(evento.id)" class="btn-action btn-delete"><span class="material-icons">delete</span></button>
+                      </div>
                     </td>
                   </tr>
                 </template>
@@ -2010,8 +2127,10 @@
                         <span x-show="!dado.ativo" style="color: red;">Inativo</span>
                       </td>
                       <td style="padding: 15px; text-align: center;">
-                        <button @click="abrirModalBancario(dado)" class="botao botao-pequeno">Editar</button>
-                        <button @click="deletarBancario(dado.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                        <div class="table-actions" style="display: flex; gap: 8px; justify-content: center;">
+                          <button @click="abrirModalBancario(dado)" class="btn-action btn-edit"><span class="material-icons">edit</span></button>
+                          <button @click="deletarBancario(dado.id)" class="btn-action btn-delete"><span class="material-icons">delete</span></button>
+                        </div>
                       </td>
                     </tr>
                   </template>
@@ -2164,8 +2283,10 @@
                       <span x-show="!rede.ativo" style="color: red;">Inativo</span>
                     </td>
                     <td style="padding: 15px; text-align: center;">
-                      <button @click="abrirModal(rede)" class="botao botao-pequeno">Editar</button>
-                      <button @click="deletar(rede.id)" class="botao botao-pequeno botao-secundario">Deletar</button>
+                      <div class="table-actions" style="display: flex; gap: 8px; justify-content: center;">
+                        <button @click="abrirModal(rede)" class="btn-action btn-edit"><span class="material-icons">edit</span></button>
+                        <button @click="deletar(rede.id)" class="btn-action btn-delete"><span class="material-icons">delete</span></button>
+                      </div>
                     </td>
                   </tr>
                 </template>
@@ -2365,15 +2486,17 @@
                     </td>
                     <td style="padding: 15px; font-size: 0.85rem;" x-text="formatarDataHora(catecumeno.created_at)"></td>
                     <td style="padding: 15px; text-align: center;">
-                      <button @click="verDetalhes(catecumeno)" class="botao botao-pequeno" title="Ver detalhes" style="margin-right: 5px;">
-                        <span class="material-icons" style="font-size: 16px;">visibility</span>
-                      </button>
-                      <button @click="abrirModal(catecumeno)" class="botao botao-pequeno" title="Editar" style="margin-right: 5px;">
-                        <span class="material-icons" style="font-size: 16px;">edit</span>
-                      </button>
-                      <button @click="deletar(catecumeno.id)" class="botao botao-pequeno botao-secundario" title="Deletar">
-                        <span class="material-icons" style="font-size: 16px;">delete</span>
-                      </button>
+                      <div class="table-actions" style="display: flex; gap: 8px; justify-content: center;">
+                        <button @click="verDetalhes(catecumeno)" class="btn-action btn-view" title="Ver detalhes">
+                          <span class="material-icons">visibility</span>
+                        </button>
+                        <button @click="abrirModal(catecumeno)" class="btn-action btn-edit" title="Editar">
+                          <span class="material-icons">edit</span>
+                        </button>
+                        <button @click="deletar(catecumeno.id)" class="btn-action btn-delete" title="Deletar">
+                          <span class="material-icons">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </template>
@@ -2627,12 +2750,12 @@
                         </span>
                       </div>
                     </div>
-                    <div style="display: flex; gap: 5px;">
-                      <button @click="abrirModal(turma)" class="botao botao-pequeno" title="Editar">
-                        <span class="material-icons" style="font-size: 16px;">edit</span>
+                    <div class="table-actions" style="display: flex; gap: 8px;">
+                      <button @click="abrirModal(turma)" class="btn-action btn-edit" title="Editar">
+                        <span class="material-icons">edit</span>
                       </button>
-                      <button @click="deletar(turma.id)" class="botao botao-pequeno botao-secundario" title="Deletar">
-                        <span class="material-icons" style="font-size: 16px;">delete</span>
+                      <button @click="deletar(turma.id)" class="btn-action btn-delete" title="Deletar">
+                        <span class="material-icons">delete</span>
                       </button>
                     </div>
                   </div>
@@ -2856,7 +2979,8 @@
   
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../js/env-dev.js"></script>
+  <script src="../js/config-prod.js"></script>
+  <script src="../js/env-dev.js" onerror="console.log('⚠️ env-dev.js não encontrado (normal em produção)')"></script>
   <script src="../js/config.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>

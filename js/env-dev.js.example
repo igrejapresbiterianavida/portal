@@ -1,0 +1,52 @@
+// ============================================
+// ENV-DEV.JS - Variáveis de Ambiente para Desenvolvimento Local
+// ============================================
+// 
+// ⚠️ IMPORTANTE: Este arquivo contém credenciais sensíveis!
+// - NÃO faça commit deste arquivo no Git
+// - Copie este arquivo para env-dev.js e preencha suas credenciais
+// 
+// 📝 COMO CONFIGURAR:
+// 
+// 1. Copie este arquivo: cp env-dev.js.example env-dev.js
+// 2. Acesse https://app.supabase.com
+// 3. Selecione seu projeto
+// 4. Vá em Settings > API
+// 5. Copie:
+//    - Project URL → cole em SUPABASE_URL
+//    - anon public → cole em SUPABASE_ANON_KEY
+//
+// 💡 Se não tiver Supabase configurado, o site usará os arquivos
+//    JSON da pasta data/ como fallback (funcionalidade limitada)
+// ============================================
+
+window.ENV = {
+  // ==================== SUPABASE ====================
+  // 🔗 COLE SUAS CREDENCIAIS AQUI:
+  
+  SUPABASE_URL: '',  // Ex: 'https://abcdefg.supabase.co'
+  
+  SUPABASE_ANON_KEY: '',  // Ex: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  
+  // ==================== YOUTUBE ====================
+  CANAL_ID: 'UCTOsnSoOX31RB6Dr_kh9sHw',
+  
+  // ==================== EMAILJS ====================
+  EMAILJS_SERVICE_ID: '',
+  EMAILJS_TEMPLATE_ID: '',
+  EMAILJS_PUBLIC_KEY: '',
+  EMAILJS_TO_EMAIL: ''
+};
+
+// Verificar configuração
+(function() {
+  const hasSupabase = window.ENV.SUPABASE_URL && window.ENV.SUPABASE_ANON_KEY;
+  
+  if (hasSupabase) {
+    console.log('✅ Supabase configurado - usando banco de dados');
+  } else {
+    console.warn('⚠️ Supabase NÃO configurado - usando arquivos JSON locais (data/)');
+    console.warn('📝 Para configurar, edite js/env-dev.js com suas credenciais');
+  }
+})();
+

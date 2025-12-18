@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Criar Conta - Igreja Presbiteriana Vida">
+  <title>Criar Conta | IPV - Igreja Presbiteriana Vida</title>
+  
+  <!-- Favicons e Ícones -->
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/ipvida.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/icons/ipvida.png">
+  <link rel="apple-touch-icon" href="../assets/icons/ipvida.png">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/globais.css">
+  <link rel="stylesheet" href="../css/componentes.css">
+  <link rel="stylesheet" href="../css/animacoes.css">
+  <link rel="stylesheet" href="../css/mobile.css">
+  <link rel="stylesheet" href="../css/desktop.css">
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .cadastro-container {
+      background: var(--branco);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .cadastro-header {
+      background: linear-gradient(135deg, #1A4731 0%, #2D6A4F 100%);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+    }
+    
+    .cadastro-header img {
+      width: 200px;
+      height: 100px;
+      margin: 0 auto 0px auto;
+      display: block;
+    }
+    
+    .cadastro-header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    
+    .cadastro-header p {
+      margin: 10px 0 0;
+      opacity: 0.9;
+      font-size: 0.95rem;
+      color: #ffffff;
+
+    }
+    
+    .cadastro-form {
+      padding: 30px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1A4731;
+      margin-bottom: 8px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #ffffff;
+      box-sizing: border-box;
+      color: #1A4731;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #1A4731;
+      box-shadow: 0 0 0 4px rgba(26, 71, 49, 0.1);
+    }
+    
+    .form-input.error {
+      border-color: #DC2626;
+    }
+    
+    .error-message {
+      color: #DC2626;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+    
+    .password-wrapper {
+      position: relative;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      padding: 5px;
+    }
+    
+    .password-toggle:hover {
+      color: #1A4731;
+    }
+    
+    .password-strength {
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    
+    .password-strength-bar {
+      height: 100%;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+    
+    .strength-weak { background: #DC2626; width: 33%; }
+    .strength-medium { background: #F59E0B; width: 66%; }
+    .strength-strong { background: #10B981; width: 100%; }
+    
+    .btn-cadastro {
+      width: 100%;
+      background: linear-gradient(135deg, #1A4731 0%, #2D6A4F 100%);
+      color: #ffffff;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(26, 71, 49, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .btn-cadastro:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 71, 49, 0.5);
+    }
+    
+    .btn-cadastro:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    .divider {
+      margin: 25px 0;
+      text-align: center;
+      color: #9CA3AF;
+      font-size: 0.9rem;
+      position: relative;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #E5E7EB;
+    }
+    
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    
+    .btn-google {
+      width: 100%;
+      background: white;
+      border: 2px solid #e2e8f0;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #374151;
+    }
+    
+    .btn-google:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    
+    .btn-google svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .cadastro-footer {
+      text-align: center;
+      padding: 20px 30px 30px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .cadastro-footer p {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    
+    .cadastro-footer a {
+      color: #1A4731;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    
+    .cadastro-footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .voltar-site {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(26, 71, 49, 0.1);
+      color: #1A4731;
+      padding: 10px 15px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+      z-index: 10;
+    }
+    
+    .voltar-site:hover {
+      background: rgba(26, 71, 49, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .alerta {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .alerta-erro {
+      background: #FEE2E2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+    }
+    
+    .alerta-sucesso {
+      background: #D1FAE5;
+      color: #059669;
+      border: 1px solid #A7F3D0;
+    }
+    
+    .termos-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .termos-check input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #1A4731;
+      margin-top: 2px;
+    }
+    
+    .termos-check label {
+      font-size: 0.85rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    
+    .termos-check a {
+      color: #1A4731;
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 540px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-group.full-width {
+        grid-column: span 1;
+      }
+      
+      .cadastro-header {
+        padding: 30px 20px;
+      }
+      
+      .cadastro-form {
+        padding: 20px;
+      }
+      
+      .cadastro-footer {
+        padding: 15px 20px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Link para voltar ao site -->
+  <a style="color: #ffffff;" href="../index.html" class="voltar-site">
+    <span class="material-icons" style="font-size: 18px;">arrow_back</span>
+    Voltar ao site
+  </a>
+  
+  <!-- Container de Cadastro -->
+  <div class="cadastro-container" x-data="cadastroForm()">
+    
+    <!-- Header -->
+    <div class="cadastro-header">
+      <img src="../assets/images/logo-branco.svg" alt="Logo IPVida" onerror="this.style.display='none'">
+      <h1>Criar Conta</h1>
+      <p>Junte-se à nossa comunidade</p>
+    </div>
+    
+    <!-- Formulário -->
+    <div class="cadastro-form">
+      
+      <!-- Mensagem de Erro -->
+      <div x-show="erro" class="alerta alerta-erro" x-transition>
+        <i class="bi bi-exclamation-circle"></i>
+        <span x-text="erro"></span>
+      </div>
+      
+      <!-- Mensagem de Sucesso -->
+      <div x-show="sucesso" class="alerta alerta-sucesso" x-transition>
+        <i class="bi bi-check-circle"></i>
+        <span x-text="sucesso"></span>
+      </div>
+      
+      <form @submit.prevent="enviar()">
+        
+        <!-- Nome e Sobrenome -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nome *</label>
+            <input 
+              type="text" 
+              class="form-input" 
+              x-model="dados.nome"
+              placeholder="Seu nome"
+              required
+              :disabled="carregando"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Sobrenome *</label>
+            <input 
+              type="text" 
+              class="form-input" 
+              x-model="dados.sobrenome"
+              placeholder="Seu sobrenome"
+              required
+              :disabled="carregando"
+            >
+          </div>
+        </div>
+        
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input 
+            type="email" 
+            class="form-input" 
+            x-model="dados.email"
+            placeholder="seu@email.com"
+            required
+            :disabled="carregando"
+          >
+        </div>
+        
+        <!-- Telefone -->
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input 
+            type="tel" 
+            class="form-input" 
+            x-model="dados.telefone"
+            placeholder="(00) 00000-0000"
+            :disabled="carregando"
+            @input="formatarTelefone"
+          >
+        </div>
+        
+        <!-- Senha -->
+        <div class="form-group">
+          <label class="form-label">Senha *</label>
+          <div class="password-wrapper">
+            <input 
+              :type="mostrarSenha ? 'text' : 'password'" 
+              class="form-input" 
+              x-model="dados.senha"
+              placeholder="Mínimo 6 caracteres"
+              required
+              minlength="6"
+              :disabled="carregando"
+              @input="verificarForcaSenha"
+            >
+            <button type="button" class="password-toggle" @click="mostrarSenha = !mostrarSenha">
+              <i class="bi" :class="mostrarSenha ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+          <div class="password-strength" x-show="dados.senha.length > 0">
+            <div class="password-strength-bar" :class="forcaSenhaClasse"></div>
+          </div>
+        </div>
+        
+        <!-- Confirmar Senha -->
+        <div class="form-group">
+          <label class="form-label">Confirmar Senha *</label>
+          <div class="password-wrapper">
+            <input 
+              :type="mostrarConfirmarSenha ? 'text' : 'password'" 
+              class="form-input" 
+              :class="{'error': dados.confirmarSenha && dados.senha !== dados.confirmarSenha}"
+              x-model="dados.confirmarSenha"
+              placeholder="Repita a senha"
+              required
+              :disabled="carregando"
+            >
+            <button type="button" class="password-toggle" @click="mostrarConfirmarSenha = !mostrarConfirmarSenha">
+              <i class="bi" :class="mostrarConfirmarSenha ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+          <p class="error-message" x-show="dados.confirmarSenha && dados.senha !== dados.confirmarSenha">
+            As senhas não coincidem
+          </p>
+        </div>
+        
+        <!-- Termos -->
+        <div class="termos-check">
+          <input type="checkbox" id="termos" x-model="aceitouTermos" required>
+          <label for="termos">
+            Li e aceito os <a href="termos-privacidade.html" target="_blank">Termos de Uso</a> e a 
+            <a href="termos-privacidade.html" target="_blank">Política de Privacidade</a>
+          </label>
+        </div>
+        
+        <!-- Botão Cadastrar -->
+        <button type="submit" class="btn-cadastro" :disabled="carregando || !podeEnviar">
+          <span x-show="!carregando">
+            <i class="bi bi-person-plus"></i>
+            Criar minha conta
+          </span>
+          <span x-show="carregando">
+            <i class="bi bi-arrow-repeat spin"></i>
+            Criando conta...
+          </span>
+        </button>
+        
+      </form>
+      
+      <!-- Divisor -->
+      <div class="divider">ou continue com</div>
+      
+      <!-- Botão Google -->
+      <button type="button" class="btn-google" @click="loginComGoogle()" :disabled="carregando">
+        <svg viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continuar com Google
+      </button>
+      
+    </div>
+    
+    <!-- Footer -->
+    <div class="cadastro-footer">
+      <p>Já tem uma conta? <a href="login.html">Fazer login</a></p>
+    </div>
+    
+  </div>
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config-prod.js"></script>
+  <script src="../js/env-dev.js" onerror="console.log('⚠️ env-dev.js não encontrado (normal em produção)')"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/auth.js"></script>
+  
+  <script>
+    function cadastroForm() {
+      return {
+        dados: {
+          nome: '',
+          sobrenome: '',
+          email: '',
+          telefone: '',
+          senha: '',
+          confirmarSenha: ''
+        },
+        carregando: false,
+        erro: '',
+        sucesso: '',
+        mostrarSenha: false,
+        mostrarConfirmarSenha: false,
+        aceitouTermos: false,
+        forcaSenha: 0,
+        
+        get forcaSenhaClasse() {
+          if (this.forcaSenha <= 1) return 'strength-weak';
+          if (this.forcaSenha <= 2) return 'strength-medium';
+          return 'strength-strong';
+        },
+        
+        get podeEnviar() {
+          return this.dados.nome && 
+                 this.dados.sobrenome && 
+                 this.dados.email && 
+                 this.dados.senha && 
+                 this.dados.senha.length >= 6 &&
+                 this.dados.senha === this.dados.confirmarSenha &&
+                 this.aceitouTermos;
+        },
+        
+        verificarForcaSenha() {
+          const senha = this.dados.senha;
+          let forca = 0;
+          
+          if (senha.length >= 6) forca++;
+          if (senha.length >= 8) forca++;
+          if (/[A-Z]/.test(senha)) forca++;
+          if (/[0-9]/.test(senha)) forca++;
+          if (/[^A-Za-z0-9]/.test(senha)) forca++;
+          
+          this.forcaSenha = Math.min(forca, 3);
+        },
+        
+        formatarTelefone(e) {
+          let valor = e.target.value.replace(/\D/g, '');
+          if (valor.length > 11) valor = valor.slice(0, 11);
+          
+          if (valor.length > 6) {
+            valor = `(${valor.slice(0,2)}) ${valor.slice(2,7)}-${valor.slice(7)}`;
+          } else if (valor.length > 2) {
+            valor = `(${valor.slice(0,2)}) ${valor.slice(2)}`;
+          } else if (valor.length > 0) {
+            valor = `(${valor}`;
+          }
+          
+          this.dados.telefone = valor;
+        },
+        
+        async enviar() {
+          this.erro = '';
+          this.sucesso = '';
+          
+          if (!this.podeEnviar) {
+            this.erro = 'Por favor, preencha todos os campos obrigatórios corretamente.';
+            return;
+          }
+          
+          this.carregando = true;
+          
+          try {
+            // Criar usuário no Supabase Auth
+            const { data, error } = await window.supabaseClient.client.auth.signUp({
+              email: this.dados.email,
+              password: this.dados.senha,
+              options: {
+                data: {
+                  nome: this.dados.nome,
+                  sobrenome: this.dados.sobrenome,
+                  telefone: this.dados.telefone
+                }
+              }
+            });
+            
+            if (error) throw error;
+            
+            // Criar registro na tabela usuarios
+            if (data.user) {
+              const { error: dbError } = await window.supabaseClient.client
+                .from('usuarios')
+                .insert({
+                  id: data.user.id,
+                  nome: this.dados.nome,
+                  sobrenome: this.dados.sobrenome,
+                  email: this.dados.email,
+                  telefone: this.dados.telefone,
+                  tipo: 'visitante',
+                  status: 'ativo'
+                });
+              
+              if (dbError) {
+                console.error('Erro ao criar perfil:', dbError);
+              }
+            }
+            
+            this.sucesso = 'Conta criada com sucesso! Verifique seu email para confirmar o cadastro.';
+            
+            // Limpar formulário
+            this.dados = {
+              nome: '',
+              sobrenome: '',
+              email: '',
+              telefone: '',
+              senha: '',
+              confirmarSenha: ''
+            };
+            this.aceitouTermos = false;
+            
+            // Redirecionar após 3 segundos
+            setTimeout(() => {
+              window.location.href = 'login.html';
+            }, 3000);
+            
+          } catch (error) {
+            console.error('Erro no cadastro:', error);
+            
+            if (error.message.includes('already registered')) {
+              this.erro = 'Este email já está cadastrado. Tente fazer login.';
+            } else if (error.message.includes('invalid email')) {
+              this.erro = 'Email inválido. Verifique e tente novamente.';
+            } else if (error.message.includes('weak password')) {
+              this.erro = 'Senha muito fraca. Use pelo menos 6 caracteres.';
+            } else {
+              this.erro = 'Erro ao criar conta. Tente novamente mais tarde.';
+            }
+          } finally {
+            this.carregando = false;
+          }
+        },
+        
+        async loginComGoogle() {
+          this.carregando = true;
+          this.erro = '';
+          
+          try {
+            const { error } = await window.supabaseClient.client.auth.signInWithOAuth({
+              provider: 'google',
+              options: {
+                redirectTo: window.location.origin + '/pagina/auth-callback.html'
+              }
+            });
+            
+            if (error) throw error;
+          } catch (error) {
+            console.error('Erro ao fazer login com Google:', error);
+            this.erro = 'Erro ao conectar com Google. Tente novamente.';
+            this.carregando = false;
+          }
+        }
+      };
+    }
+    
+    // Verificar se já está logado
+    document.addEventListener('DOMContentLoaded', () => {
+      const sessao = localStorage.getItem('ipvida_usuario');
+      if (sessao) {
+        window.location.href = '../index.html';
+      }
+    });
+  </script>
+  
+  <style>
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</body>
+</html>
+

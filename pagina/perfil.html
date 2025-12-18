@@ -36,11 +36,266 @@
     .perfil-main {
       flex: 1;
       padding: 40px 20px;
+      padding-top: 100px; /* Espaço para o header fixo */
     }
     
     .perfil-container {
       max-width: 900px;
       margin: 0 auto;
+    }
+    
+    /* ==================== HEADER PROFISSIONAL ==================== */
+    .perfil-header-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #1A4731 0%, #2D5F4A 100%);
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(26, 71, 49, 0.3);
+    }
+    
+    .perfil-header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    
+    /* Logo */
+    .perfil-header-left {
+      flex-shrink: 0;
+    }
+    
+    .perfil-header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+    
+    .perfil-header-logo:hover {
+      transform: scale(1.02);
+    }
+    
+    .perfil-header-logo img {
+      height: 45px;
+      width: auto;
+    }
+    
+    .perfil-header-logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    
+    .perfil-header-logo-text .logo-title {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .perfil-header-logo-text .logo-subtitle {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+    
+    /* Navegação Central */
+    .perfil-header-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .perfil-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .perfil-nav-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+    
+    .perfil-nav-link .material-icons {
+      font-size: 20px;
+    }
+    
+    /* Ações à Direita */
+    .perfil-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .perfil-btn-voltar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .perfil-btn-voltar:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateX(-3px);
+    }
+    
+    .perfil-btn-voltar .material-icons {
+      font-size: 18px;
+    }
+    
+    /* Toggle Mobile */
+    .perfil-menu-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .perfil-menu-toggle:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+    
+    /* Menu Mobile */
+    .perfil-mobile-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #1A4731 0%, #2D5F4A 100%);
+      padding: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      flex-direction: column;
+      gap: 8px;
+      transform: translateY(-10px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .perfil-mobile-menu.aberto {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .perfil-mobile-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+    
+    .perfil-mobile-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+    
+    .perfil-mobile-link .material-icons {
+      font-size: 22px;
+    }
+    
+    .perfil-mobile-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.15);
+      margin: 8px 0;
+    }
+    
+    /* Responsivo */
+    @media (max-width: 900px) {
+      .perfil-header-nav-links {
+        display: none;
+      }
+      
+      .perfil-btn-voltar {
+        display: none;
+      }
+      
+      .perfil-menu-toggle {
+        display: flex;
+      }
+      
+      .perfil-mobile-menu {
+        display: flex;
+      }
+      
+      .perfil-header-container {
+        padding: 0 16px;
+        height: 60px;
+      }
+      
+      .perfil-header-logo img {
+        height: 38px;
+      }
+      
+      .perfil-header-logo-text .logo-title {
+        font-size: 0.6rem;
+      }
+      
+      .perfil-header-logo-text .logo-subtitle {
+        font-size: 1.15rem;
+      }
+      
+      .perfil-main {
+        padding-top: 80px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .perfil-header-logo-text {
+        display: none;
+      }
+      
+      .perfil-header-container {
+        height: 56px;
+      }
+      
+      .perfil-main {
+        padding-top: 76px;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
     }
     
     /* ==================== HEADER CARD ==================== */
@@ -482,38 +737,78 @@
 </head>
 <body class="perfil-page" x-data="perfilUsuario()">
   
-  <!-- Header -->
-  <header class="navbar" x-data="{ menuAberto: false }">
-    <div class="navbar-container">
-      <div class="navbar-auth">
-        <a href="#" @click.prevent="voltar()" class="user-info">
-          <span class="material-icons">arrow_back</span>
-          <span class="user-name">Voltar</span>
+  <!-- Header Profissional -->
+  <header class="perfil-header-nav" x-data="{ menuAberto: false }">
+    <div class="perfil-header-container">
+      
+      <!-- Logo e Navegação Principal -->
+      <div class="perfil-header-left">
+        <a href="../index.html" class="perfil-header-logo">
+          <img src="../assets/images/logo.svg" alt="IPVida Logo" onerror="this.src='../assets/icons/ipvida.png'">
+          <div class="perfil-header-logo-text">
+            <span class="logo-title">Igreja Presbiteriana</span>
+            <span class="logo-subtitle">Vida</span>
+          </div>
         </a>
       </div>
       
-      <a href="../index.html" class="navbar-logo" data-link="home">
-        <img src="../assets/icons/ipvida.png" alt="IPV Logo" class="logo-image">
-        <span class="logo-text">IPV</span>
-      </a>
+      <!-- Navegação Central (Desktop) -->
+      <nav class="perfil-header-nav-links">
+        <a href="../index.html" class="perfil-nav-link">
+          <span class="material-icons">home</span>
+          <span>Início</span>
+        </a>
+        <a href="../index.html#devocional" class="perfil-nav-link">
+          <span class="material-icons">auto_stories</span>
+          <span>Devocional</span>
+        </a>
+        <a href="../index.html#videos" class="perfil-nav-link">
+          <span class="material-icons">play_circle</span>
+          <span>Vídeos</span>
+        </a>
+        <a href="../index.html#programacao" class="perfil-nav-link">
+          <span class="material-icons">event</span>
+          <span>Programação</span>
+        </a>
+      </nav>
       
-      <button class="navbar-toggle" @click="menuAberto = !menuAberto">
-        <span class="material-icons" x-text="menuAberto ? 'close' : 'menu'">menu</span>
-      </button>
+      <!-- Ações à Direita -->
+      <div class="perfil-header-right">
+        <a href="#" @click.prevent="voltar()" class="perfil-btn-voltar">
+          <span class="material-icons">arrow_back</span>
+          <span>Voltar</span>
+        </a>
+        
+        <!-- Menu Mobile Toggle -->
+        <button class="perfil-menu-toggle" @click="menuAberto = !menuAberto">
+          <span class="material-icons" x-text="menuAberto ? 'close' : 'menu'">menu</span>
+        </button>
+      </div>
+      
     </div>
     
-    <nav class="navbar-menu" :class="{ 'aberto': menuAberto }">
-      <a href="../index.html" class="navbar-link" data-link="home">
+    <!-- Menu Mobile -->
+    <nav class="perfil-mobile-menu" :class="{ 'aberto': menuAberto }" @click.away="menuAberto = false">
+      <a href="../index.html" class="perfil-mobile-link">
         <span class="material-icons">home</span>
         <span>Início</span>
       </a>
-      <a href="../index.html#devocional" class="navbar-link" data-link="section">
+      <a href="../index.html#devocional" class="perfil-mobile-link">
         <span class="material-icons">auto_stories</span>
         <span>Devocional</span>
       </a>
-      <a href="../index.html#videos" class="navbar-link" data-link="section">
+      <a href="../index.html#videos" class="perfil-mobile-link">
         <span class="material-icons">play_circle</span>
         <span>Vídeos</span>
+      </a>
+      <a href="../index.html#programacao" class="perfil-mobile-link">
+        <span class="material-icons">event</span>
+        <span>Programação</span>
+      </a>
+      <div class="perfil-mobile-divider"></div>
+      <a href="#" @click.prevent="voltar(); menuAberto = false" class="perfil-mobile-link">
+        <span class="material-icons">arrow_back</span>
+        <span>Voltar</span>
       </a>
     </nav>
   </header>
@@ -868,7 +1163,8 @@
   
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../js/env-dev.js"></script>
+  <script src="../js/config-prod.js"></script>
+  <script src="../js/env-dev.js" onerror="console.log('⚠️ env-dev.js não encontrado (normal em produção)')"></script>
   <script src="../js/config.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/auth.js"></script>

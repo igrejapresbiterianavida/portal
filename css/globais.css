@@ -23,11 +23,13 @@ html {
   display: none !important;
 }
 
-/* Esconder sininho de notificações para visitantes não logados */
-.navbar-notificacoes[x-cloak] {
+/* Esconder sininho de notificações por padrão - só mostra via JS quando logado */
+.navbar-notificacoes {
   display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
+}
+
+.navbar-notificacoes.usuario-logado {
+  display: flex !important;
 }
 
 /* Alpine.js - Garantir que x-show funcione mesmo com CSS display */

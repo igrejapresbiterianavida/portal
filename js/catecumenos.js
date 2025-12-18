@@ -115,8 +115,15 @@ function inscricaoCatecumeno() {
       if (window.auth && auth.verificarSessaoAtiva && auth.verificarSessaoAtiva()) {
         return true;
       }
-      const usuario = localStorage.getItem('ipvida_usuario');
-      return usuario !== null;
+      // Verificar localStorage - auth_usuario é a chave correta
+      const authUsuario = localStorage.getItem('auth_usuario');
+      if (authUsuario) {
+        try {
+          const u = JSON.parse(authUsuario);
+          return u && u.id;
+        } catch { return false; }
+      }
+      return false;
     },
     
     /**
@@ -639,14 +646,29 @@ function inscricaoCatecumeno() {
     },
     
     obterUsuarioId() {
-      const usuario = localStorage.getItem('ipvida_usuario');
-      if (usuario) {
-        try {
-          return JSON.parse(usuario).id || null;
-        } catch {
-          return null;
-        }
+      // Primeiro tentar via auth global
+      if (window.auth && window.auth.usuario && window.auth.usuario.id) {
+        return window.auth.usuario.id;
       }
+      
+      // Verificar auth_usuario (chave principal do sistema)
+      const authUsuario = localStorage.getItem('auth_usuario');
+      if (authUsuario) {
+        try {
+          const u = JSON.parse(authUsuario);
+          if (u && u.id) return u.id;
+        } catch { /* ignora */ }
+      }
+      
+      // Fallback: ipv_sessao
+      const sessao = localStorage.getItem('ipv_sessao');
+      if (sessao) {
+        try {
+          const s = JSON.parse(sessao);
+          if (s && s.usuario && s.usuario.id) return s.usuario.id;
+        } catch { /* ignora */ }
+      }
+      
       return null;
     },
     

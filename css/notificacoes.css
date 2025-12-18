@@ -1,0 +1,264 @@
+/* ============================================
+   NOTIFICACOES.CSS - Página de Notificações
+   Para: pagina/notificacoes.html
+   ============================================ */
+
+/* ==================== BASE ==================== */
+.notificacoes-page-content {
+  min-height: calc(100vh - 200px);
+  background: var(--cinza-muito-claro);
+  padding-top: 100px;
+  padding-bottom: var(--espacamento-xxl);
+}
+
+/* ==================== HEADER ==================== */
+.notificacoes-page-header {
+  background: linear-gradient(135deg, var(--verde-escuro), var(--verde-medio));
+  color: var(--branco);
+  padding: var(--espacamento-xl) var(--espacamento-md);
+  text-align: center;
+  border-radius: 0 0 24px 24px;
+  margin-bottom: var(--espacamento-xl);
+}
+
+.notificacoes-page-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacamento-sm);
+  color: #FFF;
+}
+
+.notificacoes-page-header p {
+  margin: var(--espacamento-sm) 0 0;
+  opacity: 0.9;
+  color: #FFF;
+}
+
+/* ==================== CONTAINER ==================== */
+.notificacoes-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--espacamento-lg);
+}
+
+/* ==================== FILTROS ==================== */
+.notificacoes-filtros {
+  display: flex;
+  gap: var(--espacamento-sm);
+  margin-bottom: var(--espacamento-lg);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filtro-btn {
+  padding: var(--espacamento-sm) var(--espacamento-md);
+  border: 2px solid var(--cinza-leve);
+  border-radius: 25px;
+  background: var(--branco);
+  color: var(--cinza-escuro);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filtro-btn:hover {
+  border-color: var(--verde-medio);
+  transform: translateY(-2px);
+}
+
+.filtro-btn:active {
+  transform: translateY(0);
+}
+
+.filtro-btn.ativo {
+  background: var(--verde-medio);
+  border-color: var(--verde-medio);
+  color: var(--branco);
+}
+
+.marcar-lidas-btn {
+  margin-left: auto;
+  background: var(--verde-escuro) !important;
+  color: var(--branco) !important;
+  border-color: var(--verde-escuro) !important;
+}
+
+/* ==================== LISTA ==================== */
+.notificacoes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacamento-md);
+}
+
+/* ==================== CARD ==================== */
+.notificacao-card {
+  display: flex;
+  gap: var(--espacamento-md);
+  padding: var(--espacamento-lg);
+  background: var(--branco);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.notificacao-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  border-color: var(--verde-claro);
+}
+
+.notificacao-card:active {
+  transform: translateY(0);
+}
+
+.notificacao-card.nao-lida {
+  border-left: 4px solid var(--verde-medio);
+  background: linear-gradient(90deg, rgba(76, 175, 80, 0.05) 0%, var(--branco) 100%);
+}
+
+/* ==================== ÍCONE ==================== */
+.notificacao-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notificacao-icon.video { background: linear-gradient(135deg, #ffebee, #ffcdd2); color: #c62828; }
+.notificacao-icon.programacao { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1565c0; }
+.notificacao-icon.aviso { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #ef6c00; }
+.notificacao-icon.grupo { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+.notificacao-icon.catecumeno { background: linear-gradient(135deg, #f3e5f5, #e1bee7); color: #7b1fa2; }
+.notificacao-icon.sistema { background: linear-gradient(135deg, #eceff1, #cfd8dc); color: #607d8b; }
+.notificacao-icon.devocional { background: linear-gradient(135deg, #e8eaf6, #c5cae9); color: #3949ab; }
+
+.notificacao-icon i {
+  font-size: 1.5rem;
+}
+
+/* ==================== CONTEÚDO ==================== */
+.notificacao-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notificacao-titulo {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--cinza-escuro);
+  margin-bottom: 6px;
+}
+
+.notificacao-mensagem {
+  color: var(--cinza-medio);
+  font-size: 0.95rem;
+  margin-bottom: var(--espacamento-sm);
+  line-height: 1.6;
+}
+
+.notificacao-meta {
+  display: flex;
+  gap: var(--espacamento-md);
+  font-size: 0.85rem;
+  color: var(--cinza-claro);
+}
+
+.notificacao-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==================== BADGE ==================== */
+.nova-badge {
+  background: var(--verde-medio);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* ==================== ESTADO VAZIO ==================== */
+.notificacoes-vazio {
+  text-align: center;
+  padding: var(--espacamento-xxl);
+  color: var(--cinza-medio);
+}
+
+.notificacoes-vazio i {
+  font-size: 5rem;
+  margin-bottom: var(--espacamento-md);
+  opacity: 0.3;
+  color: var(--verde-medio);
+}
+
+.notificacoes-vazio h3 {
+  margin: 0 0 var(--espacamento-sm);
+  color: var(--cinza-escuro);
+}
+
+/* ==================== LOADING ==================== */
+.spin {
+  animation: notif-spin 1s linear infinite;
+}
+
+@keyframes notif-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .notificacoes-page-content {
+    padding-top: 80px;
+  }
+  
+  .notificacoes-page-header h1 {
+    font-size: 1.5rem;
+    color: #FFF;
+  }
+  
+  .notificacoes-container {
+    padding: 0 var(--espacamento-md);
+  }
+  
+  .notificacao-card {
+    padding: var(--espacamento-md);
+  }
+  
+  .notificacao-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .notificacao-titulo {
+    font-size: 1rem;
+  }
+  
+  .filtro-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .marcar-lidas-btn {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Fim notificacoes.css */
+

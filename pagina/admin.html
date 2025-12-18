@@ -14,11 +14,6 @@
   <!-- CSS -->
   <link rel="stylesheet" href="../css/globais.css">
   <link rel="stylesheet" href="../css/admin.css">
-  <link rel="stylesheet" href="../css/admin-mobile.css">
-  <link rel="stylesheet" href="../css/admin-modals.css">
-  <link rel="stylesheet" href="../css/admin-tables.css">
-  <link rel="stylesheet" href="../css/ux-ui-fixes.css">
-  <link rel="stylesheet" href="../css/admin-melhorias.css">
   
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
@@ -985,9 +980,10 @@
                   <tr>
                     <td>
                       <div class="table-thumbnail">
-                        <img :src="devocional.imagem || '../assets/images/default-devocional.jpg'" 
-                             :alt="devocional.titulo"
-                             onerror="this.src='../assets/images/default-devocional.jpg'">
+                        <img 
+                          :src="devocional.imagem_url || 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2780%27 height=%2760%27 viewBox=%270 0 80 60%27%3E%3Crect fill=%27%231A4731%27 width=%2780%27 height=%2760%27/%3E%3Ctext x=%2740%27 y=%2735%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2720%27 text-anchor=%27middle%27%3EDev%3C/text%3E%3C/svg%3E'" 
+                          :alt="devocional.titulo"
+                          @error="$event.target.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2780%27 height=%2760%27 viewBox=%270 0 80 60%27%3E%3Crect fill=%27%231A4731%27 width=%2780%27 height=%2760%27/%3E%3Ctext x=%2740%27 y=%2735%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2720%27 text-anchor=%27middle%27%3EDev%3C/text%3E%3C/svg%3E'">
                       </div>
                     </td>
                     <td>
@@ -1027,9 +1023,10 @@
               <template x-for="devocional in devocionais" :key="devocional.id">
                 <div class="mobile-card">
                   <div class="mobile-card-image">
-                    <img :src="devocional.imagem || '../assets/images/default-devocional.jpg'" 
-                         :alt="devocional.titulo"
-                         onerror="this.src='../assets/images/default-devocional.jpg'">
+                    <img 
+                      :src="devocional.imagem_url || 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%27160%27 viewBox=%270 0 200 160%27%3E%3Crect fill=%27%231A4731%27 width=%27200%27 height=%27160%27/%3E%3Ctext x=%27100%27 y=%2790%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2736%27 text-anchor=%27middle%27%3EDev%3C/text%3E%3C/svg%3E'" 
+                      :alt="devocional.titulo"
+                      @error="$event.target.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%27160%27 viewBox=%270 0 200 160%27%3E%3Crect fill=%27%231A4731%27 width=%27200%27 height=%27160%27/%3E%3Ctext x=%27100%27 y=%2790%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2736%27 text-anchor=%27middle%27%3EDev%3C/text%3E%3C/svg%3E'">
                     <span class="badge" :class="devocional.ativo ? 'badge-success' : 'badge-danger'" 
                           x-text="devocional.ativo ? 'Ativo' : 'Inativo'"></span>
                   </div>
@@ -1395,9 +1392,10 @@
                   <tr>
                     <td>
                       <div class="table-thumbnail">
-                        <img :src="programa.imagem || '../assets/images/default-programa.jpg'" 
-                             :alt="programa.titulo"
-                             onerror="this.src='../assets/images/default-programa.jpg'">
+                        <img 
+                          :src="programa.imagem_url || 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2780%27 height=%2760%27 viewBox=%270 0 80 60%27%3E%3Crect fill=%27%232D5F4A%27 width=%2780%27 height=%2760%27/%3E%3Ctext x=%2740%27 y=%2735%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2714%27 text-anchor=%27middle%27%3EProg%3C/text%3E%3C/svg%3E'" 
+                          :alt="programa.titulo"
+                          @error="$event.target.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2780%27 height=%2760%27 viewBox=%270 0 80 60%27%3E%3Crect fill=%27%232D5F4A%27 width=%2780%27 height=%2760%27/%3E%3Ctext x=%2740%27 y=%2735%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2714%27 text-anchor=%27middle%27%3EProg%3C/text%3E%3C/svg%3E'">
                       </div>
                     </td>
                     <td>
@@ -1437,9 +1435,10 @@
               <template x-for="programa in programas" :key="programa.id">
                 <div class="mobile-card">
                   <div class="mobile-card-image">
-                    <img :src="programa.imagem || '../assets/images/default-programa.jpg'" 
-                         :alt="programa.titulo"
-                         onerror="this.src='../assets/images/default-programa.jpg'">
+                    <img 
+                      :src="programa.imagem_url || 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%27160%27 viewBox=%270 0 200 160%27%3E%3Crect fill=%27%232D5F4A%27 width=%27200%27 height=%27160%27/%3E%3Ctext x=%27100%27 y=%2790%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2736%27 text-anchor=%27middle%27%3EProg%3C/text%3E%3C/svg%3E'" 
+                      :alt="programa.titulo"
+                      @error="$event.target.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%27160%27 viewBox=%270 0 200 160%27%3E%3Crect fill=%27%232D5F4A%27 width=%27200%27 height=%27160%27/%3E%3Ctext x=%27100%27 y=%2790%27 fill=%27white%27 font-family=%27Arial%27 font-size=%2736%27 text-anchor=%27middle%27%3EProg%3C/text%3E%3C/svg%3E'">
                     <span class="badge" :class="programa.ativo ? 'badge-success' : 'badge-danger'" 
                           x-text="programa.ativo ? 'Ativo' : 'Inativo'"></span>
                   </div>

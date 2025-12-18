@@ -1,0 +1,198 @@
+/* ============================================
+   CONTEUDO.CSS - Páginas de Conteúdo Estático
+   Para: confissao-fe.html, termos-privacidade.html
+   ============================================ */
+
+/* ==================== HEADER ==================== */
+.conteudo-header,
+.confissao-header {
+  background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde-medio) 100%);
+  color: var(--branco);
+  padding: var(--espacamento-xxl) 0 var(--espacamento-xl);
+  margin-top: 70px;
+  text-align: center;
+}
+
+.conteudo-header h1,
+.confissao-header h1 {
+  color: var(--branco);
+  margin: 0 0 var(--espacamento-sm);
+  font-size: 2.5rem;
+}
+
+.conteudo-header p,
+.confissao-header p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ==================== CONTEÚDO ==================== */
+.conteudo-principal,
+.confissao-conteudo {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--espacamento-xl) var(--espacamento-md);
+}
+
+/* ==================== CAPÍTULO / SEÇÃO ==================== */
+.capitulo,
+.conteudo-secao {
+  background: var(--branco);
+  border-radius: var(--borda-arredondada);
+  padding: var(--espacamento-lg);
+  margin-bottom: var(--espacamento-lg);
+  box-shadow: var(--sombra-suave);
+}
+
+.capitulo h2,
+.conteudo-secao h2 {
+  color: var(--verde-escuro);
+  border-bottom: 3px solid var(--dourado);
+  padding-bottom: var(--espacamento-sm);
+  margin-bottom: var(--espacamento-md);
+}
+
+.capitulo h3,
+.conteudo-secao h3 {
+  color: var(--verde-medio);
+  margin: var(--espacamento-md) 0 var(--espacamento-sm);
+}
+
+/* ==================== PARÁGRAFO ==================== */
+.paragrafo {
+  margin-bottom: var(--espacamento-md);
+  padding-left: var(--espacamento-md);
+  border-left: 3px solid var(--cinza-leve);
+}
+
+.paragrafo-numero {
+  font-weight: var(--peso-bold);
+  color: var(--verde-medio);
+  margin-right: var(--espacamento-xs);
+}
+
+/* ==================== REFERÊNCIA BÍBLICA ==================== */
+.referencia-biblica {
+  color: var(--cinza-medio);
+  font-size: 0.875rem;
+  font-style: italic;
+  margin-top: var(--espacamento-xs);
+}
+
+/* ==================== LISTA ==================== */
+.conteudo-lista {
+  list-style: none;
+  padding: 0;
+  margin: var(--espacamento-md) 0;
+}
+
+.conteudo-lista li {
+  position: relative;
+  padding-left: var(--espacamento-lg);
+  margin-bottom: var(--espacamento-sm);
+  line-height: 1.7;
+}
+
+.conteudo-lista li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--verde-medio);
+  font-weight: bold;
+}
+
+/* ==================== DESTAQUE ==================== */
+.conteudo-destaque {
+  background: linear-gradient(135deg, rgba(26, 71, 49, 0.05), rgba(45, 106, 79, 0.08));
+  border-left: 4px solid var(--verde-medio);
+  padding: var(--espacamento-md);
+  border-radius: 0 var(--borda-arredondada-sm) var(--borda-arredondada-sm) 0;
+  margin: var(--espacamento-md) 0;
+}
+
+.conteudo-destaque p {
+  margin: 0;
+  color: var(--verde-escuro);
+  font-weight: 500;
+}
+
+/* ==================== SUMÁRIO ==================== */
+.sumario {
+  background: var(--cinza-muito-claro);
+  border-radius: var(--borda-arredondada);
+  padding: var(--espacamento-lg);
+  margin-bottom: var(--espacamento-xl);
+}
+
+.sumario h3 {
+  color: var(--verde-escuro);
+  margin-bottom: var(--espacamento-md);
+}
+
+.sumario ol {
+  padding-left: var(--espacamento-lg);
+}
+
+.sumario li {
+  margin-bottom: var(--espacamento-xs);
+}
+
+.sumario a {
+  color: var(--verde-medio);
+  text-decoration: none;
+  transition: var(--transicao-rapida);
+}
+
+.sumario a:hover {
+  color: var(--verde-escuro);
+  text-decoration: underline;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .conteudo-header h1,
+  .confissao-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .conteudo-header,
+  .confissao-header {
+    padding: var(--espacamento-xl) var(--espacamento-md);
+    margin-top: 60px;
+  }
+  
+  .conteudo-principal,
+  .confissao-conteudo {
+    padding: var(--espacamento-lg) var(--espacamento-md);
+  }
+  
+  .capitulo,
+  .conteudo-secao {
+    padding: var(--espacamento-md);
+  }
+}
+
+/* ==================== NAVBAR SIMPLES ==================== */
+.navbar-simples {
+  background: var(--branco);
+  box-shadow: var(--sombra-suave);
+  padding: var(--espacamento-sm) var(--espacamento-md);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navbar-simples .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Fim conteudo.css */
+

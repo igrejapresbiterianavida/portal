@@ -222,7 +222,7 @@
       </div><!-- navbar-auth !-->
       
       <!-- 2. Sistema de Notificações (apenas para usuários logados) -->
-      <div class="navbar-notificacoes" x-data="sistemaNotificacoes()" x-show="usuarioLogado" x-cloak style="display: none !important;" :style="usuarioLogado ? 'display: flex !important;' : 'display: none !important;'">
+      <div class="navbar-notificacoes" x-data="sistemaNotificacoes()" :class="{ 'usuario-logado': usuarioLogado }" x-cloak>
         <button 
           class="notificacao-btn" 
           @click="dropdownAberto = !dropdownAberto"

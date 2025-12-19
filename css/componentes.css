@@ -408,6 +408,13 @@
   margin-bottom: var(--espacamento-xs);
 }
 
+/* Reduzir fonte dos accordions no mobile */
+@media (max-width: 768px) {
+  .card-titulo {
+    font-size: 1rem;
+  }
+}
+
 .card-texto {
   color: var(--cinza-escuro);
   margin-bottom: var(--espacamento-sm);

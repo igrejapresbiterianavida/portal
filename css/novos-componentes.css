@@ -744,12 +744,14 @@
   color: #1a1a1a !important;
   margin: 0 0 6px !important;
   line-height: 1.4 !important;
-  display: -webkit-box !important;
+  display: block !important;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   visibility: visible !important;
   opacity: 1 !important;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .video-descricao {
@@ -826,16 +828,18 @@
   
   /* Título lista mobile - visível e legível */
   .video-titulo-lista {
-    font-size: 0.8rem !important;
+    font-size: 0.85rem !important;
     font-weight: 600 !important;
     color: #1a1a1a !important;
-    margin-bottom: 4px;
+    margin-bottom: 4px !important;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    display: -webkit-box !important;
-    line-height: 1.3;
+    display: block !important;
+    line-height: 1.3 !important;
     word-break: break-word;
     overflow: hidden;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
   .video-descricao {
@@ -3643,21 +3647,24 @@
 .botao-turma.botao-primario {
   background: linear-gradient(135deg, #10b981, #059669);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  color: var(--branco) !important;
 }
 
 .botao-turma.botao-primario:hover:not(:disabled) {
   box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+  color: var(--branco) !important;
 }
 
 .botao-turma.botao-secundario {
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  color: #475569;
-  border-color: #e2e8f0;
+  background: linear-gradient(135deg, var(--verde-medio), var(--verde-escuro));
+  color: var(--branco) !important;
+  border-color: transparent;
 }
 
 .botao-turma.botao-secundario:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-  box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2);
+  background: linear-gradient(135deg, var(--verde-escuro), var(--verde-medio));
+  box-shadow: 0 4px 12px rgba(26, 71, 49, 0.3);
+  color: var(--branco) !important;
 }
 
 .botao-turma.botao-desabilitado,
@@ -3758,6 +3765,12 @@
 @media (max-width: 768px) {
   .turmas-grid {
     grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  
+  .turma-card {
+    max-width: 100%;
+    width: 100%;
   }
   
   .turma-card-header {

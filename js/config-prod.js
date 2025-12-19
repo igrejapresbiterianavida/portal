@@ -22,3 +22,4 @@ window.SUPABASE_CONFIG.CANAL_ID = 'UCTOsnSoOX31RB6Dr_kh9sHw'; // @ipbvida
 console.log('✅ Configurações de produção carregadas');
 
 
+

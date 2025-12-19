@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <meta name="description" content="Igreja Presbiteriana Vida - Uma comunidade de fé, esperança e amor em Campinas-SP">
   <meta name="keywords" content="igreja, presbiteriana, campinas, culto, fé, cristo">
   <meta name="theme-color" content="#1A4731">
@@ -30,6 +30,49 @@
   <!-- CSS -->
   <link rel="stylesheet" href="css/globais.css">
   <link rel="stylesheet" href="css/site.css">
+  
+  <!-- Estilos específicos para dispositivos móveis físicos -->
+  <style>
+    /* Garantir centralização dos cards de catecúmenos em dispositivos móveis */
+    @media (max-width: 1024px) {
+      .catecumenos-sistema .turmas-grid {
+        grid-template-columns: 1fr !important;
+        justify-items: center !important;
+        justify-content: center !important;
+      }
+      
+      .catecumenos-sistema .turma-card {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+      }
+      
+      .catecumenos-sistema .botao-turma,
+      .catecumenos-sistema .botao-turma.botao-primario,
+      .catecumenos-sistema .botao-turma.botao-secundario {
+        color: #ffffff !important;
+      }
+    }
+    
+    /* Garantir fonte reduzida dos accordions */
+    @media (max-width: 1024px) {
+      #cremos .card-titulo {
+        font-size: 1rem !important;
+      }
+    }
+    
+    /* Garantir título visível nos vídeos modo lista */
+    @media (max-width: 1024px) {
+      .videos-grid.modo-lista .video-card-lista .video-detalhes .video-titulo-lista {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.85rem !important;
+        color: #1a1a1a !important;
+      }
+    }
+  </style>
+  
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
   

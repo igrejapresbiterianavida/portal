@@ -876,6 +876,32 @@ input[type="radio"] {
   color: var(--branco) !important;
 }
 
+/* Media query para garantir centralização e estilos no mobile */
+@media (max-width: 1024px) {
+  .turmas-grid {
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    max-width: 100% !important;
+  }
+  
+  .turma-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+  
+  .botao-turma,
+  .botao-acessar-sala,
+  .botao-whatsapp-turma {
+    color: var(--branco) !important;
+  }
+  
+  .botao-turma.botao-primario,
+  .botao-turma.botao-secundario {
+    color: var(--branco) !important;
+  }
+}
+
 /* ==================== REDES SOCIAIS FOOTER ==================== */
 
 .footer-redes-sociais {

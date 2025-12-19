@@ -409,9 +409,30 @@
 }
 
 /* Reduzir fonte dos accordions no mobile */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .card-titulo {
-    font-size: 1rem;
+    font-size: 1rem !important;
+  }
+  
+  /* Garantir que os textos dos botões sejam brancos nos cards de catecúmenos */
+  .botao-turma {
+    color: var(--branco) !important;
+  }
+  
+  .botao-turma.botao-primario,
+  .botao-turma.botao-secundario {
+    color: var(--branco) !important;
+  }
+}
+
+/* Media query específica para dispositivos móveis físicos - Accordions */
+@media (max-width: 1024px) and (max-device-width: 1024px) {
+  #cremos .card-titulo {
+    font-size: 1rem !important;
+  }
+  
+  #cremos .card-texto {
+    font-size: 0.9rem !important;
   }
 }
 

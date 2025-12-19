@@ -840,6 +840,20 @@
     overflow: hidden;
     visibility: visible !important;
     opacity: 1 !important;
+    height: auto !important;
+    min-height: 2.6em !important;
+  }
+  
+  .video-detalhes {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+  
+  .video-detalhes .video-titulo-lista {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
   .video-descricao {
@@ -856,6 +870,22 @@
   .video-meta-lista i {
     font-size: 0.75rem;
     color: #cc0000;
+  }
+}
+
+/* Media query específica para dispositivos móveis físicos - Vídeos */
+@media (max-width: 1024px) and (max-device-width: 1024px) {
+  .videos-grid.modo-lista .video-card-lista .video-detalhes .video-titulo-lista {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    color: #1a1a1a !important;
+    margin-bottom: 4px !important;
+    line-height: 1.3 !important;
+    height: auto !important;
+    min-height: 2.6em !important;
   }
 }
 
@@ -3761,26 +3791,66 @@
   font-size: 1.1rem;
 }
 
-/* Responsivo para Cards de Turmas */
-@media (max-width: 768px) {
+/* Responsivo para Cards de Turmas - Desktop e Tablet */
+@media (max-width: 1024px) {
   .turmas-grid {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    max-width: 100% !important;
   }
   
   .turma-card {
-    max-width: 100%;
-    width: 100%;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto !important;
   }
   
   .turma-card-header {
-    flex-direction: column;
-    gap: var(--espacamento-sm);
-    text-align: center;
+    flex-direction: column !important;
+    gap: var(--espacamento-sm) !important;
+    text-align: center !important;
   }
   
   .turma-vagas {
-    text-align: center;
+    text-align: center !important;
+  }
+}
+
+/* Media query específica para dispositivos móveis físicos */
+@media (max-width: 1024px) and (max-device-width: 1024px) {
+  .catecumenos-sistema .turmas-grid {
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    justify-content: center !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  
+  .catecumenos-sistema .turma-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .catecumenos-sistema .turma-card-header {
+    flex-direction: column !important;
+    gap: var(--espacamento-sm) !important;
+    text-align: center !important;
+  }
+  
+  .catecumenos-sistema .turma-vagas {
+    text-align: center !important;
+  }
+  
+  .catecumenos-sistema .botao-turma {
+    color: var(--branco) !important;
+  }
+  
+  .catecumenos-sistema .botao-turma.botao-primario,
+  .catecumenos-sistema .botao-turma.botao-secundario {
+    color: var(--branco) !important;
   }
 }
 

@@ -405,13 +405,28 @@
   font-size: 1.25rem;
   font-weight: var(--peso-bold);
   color: var(--verde-escuro);
-  margin-bottom: var(--espacamento-xs);
+  margin-bottom: 0;
+  margin-top: 0;
 }
 
 /* Reduzir fonte dos accordions no mobile */
 @media (max-width: 1024px) {
   .card-titulo {
     font-size: 1rem !important;
+  }
+  
+  /* Reduzir espaçamento dos accordions no mobile */
+  #cremos .card-corpo {
+    padding: var(--espacamento-sm) var(--espacamento-md) !important;
+  }
+  
+  #cremos .card-titulo {
+    margin-bottom: 0 !important;
+    padding-bottom: 0.5rem !important;
+  }
+  
+  #cremos .card-texto:first-of-type {
+    margin-top: var(--espacamento-xs) !important;
   }
   
   /* Garantir que os textos dos botões sejam brancos nos cards de catecúmenos */
@@ -439,7 +454,22 @@
 .card-texto {
   color: var(--cinza-escuro);
   margin-bottom: var(--espacamento-sm);
+  margin-top: var(--espacamento-sm);
   flex: 1;
+}
+
+/* Ajustar espaçamento dos accordions */
+#cremos .card-corpo {
+  padding: var(--espacamento-md);
+}
+
+#cremos .card-titulo {
+  margin-bottom: 0;
+  padding-bottom: var(--espacamento-xs);
+}
+
+#cremos .card-texto:first-of-type {
+  margin-top: var(--espacamento-sm);
 }
 
 .card-footer {
